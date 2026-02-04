@@ -5,7 +5,7 @@
 
 import os
 from datetime import timezone, datetime
-from unittest.mock import patch
+from unittest.mock import patch, mock_open
 from uuid import uuid4
 
 import httpx
@@ -143,80 +143,37 @@ def test_get_logs_summary(mock_exists, mock_active_logging_format):
 
 
 @patch('wazuh.core.manager.exists', return_value=True)
-@patch('wazuh.core.manager.WazuhSocket')
-def test_validate_ossec_conf(mock_wazuhsocket, mock_exists):
-    with patch('socket.socket') as sock:
-        # Mock sock response
-        json_response = json.dumps({'error': 0, 'message': ""}).encode()
-        mock_wazuhsocket.return_value.receive.return_value = json_response
-        result = validate_ossec_conf()
+@patch('builtins.open', mock_open(read_data='<ossec_config></ossec_config>'))
+@patch('wazuh.core.utils.validate_wazuh_xml')
+def test_validate_ossec_conf(mock_validate_xml, mock_exists):
+    # Test successful validation
+    mock_validate_xml.return_value = None  # validate_wazuh_xml doesn't return anything on success
+    result = validate_ossec_conf()
 
-        assert result == {'status': 'OK'}
-        mock_exists.assert_called_with(os.path.join(common.WAZUH_PATH, 'queue', 'sockets', 'com'))
+    assert result == {'status': 'OK'}
+    mock_exists.assert_called_with(common.OSSEC_CONF)
+    mock_validate_xml.assert_called_once()
 
 
 @patch("wazuh.core.manager.exists", return_value=True)
+@patch('builtins.open', mock_open(read_data='<ossec_config></ossec_config>'))
 def test_validation_ko(mock_exists):
-    # Socket creation raise socket.error
-    with patch('socket.socket', side_effect=socket.error):
-        with pytest.raises(WazuhInternalError, match='.* 1013 .*'):
+    # Test when ossec.conf file doesn't exist
+    with patch("wazuh.core.manager.exists", return_value=False):
+        with pytest.raises(WazuhInternalError, match='.* 1020 .*'):
             validate_ossec_conf()
 
-    with patch('socket.socket.bind'):
-        # Socket connection raise socket.error
-        with patch('socket.socket.connect', side_effect=socket.error):
-            with pytest.raises(WazuhInternalError, match='.* 1013 .*'):
-                validate_ossec_conf()
+    # Test when XML validation fails
+    with patch('wazuh.core.utils.validate_wazuh_xml', side_effect=WazuhError(1113)):
+        with pytest.raises(WazuhError, match='.* 1113 .*'):
+            validate_ossec_conf()
 
-        # execq_socket_path not exists
-        with patch("wazuh.core.manager.exists", return_value=False):
-            with pytest.raises(WazuhInternalError, match='.* 1901 .*'):
-                validate_ossec_conf()
-
-        with patch('socket.socket.connect'):
-            # Socket send raise socket.error
-            with patch('wazuh.core.manager.WazuhSocket.send', side_effect=socket.error):
-                with pytest.raises(WazuhInternalError, match='.* 1014 .*'):
-                    validate_ossec_conf()
-
-            with patch('socket.socket.send'):
-                # Socket recv raise socket.error
-                with patch('wazuh.core.manager.WazuhSocket.receive', side_effect=socket.timeout):
-                    with pytest.raises(WazuhInternalError, match='.* 1014 .*'):
-                        validate_ossec_conf()
-
-                # parse_wcom_output raise KeyError
-                with patch('wazuh.core.manager.WazuhSocket'):
-                    with patch('wazuh.core.manager.parse_wcom_output', side_effect=KeyError):
-                        with pytest.raises(WazuhInternalError, match='.* 1904 .*'):
-                            validate_ossec_conf()
+    # Test when validation raises generic error
+    with patch('wazuh.core.utils.validate_wazuh_xml', side_effect=Exception("Test error")):
+        with pytest.raises(WazuhError, match='.* 1908 .*'):
+            validate_ossec_conf()
 
 
-@pytest.mark.parametrize('error_flag, error_msg', [
-    (0, ""),
-    (1, "2019/02/27 11:30:07 wazuh-clusterd: ERROR: [Cluster] [Main] Error 3004 - Error in cluster configuration: "
-        "Unspecified key"),
-    (1, "2019/02/27 11:30:24 wazuh-authd: ERROR: (1230): Invalid element in the configuration: "
-        "'use_source_i'.\n2019/02/27 11:30:24 wazuh-authd: ERROR: (1202): Configuration error at "
-        "'/var/ossec/etc/ossec.conf'.")
-])
-def test_parse_wcom_output(error_flag, error_msg):
-    """Test parse_wcom_output function works and returns expected message.
-
-    Parameters
-    ----------
-    error_flag : int
-        Indicate if there is an error found.
-    error_msg
-        Error message to be sent.
-    """
-    json_response = json.dumps({'error': error_flag, 'message': error_msg}).encode()
-    if not error_flag:
-        result = parse_wcom_output(json_response)
-        assert result['status'] == 'OK'
-    else:
-        with pytest.raises(WazuhException, match=f'.* 1908 .*'):
-            parse_wcom_output(json_response)
 
 
 @patch('wazuh.core.manager.configuration.api_conf', new={'max_upload_size': 0})

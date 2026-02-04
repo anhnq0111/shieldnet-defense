@@ -22,7 +22,7 @@ from wazuh import WazuhError, WazuhException, WazuhInternalError
 from wazuh.core import common
 from wazuh.core.cluster.utils import get_manager_status
 from wazuh.core.configuration import get_active_configuration, get_cti_url
-from wazuh.core.utils import get_utc_now, get_utc_strptime, tail
+from wazuh.core.utils import get_utc_now, get_utc_strptime, tail, validate_wazuh_xml
 from wazuh.core.wazuh_socket import WazuhSocket
 
 
@@ -174,87 +174,44 @@ def get_logs_summary(limit: int = 2000) -> dict:
 def validate_ossec_conf() -> str:
     """Check if Wazuh configuration is OK.
 
+    Validates the ossec.conf file by checking XML syntax and business rules.
+    This replaces the previous socket-based validation that required execd,
+    which has been removed from the manager as part of agent 000 elimination.
+
     Raises
     ------
-    WazuhInternalError(1014)
-        If there is a socket communication error.
-    WazuhInternalError(1013)
-        If it is unable to connect to socket.
-    WazuhInternalError(1901)
-        If 'wcom' socket cannot be created.
-    WazuhInternalError(1904)
-        If there is bad data received from 'wcom'.
-
-    Returns
-    -------
-    str
-        Status of the configuration.
-    """
-
-    # Socket path
-    wcom_socket_path = common.WCOM_SOCKET
-    # Message for checking Wazuh configuration
-    wcom_msg = common.CHECK_CONFIG_COMMAND
-
-    # Connect to wcom socket
-    if exists(wcom_socket_path):
-        try:
-            wcom_socket = WazuhSocket(wcom_socket_path)
-        except WazuhException as e:
-            extra_msg = f'Socket: WAZUH_PATH/queue/sockets/com. Error {e.message}'
-            raise WazuhInternalError(1013, extra_message=extra_msg)
-    else:
-        raise WazuhInternalError(1901)
-
-    # Send msg to wcom socket
-    try:
-        wcom_socket.send(wcom_msg.encode())
-
-        buffer = bytearray()
-        datagram = wcom_socket.receive()
-        buffer.extend(datagram)
-
-    except (socket.error, socket.timeout) as e:
-        raise WazuhInternalError(1014, extra_message=str(e))
-    finally:
-        wcom_socket.close()
-
-    try:
-        response = parse_wcom_output(buffer.decode('utf-8').rstrip('\0'))
-    except (KeyError, json.decoder.JSONDecodeError) as e:
-        raise WazuhInternalError(1904, extra_message=str(e))
-
-    return response
-
-
-def parse_wcom_output(output: str) -> Dict:
-    """Parse output from WCOM socket to fetch log message and remove log date, log daemon, log level, etc.
-
-    Parameters
-    ----------
-    output : str
-        Raw output from WCOM socket (handled by modulesd).
+    WazuhInternalError(1020)
+        If ossec.conf file doesn't exist or can't be read.
+    WazuhError(1113)
+        If XML syntax is invalid.
+    WazuhError(1908)
+        If configuration validation fails.
 
     Returns
     -------
     dict
-        Cleaned log message in a dictionary structure.
+        Status dictionary with 'status': 'OK' if configuration is valid.
     """
-    json_output = json.loads(output)
-    error_flag = json_output['error']
-    if error_flag != 0:
-        errors = []
-        log_lines = json_output['message'].splitlines(keepends=False)
-        for line in log_lines:
-            match = _re_logtest.match(line)
-            if match:
-                errors.append(match.group(1))
-        errors = list(OrderedDict.fromkeys(errors))
-        raise WazuhError(1908, extra_message=', '.join(errors))
-    else:
-        response = {'status': 'OK'}
+    try:
+        # Read current configuration
+        if not exists(common.OSSEC_CONF):
+            raise WazuhInternalError(1020)
 
-    return response
+        with open(common.OSSEC_CONF, 'r') as f:
+            conf_content = f.read()
+
+        # Validate XML structure and business rules
+        validate_wazuh_xml(conf_content)
+
+        # If we get here, validation passed
+        return {'status': 'OK'}
+
+    except WazuhError:
+        # Re-raise WazuhErrors (includes validation errors from validate_wazuh_xml)
+        raise
+    except Exception as e:
+        # Wrap unexpected errors
+        raise WazuhError(1908, extra_message=str(e))
 
 
 def get_api_conf() -> dict:

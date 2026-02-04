@@ -226,7 +226,9 @@ def test_restart_ko_socket(mock_exists, mock_fcntl, mock_open):
         "'/var/ossec/etc/ossec.conf'.")
 ])
 @patch("wazuh.core.manager.exists", return_value=True)
-def test_validation(mock_exists, error_flag, error_msg):
+@patch('builtins.open', mock_open(read_data='<ossec_config></ossec_config>'))
+@patch('wazuh.core.utils.validate_wazuh_xml')
+def test_validation(mock_validate_xml, mock_open_file, mock_exists, error_flag, error_msg):
     """Test validation() method works as expected
 
     Tests configuration validation function with multiple scenarios:
@@ -237,31 +239,35 @@ def test_validation(mock_exists, error_flag, error_msg):
     Parameters
     ----------
     error_flag : int
-        Error flag to be mocked in the socket response.
+        Error flag (0 = success, 1 = error).
     error_msg : str
-        Error message to be mocked in the socket response.
+        Error message if validation fails.
     """
-    with patch('wazuh.core.manager.WazuhSocket') as sock:
-        # Mock sock response
-        json_response = json.dumps({'error': error_flag, 'message': error_msg}).encode()
-        sock.return_value.receive.return_value = json_response
-        result = validation()
+    if error_flag == 0:
+        # Success case - XML validation passes
+        mock_validate_xml.return_value = None
+    else:
+        # Error case - XML validation fails
+        mock_validate_xml.side_effect = WazuhError(1908, extra_message=error_msg)
 
-        # Assert if error was returned
-        assert isinstance(result, AffectedItemsWazuhResult), 'No expected result type'
-        assert result.render()['data']['total_failed_items'] == error_flag
+    result = validation()
+
+    # Assert if error was returned
+    assert isinstance(result, AffectedItemsWazuhResult), 'No expected result type'
+    assert result.render()['data']['total_failed_items'] == error_flag
 
 
 @pytest.mark.parametrize('exception', [
-    WazuhInternalError(1013),
-    WazuhError(1013)
+    WazuhInternalError(1020),  # File not found
+    WazuhError(1113),  # XML validation error
+    WazuhError(1908)  # General validation error
 ])
 @patch('wazuh.manager.validate_ossec_conf')
 def test_validation_ko(mock_validate, exception):
     mock_validate.side_effect = exception
 
     if isinstance(exception, WazuhInternalError):
-        with pytest.raises(WazuhInternalError, match='.* 1013 .*'):
+        with pytest.raises(WazuhInternalError, match='.* 1020 .*'):
             validation()
     else:
         result = validation()
@@ -321,7 +327,7 @@ def test_get_basic_info(mock_uid, mock_gid, mock_open_file, mock_exists, mock_ch
 
 @patch('wazuh.manager.validate_ossec_conf', return_value={'status': 'OK'})
 @patch('wazuh.manager.write_ossec_conf')
-@patch('wazuh.manager.validate_wazuh_xml')
+@patch('wazuh.core.utils.validate_wazuh_xml')
 @patch('wazuh.manager.full_copy')
 @patch('wazuh.manager.exists', return_value=True)
 @patch('wazuh.manager.remove')
@@ -342,7 +348,7 @@ def test_update_ossec_conf(move_mock, remove_mock, exists_mock, full_copy_mock, 
 ])
 @patch('wazuh.manager.validate_ossec_conf')
 @patch('wazuh.manager.write_ossec_conf')
-@patch('wazuh.manager.validate_wazuh_xml')
+@patch('wazuh.core.utils.validate_wazuh_xml')
 @patch('wazuh.manager.full_copy')
 @patch('wazuh.manager.exists', return_value=True)
 @patch('wazuh.manager.remove')
