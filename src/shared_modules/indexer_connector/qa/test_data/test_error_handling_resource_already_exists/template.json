@@ -16,7 +16,7 @@
         "number_of_shards": "1",
         "query.default_field": [
           "base.tags",
-          "agent.id",
+          "wazuh.agent.id",
           "host.os.family",
           "host.os.full.text",
           "host.os.version",
