@@ -394,10 +394,11 @@ async def test_async_decompress_files(decompress_files_mock):
 @patch('zlib.decompress')
 @patch('os.makedirs')
 @patch('os.path.exists', side_effect=[False, True, True])
+@patch('wazuh.core.cluster.cluster.is_file_allowed', return_value=True)
 @patch('wazuh.core.cluster.cluster.remove')
 @patch('wazuh.core.cluster.cluster.mkdir_with_mode')
 @patch('json.loads', return_value="some string with files")
-async def test_decompress_files_ok(json_loads_mock, mkdir_with_mode_mock, remove_mock, os_path_exists_mock,
+async def test_decompress_files_ok(json_loads_mock, mkdir_with_mode_mock, remove_mock, is_valid_mock, os_path_exists_mock,
                                    mock_makedirs, zlib_mock):
     """Check if the decompressing function is working properly."""
     zip_path = '/foo/bar/'
@@ -422,8 +423,9 @@ async def test_decompress_files_ok(json_loads_mock, mkdir_with_mode_mock, remove
 @pytest.mark.asyncio
 @patch('shutil.rmtree')
 @patch('zlib.decompress', return_value=Exception)
+@patch('wazuh.core.cluster.cluster.is_file_allowed', return_value=True)
 @patch('wazuh.core.cluster.cluster.mkdir_with_mode')
-async def test_decompress_files_ko(mkdir_with_mode_mock, zlib_mock, rmtree_mock):
+async def test_decompress_files_ko(mkdir_with_mode_mock, is_valid_mock, zlib_mock, rmtree_mock):
     """Check if the decompressing function is raising the necessary exceptions."""
 
     # Raising the expected Exception
@@ -444,6 +446,36 @@ async def test_decompress_files_ko(mkdir_with_mode_mock, zlib_mock, rmtree_mock)
                     with patch('wazuh.core.cluster.cluster.remove'):
                         mock_makedirs.errno = 13  # Errno 13: Permission denied
                         cluster.decompress_files(zip_dir)
+
+@pytest.mark.asyncio
+@patch('zlib.decompress')
+@patch('os.makedirs')
+@patch('os.path.exists', side_effect=[False, True, True])
+@patch('wazuh.core.cluster.cluster.is_file_allowed', side_effect=[True, False])
+@patch('wazuh.core.cluster.cluster.remove')
+@patch('wazuh.core.cluster.cluster.mkdir_with_mode')
+@patch('json.loads', return_value="some string with files")
+async def test_decompress_files_ko_not_allowed(json_loads_mock, mkdir_with_mode_mock, remove_mock, is_valid_mock, os_path_exists_mock,
+                                   mock_makedirs, zlib_mock):
+    """Check if the decompressing function is working properly."""
+    zip_path = '/foo/bar/'
+    compress_data = f'path{cluster.PATH_SEP}content{cluster.FILE_SEP}path2{cluster.PATH_SEP}content2'.encode()
+
+    with patch('builtins.open', new_callable=mock_open, read_data=compress_data) as open_mock:
+        handlers = [open_mock.return_value]*3
+        open_mock.side_effect = handlers
+
+        ko_files, zip_dir = cluster.decompress_files(compress_path=zip_path)
+        assert ko_files == "some string with files"
+        assert zip_dir == zip_path + 'dir'
+        zlib_mock.assert_has_calls([call(b'content')])
+        mock_makedirs.assert_called_once_with(zip_path + 'dir')
+        json_loads_mock.assert_called_once()
+        is_valid_mock.assert_has_calls([call('path'), call('path2')])
+        mkdir_with_mode_mock.assert_called_once_with(zip_dir)
+        remove_mock.assert_called_once_with(zip_path)
+        assert open_mock.call_args_list == [call('/foo/bar/', 'rb'), call('/foo/bar/dir/path', 'wb'),
+                                            call('/foo/bar/dir/files_metadata.json')]
 
 
 @patch('wazuh.core.cluster.cluster.get_cluster_items')

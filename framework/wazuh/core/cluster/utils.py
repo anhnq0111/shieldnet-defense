@@ -382,6 +382,66 @@ def get_cluster_items():
 
 
 @lru_cache()
+def is_file_allowed(file_path: str) -> bool:
+    """Check if a file is allowed in cluster operations based on cluster.json specifications.
+
+    Parameters
+    ----------
+    file_path : str
+        Path to the file to be checked. Absolute or relative to Wazuh installation dir.
+    
+    Returns
+    -------
+    bool
+        True if the file is allowed, False otherwise.
+    """
+    cluster_items = get_cluster_items()
+    specs = cluster_items.get('files', {})
+    
+    # Early exclusion based strictly on input string
+    if any(file_path.endswith(ext) for ext in specs.get("excluded_extensions", [])):
+        return False
+
+    file_name = os.path.basename(file_path)
+    if file_name in specs.get("excluded_files", []):
+        return False
+
+    # Path normalization and security check
+    full_path = os.path.realpath(
+        os.path.join(common.WAZUH_PATH, file_path) if not os.path.isabs(file_path) else file_path
+    )
+
+    if not full_path.startswith(common.WAZUH_PATH):
+        return False
+
+    # Get relative path from Wazuh installation dir
+    rel_path = os.path.relpath(full_path, common.WAZUH_PATH)
+
+    # Filter and sort directory keys by specificity
+    allowed_dirs = sorted(
+        (k for k in specs if k.endswith('/')), 
+        key=len, 
+        reverse=True
+    )
+    
+    for folder in allowed_dirs:
+        if rel_path.startswith(folder):
+            folder_cfg = specs[folder]
+
+            sub_path = rel_path.removeprefix(folder)
+            if not folder_cfg.get("recursive", False) and "/" in sub_path:
+                continue
+                
+            allowed = folder_cfg.get("files", [])
+            if "all" in allowed or file_name in allowed:
+                return True
+
+            return False
+
+    return False
+
+
+@lru_cache()
 def read_config(config_file=common.OSSEC_CONF):
     """Get the cluster configuration.
 

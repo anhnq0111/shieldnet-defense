@@ -30,6 +30,7 @@ from wazuh.core.cluster.utils import (
     IMBALANCE_TOLERANCE,
     REMOVE_DISCONNECTED_NODE_AFTER,
     get_cluster_items,
+    is_file_allowed,
     read_config,
 )
 from wazuh.core.InputValidator import InputValidator
@@ -497,6 +498,8 @@ def decompress_files(compress_path, ko_files_name="files_metadata.json"):
 
                 for file in files:
                     filepath, content = file.split(PATH_SEP.encode(), 1)
+                    if not is_file_allowed(filepath.decode()):
+                        continue
                     content = zlib.decompress(content)
                     full_path = os.path.join(decompress_dir, filepath.decode())
                     if not os.path.exists(os.path.dirname(full_path)):

@@ -9,6 +9,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+from wazuh.core import common
+
 with patch('wazuh.core.common.getgrnam'):
     with patch('wazuh.core.common.getpwnam'):
         with patch('wazuh.core.common.wazuh_uid'):
@@ -439,3 +441,54 @@ def test_raise_if_exc(result):
             utils.raise_if_exc(result)
     else:
         utils.raise_if_exc(result)
+
+mock_cluster_json = {
+    "files": {
+        "etc/": {
+            "permissions": "0o640",
+            "files": ["client.keys"],
+            "recursive": False
+        },
+        "etc/shared/": {
+            "files": ["all"],
+            "recursive": True
+        },
+        "var/multigroups/": {
+            "files": ["merged.mg"],
+            "recursive": True
+        },
+        "etc/rules/": {
+            "files": ["all"],
+            "recursive": True
+        },
+        "excluded_files": ["ar.conf", "ossec.conf"],
+        "excluded_extensions": ["~", ".tmp"]
+    }
+}
+
+@pytest.mark.parametrize("input_path, expected", [
+    ("etc/client.keys", True),
+    ("etc/rules/local.xml", True),
+    ("etc/rules/sub/deep.xml", True),
+    ("var/multigroups/merged.mg", True),
+    (f"{common.WAZUH_PATH}/etc/shared/test.txt", True),
+    ("etc/rules/test.tmp", False),
+    ("etc/shared/ar.conf", False),
+    ("temp_file~", False),
+    ("etc/forbidden.txt", False),
+    ("etc/sub/client.keys", False),
+    ("nonexistent/file.txt", False),
+    ("/etc/passwd", False),
+    ("etc/rules/../../etc/shadow", False),
+    (f"{common.WAZUH_PATH}/../home/user/.ssh/id_rsa", False),
+    ("", False),
+    (".", False),
+    ("var/multigroups/", False),
+])
+@patch('wazuh.core.cluster.cluster.get_cluster_items', return_value=mock_cluster_json)
+def test_is_file_allowed(mock_get, input_path, expected):
+   
+    utils.is_file_allowed.cache_clear()
+    
+    with patch('os.path.realpath', side_effect=lambda x: os.path.normpath(x)):
+        assert utils.is_file_allowed(input_path) == expected
