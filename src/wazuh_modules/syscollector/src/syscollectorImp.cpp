@@ -3374,7 +3374,7 @@ void Syscollector::runRecoveryProcess()
 
                 try
                 {
-                    items = m_spDBSync->getEveryElement(tableName);
+                    items = m_spDBSync->getEverySyncElement(tableName);
                 }
                 catch (const std::exception& ex)
                 {

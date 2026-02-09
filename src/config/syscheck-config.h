@@ -299,6 +299,8 @@ typedef struct fim_file_data {
 
     // Version for state tracking
     int version;
+
+    bool sync;
 } fim_file_data;
 
 typedef struct fim_registry_key {
@@ -454,6 +456,9 @@ typedef struct _config {
     int process_priority; // Adjusts the priority of the process (or threads in Windows)
 
     AgentSyncProtocolHandle *sync_handle;
+    int file_limit;
+    int registry_key_limit;
+    int registry_value_limit;
 } syscheck_config;
 
 

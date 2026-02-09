@@ -12,6 +12,7 @@
  * Copyright (C) 2003 Daniel B. Cid <daniel@underlinux.com.br>
  */
 
+#include "cJSON.h"
 #include "shared.h"
 #include "syscheck.h"
 #include "../rootcheck/rootcheck.h"
@@ -21,12 +22,14 @@
 #include "ebpf/include/ebpf_whodata.h"
 #include "agent_sync_protocol_c_interface.h"
 #include "schemaValidator_c.h"
+#include "agentd_query.h"
 
 // Global variables
 syscheck_config syscheck;
 int notify_scan = 0;
 int sys_debug_level;
 int audit_queue_full_reported = 0;
+int synced_docs = 0;
 
 #ifdef USE_MAGIC
 #include <magic.h>
@@ -80,6 +83,59 @@ void read_internal(int debug_level)
     return;
 }
 
+void free_pending_sync_item(void *data) {
+    if (data) {
+        pending_sync_item_t *item = (pending_sync_item_t *)data;
+        cJSON_Delete(item->json);
+        free(item);
+    }
+}
+
+void add_pending_sync_item(OSList *pending_items, const cJSON *json, int sync_value) {
+    if (pending_items == NULL || json == NULL) {
+        return;
+    }
+
+    pending_sync_item_t *item = (pending_sync_item_t *)malloc(sizeof(pending_sync_item_t));
+    if (item == NULL) {
+        merror("Failed to allocate memory for pending sync item");
+        return;
+    }
+
+    item->json = cJSON_Duplicate(json, true);
+    if (item->json == NULL) {
+        merror("Failed to duplicate item for pending sync item");
+        free(item);
+        return;
+    }
+
+    item->sync_value = sync_value;
+
+    OSList_AddData(pending_items, item);
+    const cJSON* path = cJSON_GetObjectItem(json, "path");
+    const cJSON* version = cJSON_GetObjectItem(json, "version");
+    mdebug2("Added item to pending sync list: %s (version: %d, sync: %d)", cJSON_GetStringValue(path), (int)cJSON_GetNumberValue(version), sync_value);
+}
+
+void process_pending_sync_updates(char* table_name, OSList *pending_items) {
+    if (pending_items == NULL) {
+        return;
+    }
+
+    int count = 0;
+    OSListNode *node_it;
+    OSList_foreach(node_it, pending_items) {
+        pending_sync_item_t *item = (pending_sync_item_t *)node_it->data;
+        if (item != NULL && item->json != NULL) {
+            const cJSON* path = cJSON_GetObjectItem(item->json, "path");
+            minfo("Setting sync=%d for path: %s", item->sync_value, cJSON_GetStringValue(path));
+            fim_db_set_sync_flag(table_name, item, item->sync_value);
+            count++;
+        }
+    }
+    minfo("Processed %d pending sync flag updates", count);
+}
+
 static int fim_startmq(const char* key, short type, short attempts) {
     return StartMQ(key, type, attempts);
 }
@@ -88,6 +144,58 @@ static int fim_send_binary_msg(int queue, const void* message, size_t message_le
     return SendBinaryMSG(queue, message, message_len, locmsg, loc);
 }
 
+/**
+ * @brief Fetch document sync limits from agentd.
+ *
+ * Queries agentd for FIM document sync limits and updates syscheck configuration.
+ * The limits control how many documents are synced for each table type.
+ *
+ * @return true if limits were successfully fetched and parsed, false otherwise.
+ */
+bool fetch_document_limits_from_agentd(){
+    char json_buffer[OS_MAXSTR];
+    w_query_agentd(SYSCHECK, "getdoclimits fim", json_buffer, sizeof(json_buffer));
+
+    cJSON* root = cJSON_Parse(json_buffer);
+    if (!root)
+    {
+        mdebug1("Failed to parse getdoclimits fim response");
+        return false;
+    }
+
+    cJSON* file = cJSON_GetObjectItem(root, "file");
+    if (file && cJSON_IsNumber(file))
+    {
+        const double value = cJSON_GetNumberValue(file);
+        if (value >= 0)
+        {
+            syscheck.file_limit = (int)value;
+        }
+    }
+
+    cJSON* registry_key = cJSON_GetObjectItem(root, "registry_key");
+    if (registry_key && cJSON_IsNumber(registry_key))
+    {
+        const double value = cJSON_GetNumberValue(registry_key);
+        if (value >= 0)
+        {
+            syscheck.registry_key_limit = (int)value;
+        }
+    }
+
+    cJSON* registry_value = cJSON_GetObjectItem(root, "registry_value");
+    if (registry_value && cJSON_IsNumber(registry_value))
+    {
+        const double value = cJSON_GetNumberValue(registry_value);
+        if (value >= 0)
+        {
+            syscheck.registry_value_limit = (int)value;
+        }
+    }
+
+    cJSON_Delete(root);
+    return true;
+}
 
 void fim_initialize() {
     // Create store data
@@ -109,6 +217,92 @@ void fim_initialize() {
         merror("Unable to initialize database. FIM module will be disabled.");
         syscheck.disabled = 1;
         return;
+    }
+
+    syscheck.file_limit = 0;
+    syscheck.registry_key_limit = 0;
+    syscheck.registry_value_limit = 0;
+#ifdef CLIENT
+        while (!fetch_document_limits_from_agentd())
+        {
+        // TODO: change log level
+        minfo("Trying to fetch limits from agentd...");
+#ifdef WIN32
+            Sleep(1000);
+#else
+            sleep(1);
+#endif // WIN32
+        }
+#endif // CLIENT
+    // Check for limit changes
+#ifdef WIN32
+    int table_count = 3;
+    char* table_names[3] = {FIMDB_FILE_TABLE_NAME, FIMDB_REGISTRY_KEY_TABLENAME, FIMDB_REGISTRY_VALUE_TABLENAME};
+#else
+    int table_count = 1;
+    char* table_names[1] = {FIMDB_FILE_TABLE_NAME};
+#endif
+    for (int i = 0; i < table_count; i++) {
+        char* table_name = table_names[i];
+
+        // Get the appropriate limit for this table
+        int limit = 0;
+        if (strcmp(table_name, FIMDB_FILE_TABLE_NAME) == 0) {
+            limit = syscheck.file_limit;
+        } else if (strcmp(table_name, FIMDB_REGISTRY_KEY_TABLENAME) == 0) {
+            limit = syscheck.registry_key_limit;
+        } else if (strcmp(table_name, FIMDB_REGISTRY_VALUE_TABLENAME) == 0) {
+            limit = syscheck.registry_value_limit;
+        }
+
+        synced_docs = fim_db_count_synced_docs(table_name);
+        if (synced_docs != 0) { // No need to check if no scans have been run
+            if (synced_docs < limit) { // Limit increased
+                int document_count = limit - synced_docs;
+                cJSON* docs_to_promote = fim_db_get_documents_to_promote(table_name, document_count);
+
+                if (docs_to_promote) {
+                    OSList* pending_sync_updates = OSList_Create();
+                    if (pending_sync_updates) {
+                        OSList_SetFreeDataPointer(pending_sync_updates, free_pending_sync_item);
+
+                        // Iterate through the cJSON array and add to pending list
+                        cJSON* item = NULL;
+                        cJSON_ArrayForEach(item, docs_to_promote) {
+                            add_pending_sync_item(pending_sync_updates, item, 1);
+                            synced_docs++;
+                        }
+
+                        // Process pending sync updates
+                        process_pending_sync_updates(table_name, pending_sync_updates);
+                        OSList_Destroy(pending_sync_updates);
+                    }
+                    cJSON_Delete(docs_to_promote);
+                }
+            } else if (synced_docs > limit) { // Limit decreased
+                int document_count = synced_docs - limit;
+                cJSON* docs_to_demote = fim_db_get_documents_to_demote(table_name, document_count);
+
+                if (docs_to_demote) {
+                    OSList* pending_sync_updates = OSList_Create();
+                    if (pending_sync_updates) {
+                        OSList_SetFreeDataPointer(pending_sync_updates, free_pending_sync_item);
+
+                        // Iterate through the cJSON array and add to pending list
+                        cJSON* item = NULL;
+                        cJSON_ArrayForEach(item, docs_to_demote) {
+                            add_pending_sync_item(pending_sync_updates, item, 0);
+                            synced_docs--;
+                        }
+
+                        // Process pending sync updates
+                        process_pending_sync_updates(table_name, pending_sync_updates);
+                        OSList_Destroy(pending_sync_updates);
+                    }
+                    cJSON_Delete(docs_to_demote);
+                }
+            }
+        }
     }
 
     w_rwlock_init(&syscheck.directories_lock, NULL);

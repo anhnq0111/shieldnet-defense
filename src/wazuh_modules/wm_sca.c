@@ -30,6 +30,7 @@
 
 #include "sca/include/sca.h"
 #include "yaml2json.h"
+#include "agentd_query.h"
 
 #define SCA_SYNC_PROTOCOL_DB_PATH "queue/sca/db/sca_sync.db"
 #define SCA_SYNC_RETRIES 3
@@ -111,110 +112,6 @@ sca_set_push_functions_func sca_set_push_functions_ptr = NULL;
 sca_set_sync_parameters_func sca_set_sync_parameters_ptr = NULL;
 sca_set_sync_limit_func sca_set_sync_limit_ptr = NULL;
 
-#ifdef WIN32
-extern size_t agcom_dispatch(char * command, char ** output);
-#endif
-
-static bool wm_sca_query_agentd(const char* command, char* output_buffer, size_t buffer_size)
-{
-    if (!command || !output_buffer || buffer_size == 0)
-    {
-        return false;
-    }
-
-    char response_buffer[OS_MAXSTR];
-    ssize_t response_length = 0;
-
-#ifndef WIN32
-    const char* AGENT_SOCKET = "queue/sockets/agent";
-    const size_t MAX_RECV_SIZE = sizeof(response_buffer) - 1;
-
-    int sock = OS_ConnectUnixDomain(AGENT_SOCKET, SOCK_STREAM, MAX_RECV_SIZE);
-    if (sock < 0)
-    {
-        mdebug1("Could not connect to agent socket: %s", strerror(errno));
-        return false;
-    }
-
-    if (OS_SendSecureTCP(sock, strlen(command), command) != 0)
-    {
-        mdebug1("Failed to send request to agent socket: %s", strerror(errno));
-        close(sock);
-        return false;
-    }
-
-    memset(response_buffer, 0, sizeof(response_buffer));
-    response_length = OS_RecvSecureTCP(sock, response_buffer, MAX_RECV_SIZE);
-    close(sock);
-
-    if (response_length <= 0)
-    {
-        if (response_length == 0)
-        {
-            mdebug1("Empty response from agent socket");
-        }
-        else if (response_length == -2)
-        {
-            mdebug1("Maximum buffer length reached reading from agent socket");
-        }
-        else
-        {
-            mdebug1("Failed to receive response from agent socket: %s", strerror(errno));
-        }
-        return false;
-    }
-
-    response_buffer[response_length] = '\0';
-#else
-    char* output = NULL;
-    size_t result = agcom_dispatch((char*)command, &output);
-
-    if (result == 0 || !output)
-    {
-        mdebug1("Failed to query agentd via agcom_dispatch");
-        return false;
-    }
-
-    size_t output_len = strlen(output);
-    size_t max_copy = sizeof(response_buffer) - 1;
-    if (output_len > max_copy)
-    {
-        output_len = max_copy;
-    }
-
-    memcpy(response_buffer, output, output_len);
-    response_buffer[output_len] = '\0';
-    response_length = output_len;
-    os_free(output);
-#endif
-
-    if (response_length >= 3 && strncmp(response_buffer, "ok ", 3) == 0)
-    {
-        const char* json_start = response_buffer + 3;
-        size_t json_len = strlen(json_start);
-
-        if (json_len >= buffer_size)
-        {
-            mdebug1("Output buffer too small (%zu bytes needed, %zu available)", json_len + 1, buffer_size);
-            return false;
-        }
-
-        strncpy(output_buffer, json_start, buffer_size - 1);
-        output_buffer[buffer_size - 1] = '\0';
-        return true;
-    }
-    else if (response_length >= 4 && strncmp(response_buffer, "err ", 4) == 0)
-    {
-        mdebug1("Agentd returned error: %s", response_buffer + 4);
-        return false;
-    }
-    else
-    {
-        mdebug1("Unexpected response format from agentd: %s", response_buffer);
-        return false;
-    }
-}
-
 static bool wm_sca_query_agentd_doclimits(uint64_t *sync_limit)
 {
     if (!sync_limit)
@@ -225,7 +122,7 @@ static bool wm_sca_query_agentd_doclimits(uint64_t *sync_limit)
     *sync_limit = 0;
 
     char json_buffer[OS_MAXSTR];
-    if (!wm_sca_query_agentd("getdoclimits sca", json_buffer, sizeof(json_buffer)))
+    if (!w_query_agentd(WM_SCA_LOGTAG, "getdoclimits sca", json_buffer, sizeof(json_buffer)))
     {
         return false;
     }
