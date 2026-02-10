@@ -4111,7 +4111,7 @@ TEST_F(SyscollectorImpTest, schemaValidationRejectsInvalidDataWithMock)
 
     // Capture log messages to verify validation errors
     std::vector<std::string> loggedMessages;
-    auto customLogFunction = [&loggedMessages](modules_log_level_t level, const std::string & message)
+    auto customLogFunction = [&loggedMessages](modules_log_level_t, const std::string & message)
     {
         loggedMessages.push_back(message);
     };
@@ -4256,7 +4256,7 @@ TEST_F(SyscollectorImpTest, schemaValidationQueuesWhenValidatorNotFound)
 
     // Capture log messages to verify warning is logged
     std::vector<std::string> loggedMessages;
-    auto customLogFunction = [&loggedMessages](modules_log_level_t level, const std::string & message)
+    auto customLogFunction = [&loggedMessages](modules_log_level_t, const std::string & message)
     {
         loggedMessages.push_back(message);
     };
@@ -4335,4 +4335,656 @@ TEST_F(SyscollectorImpTest, schemaValidationQueuesWhenValidatorNotFound)
     }
 
     EXPECT_TRUE(foundMissingValidatorWarning) << "Expected warning for missing validator not found";
+}
+
+// Document limits test cases
+
+// Test setDocumentLimits with package limit
+TEST_F(SyscollectorImpTest, DocumentLimits_SetLimitForPackages)
+{
+    // JSON with multiple packages to test limit enforcement
+    constexpr auto MULTIPLE_PACKAGES_JSON
+    {
+        R"([{
+            "name": "pkg1",
+            "version": "1.0",
+            "architecture": "x86_64",
+            "format": "rpm",
+            "vendor": "vendor1",
+            "install_time": "2023-01-01T00:00:00Z"
+        },
+        {
+            "name": "pkg2",
+            "version": "2.0",
+            "architecture": "x86_64",
+            "format": "rpm",
+            "vendor": "vendor2",
+            "install_time": "2023-01-02T00:00:00Z"
+        },
+        {
+            "name": "pkg3",
+            "version": "3.0",
+            "architecture": "x86_64",
+            "format": "rpm",
+            "vendor": "vendor3",
+            "install_time": "2023-01-03T00:00:00Z"
+        }])"
+    };
+
+    auto spInfoWrapper {std::make_shared<MockSysInfo>()};
+
+    EXPECT_CALL(*spInfoWrapper, hardware()).WillRepeatedly(Return(nlohmann::json::parse("{}")));
+    EXPECT_CALL(*spInfoWrapper, os()).WillRepeatedly(Return(nlohmann::json::parse("{}")));
+    EXPECT_CALL(*spInfoWrapper, networks(_)).Times(0);
+    EXPECT_CALL(*spInfoWrapper, packages(_))
+    .WillOnce([&MULTIPLE_PACKAGES_JSON](const std::function<void(nlohmann::json&)>& cb)
+    {
+        auto packagesData = nlohmann::json::parse(MULTIPLE_PACKAGES_JSON);
+
+        for (auto& pkg : packagesData)
+        {
+            cb(pkg);
+        }
+    });
+    EXPECT_CALL(*spInfoWrapper, ports(_)).Times(0);
+    EXPECT_CALL(*spInfoWrapper, hotfixes()).Times(0);
+    EXPECT_CALL(*spInfoWrapper, processes(_)).Times(0);
+    EXPECT_CALL(*spInfoWrapper, groups()).Times(0);
+    EXPECT_CALL(*spInfoWrapper, users()).Times(0);
+    EXPECT_CALL(*spInfoWrapper, services()).Times(0);
+    EXPECT_CALL(*spInfoWrapper, browserExtensions()).Times(0);
+
+    CallbackMock wrapperDelta;
+    std::function<void(const std::string&)> callbackDataDelta
+    {
+        [&wrapperDelta](const std::string & data)
+        {
+            auto delta = nlohmann::json::parse(data);
+
+            if (delta.contains("data") && delta["data"].contains("event") && delta["data"]["event"].contains("created"))
+            {
+                delta["data"]["event"].erase("created");
+            }
+
+            wrapperDelta.callbackMock(delta.dump());
+        }
+    };
+
+    CallbackMockPersist wrapperPersist;
+    std::function<void(const std::string&, Operation_t, const std::string&, const std::string&, uint64_t)> callbackDataPersist
+    {
+        [&wrapperPersist](const std::string & id, Operation_t operation, const std::string & index, const std::string & data, uint64_t version)
+        {
+            auto persist = nlohmann::json::parse(data);
+
+            if (persist.contains("state"))
+            {
+                persist.erase("state");
+            }
+
+            wrapperPersist.callbackMock(id, operation, index, persist.dump(), version);
+        }
+    };
+
+    // Mock agentd query function to return document limits
+    bool agentdQueryCalled = false;
+    auto mockAgentdQuery = [&agentdQueryCalled](const char* command, char* output_buffer, size_t buffer_size) -> bool
+    {
+        if (std::string(command) == "getdoclimits syscollector")
+        {
+            agentdQueryCalled = true;
+            // Return limit of 2 packages
+            std::string response = R"({"packages": 2})";
+            std::strncpy(output_buffer, response.c_str(), buffer_size - 1);
+            output_buffer[buffer_size - 1] = '\0';
+            return true;
+        }
+
+        return false;
+    };
+
+    // We expect only 2 packages to be synced due to limit
+    EXPECT_CALL(wrapperPersist, callbackMock(testing::_, OPERATION_CREATE, "wazuh-states-inventory-packages", testing::_, testing::_))
+    .Times(2);
+
+    std::thread t
+    {
+        [&spInfoWrapper, &callbackDataDelta, &callbackDataPersist, &mockAgentdQuery]()
+        {
+            Syscollector::instance().setAgentdQueryFunction(mockAgentdQuery);
+
+            Syscollector::instance().init(spInfoWrapper,
+                                          callbackDataDelta,
+                                          callbackDataPersist,
+                                          logFunction,
+                                          SYSCOLLECTOR_DB_PATH,
+                                          "",
+                                          "",
+                                          5,
+                                          true,   // scanOnStart
+                                          false,  // hardware
+                                          false,  // os
+                                          false,  // network
+                                          true,   // packages
+                                          false,  // ports
+                                          false,  // portsAll
+                                          false,  // processes
+                                          false,  // hotfixes
+                                          false,  // groups
+                                          false,  // users
+                                          false,  // services
+                                          false,  // browserExtensions
+                                          true);  // notifyOnFirstScan
+
+            Syscollector::instance().start();
+        }
+    };
+
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+    Syscollector::instance().destroy();
+
+    if (t.joinable())
+    {
+        t.join();
+    }
+
+    EXPECT_TRUE(agentdQueryCalled);
+}
+
+// Test fetchDocumentLimitsFromAgentd with valid response
+TEST_F(SyscollectorImpTest, DocumentLimits_FetchFromAgentdSuccess)
+{
+    auto spInfoWrapper {std::make_shared<MockSysInfo>()};
+
+    EXPECT_CALL(*spInfoWrapper, hardware()).WillRepeatedly(Return(nlohmann::json::parse("{}")));
+    EXPECT_CALL(*spInfoWrapper, os()).WillRepeatedly(Return(nlohmann::json::parse("{}")));
+    EXPECT_CALL(*spInfoWrapper, networks(_)).Times(0);
+    EXPECT_CALL(*spInfoWrapper, packages(_)).Times(0);
+    EXPECT_CALL(*spInfoWrapper, ports(_)).Times(0);
+    EXPECT_CALL(*spInfoWrapper, hotfixes()).Times(0);
+    EXPECT_CALL(*spInfoWrapper, processes(_)).Times(0);
+    EXPECT_CALL(*spInfoWrapper, groups()).Times(0);
+    EXPECT_CALL(*spInfoWrapper, users()).Times(0);
+    EXPECT_CALL(*spInfoWrapper, services()).Times(0);
+    EXPECT_CALL(*spInfoWrapper, browserExtensions()).Times(0);
+
+    CallbackMock wrapperDelta;
+    std::function<void(const std::string&)> callbackDataDelta
+    {
+        [&wrapperDelta](const std::string & data)
+        {
+            wrapperDelta.callbackMock(data);
+        }
+    };
+
+    CallbackMockPersist wrapperPersist;
+    std::function<void(const std::string&, Operation_t, const std::string&, const std::string&, uint64_t)> callbackDataPersist
+    {
+        [&wrapperPersist](const std::string & id, Operation_t operation, const std::string & index, const std::string & data, uint64_t version)
+        {
+            wrapperPersist.callbackMock(id, operation, index, data, version);
+        }
+    };
+
+    // Mock agentd query function with comprehensive limits
+    bool agentdQueryCalled = false;
+    auto mockAgentdQuery = [&agentdQueryCalled](const char* command, char* output_buffer, size_t buffer_size) -> bool
+    {
+        if (std::string(command) == "getdoclimits syscollector")
+        {
+            agentdQueryCalled = true;
+            std::string response = R"({
+                "packages": 100,
+                "processes": 50,
+                "ports": 200,
+                "hotfixes": 30
+            })";
+            std::strncpy(output_buffer, response.c_str(), buffer_size - 1);
+            output_buffer[buffer_size - 1] = '\0';
+            return true;
+        }
+
+        return false;
+    };
+
+    std::thread t
+    {
+        [&spInfoWrapper, &callbackDataDelta, &callbackDataPersist, &mockAgentdQuery]()
+        {
+            Syscollector::instance().setAgentdQueryFunction(mockAgentdQuery);
+
+            Syscollector::instance().init(spInfoWrapper,
+                                          callbackDataDelta,
+                                          callbackDataPersist,
+                                          logFunction,
+                                          SYSCOLLECTOR_DB_PATH,
+                                          "",
+                                          "",
+                                          5,
+                                          true,   // scanOnStart
+                                          false,  // hardware
+                                          false,  // os
+                                          false,  // network
+                                          false,  // packages
+                                          false,  // ports
+                                          false,  // portsAll
+                                          false,  // processes
+                                          false,  // hotfixes
+                                          false,  // groups
+                                          false,  // users
+                                          false,  // services
+                                          false,  // browserExtensions
+                                          false); // notifyOnFirstScan
+
+            Syscollector::instance().start();
+        }
+    };
+
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+    Syscollector::instance().destroy();
+
+    if (t.joinable())
+    {
+        t.join();
+    }
+
+    EXPECT_TRUE(agentdQueryCalled);
+}
+
+// Test fetchDocumentLimitsFromAgentd with agentd function not set
+TEST_F(SyscollectorImpTest, DocumentLimits_FetchFromAgentdNotSet)
+{
+    auto spInfoWrapper {std::make_shared<MockSysInfo>()};
+
+    EXPECT_CALL(*spInfoWrapper, hardware()).WillRepeatedly(Return(nlohmann::json::parse("{}")));
+    EXPECT_CALL(*spInfoWrapper, os()).WillRepeatedly(Return(nlohmann::json::parse("{}")));
+    EXPECT_CALL(*spInfoWrapper, networks(_)).Times(0);
+    EXPECT_CALL(*spInfoWrapper, packages(_)).Times(0);
+    EXPECT_CALL(*spInfoWrapper, ports(_)).Times(0);
+    EXPECT_CALL(*spInfoWrapper, hotfixes()).Times(0);
+    EXPECT_CALL(*spInfoWrapper, processes(_)).Times(0);
+    EXPECT_CALL(*spInfoWrapper, groups()).Times(0);
+    EXPECT_CALL(*spInfoWrapper, users()).Times(0);
+    EXPECT_CALL(*spInfoWrapper, services()).Times(0);
+    EXPECT_CALL(*spInfoWrapper, browserExtensions()).Times(0);
+
+    CallbackMock wrapperDelta;
+    std::function<void(const std::string&)> callbackDataDelta
+    {
+        [&wrapperDelta](const std::string & data)
+        {
+            wrapperDelta.callbackMock(data);
+        }
+    };
+
+    CallbackMockPersist wrapperPersist;
+    std::function<void(const std::string&, Operation_t, const std::string&, const std::string&, uint64_t)> callbackDataPersist
+    {
+        [&wrapperPersist](const std::string & id, Operation_t operation, const std::string & index, const std::string & data, uint64_t version)
+        {
+            wrapperPersist.callbackMock(id, operation, index, data, version);
+        }
+    };
+
+    // Do NOT set agentd query function - test the warning path
+    std::vector<std::string> logMessages;
+    auto captureLogFunction = [&logMessages](modules_log_level_t, const char* log)
+    {
+        logMessages.push_back(log);
+    };
+
+    std::thread t
+    {
+        [&spInfoWrapper, &callbackDataDelta, &callbackDataPersist, &captureLogFunction]()
+        {
+            // Note: NOT calling setAgentdQueryFunction
+
+            Syscollector::instance().init(spInfoWrapper,
+                                          callbackDataDelta,
+                                          callbackDataPersist,
+                                          captureLogFunction,
+                                          SYSCOLLECTOR_DB_PATH,
+                                          "",
+                                          "",
+                                          5,
+                                          true,   // scanOnStart
+                                          false,  // hardware
+                                          false,  // os
+                                          false,  // network
+                                          false,  // packages
+                                          false,  // ports
+                                          false,  // portsAll
+                                          false,  // processes
+                                          false,  // hotfixes
+                                          false,  // groups
+                                          false,  // users
+                                          false,  // services
+                                          false,  // browserExtensions
+                                          false); // notifyOnFirstScan
+
+            Syscollector::instance().start();
+        }
+    };
+
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+    Syscollector::instance().destroy();
+
+    if (t.joinable())
+    {
+        t.join();
+    }
+
+    // Verify warning was logged
+    bool foundWarning = false;
+
+    for (const auto& msg : logMessages)
+    {
+        if (msg.find("Agentd query function not set") != std::string::npos)
+        {
+            foundWarning = true;
+            break;
+        }
+    }
+
+    EXPECT_TRUE(foundWarning);
+}
+
+// Test promoteUnsyncedItems through limit increase scenario
+TEST_F(SyscollectorImpTest, DocumentLimits_PromoteUnsyncedItems)
+{
+    constexpr auto FIVE_PACKAGES_JSON
+    {
+        R"([{
+            "name": "pkg1",
+            "version": "1.0",
+            "architecture": "x86_64",
+            "format": "rpm"
+        },
+        {
+            "name": "pkg2",
+            "version": "2.0",
+            "architecture": "x86_64",
+            "format": "rpm"
+        },
+        {
+            "name": "pkg3",
+            "version": "3.0",
+            "architecture": "x86_64",
+            "format": "rpm"
+        },
+        {
+            "name": "pkg4",
+            "version": "4.0",
+            "architecture": "x86_64",
+            "format": "rpm"
+        },
+        {
+            "name": "pkg5",
+            "version": "5.0",
+            "architecture": "x86_64",
+            "format": "rpm"
+        }])"
+    };
+
+    auto spInfoWrapper {std::make_shared<MockSysInfo>()};
+
+    EXPECT_CALL(*spInfoWrapper, hardware()).WillRepeatedly(Return(nlohmann::json::parse("{}")));
+    EXPECT_CALL(*spInfoWrapper, os()).WillRepeatedly(Return(nlohmann::json::parse("{}")));
+    EXPECT_CALL(*spInfoWrapper, networks(_)).Times(0);
+    EXPECT_CALL(*spInfoWrapper, packages(_))
+    .WillRepeatedly([&FIVE_PACKAGES_JSON](const std::function<void(nlohmann::json&)>& cb)
+    {
+        auto packagesData = nlohmann::json::parse(FIVE_PACKAGES_JSON);
+
+        for (auto& pkg : packagesData)
+        {
+            cb(pkg);
+        }
+    });
+    EXPECT_CALL(*spInfoWrapper, ports(_)).Times(0);
+    EXPECT_CALL(*spInfoWrapper, hotfixes()).Times(0);
+    EXPECT_CALL(*spInfoWrapper, processes(_)).Times(0);
+    EXPECT_CALL(*spInfoWrapper, groups()).Times(0);
+    EXPECT_CALL(*spInfoWrapper, users()).Times(0);
+    EXPECT_CALL(*spInfoWrapper, services()).Times(0);
+    EXPECT_CALL(*spInfoWrapper, browserExtensions()).Times(0);
+
+    CallbackMock wrapperDelta;
+    std::function<void(const std::string&)> callbackDataDelta
+    {
+        [&wrapperDelta](const std::string & data)
+        {
+            wrapperDelta.callbackMock(data);
+        }
+    };
+
+    CallbackMockPersist wrapperPersist;
+    std::atomic<int> insertCount{0};
+    std::function<void(const std::string&, Operation_t, const std::string&, const std::string&, uint64_t)> callbackDataPersist
+    {
+        [&wrapperPersist, &insertCount](const std::string & id, Operation_t operation, const std::string & index, const std::string & data, uint64_t version)
+        {
+            if (operation == OPERATION_CREATE && index == "wazuh-states-inventory-packages")
+            {
+                insertCount++;
+            }
+
+            wrapperPersist.callbackMock(id, operation, index, data, version);
+        }
+    };
+
+    // Start with limit of 2, then increase to 4
+    std::atomic<int> callCount{0};
+    auto mockAgentdQuery = [&callCount](const char* command, char* output_buffer, size_t buffer_size) -> bool
+    {
+        if (std::string(command) == "getdoclimits syscollector")
+        {
+            callCount++;
+
+            if (callCount == 1)
+            {
+                // First call: limit 2
+                std::string response = R"({"packages": 2})";
+                std::strncpy(output_buffer, response.c_str(), buffer_size - 1);
+            }
+            else
+            {
+                // Subsequent calls: limit 4
+                std::string response = R"({"packages": 4})";
+                std::strncpy(output_buffer, response.c_str(), buffer_size - 1);
+            }
+
+            output_buffer[buffer_size - 1] = '\0';
+            return true;
+        }
+
+        return false;
+    };
+
+    std::thread t
+    {
+        [&spInfoWrapper, &callbackDataDelta, &callbackDataPersist, &mockAgentdQuery]()
+        {
+            Syscollector::instance().setAgentdQueryFunction(mockAgentdQuery);
+
+            Syscollector::instance().init(spInfoWrapper,
+                                          callbackDataDelta,
+                                          callbackDataPersist,
+                                          logFunction,
+                                          SYSCOLLECTOR_DB_PATH,
+                                          "",
+                                          "",
+                                          5,
+                                          true,   // scanOnStart
+                                          false,  // hardware
+                                          false,  // os
+                                          false,  // network
+                                          true,   // packages
+                                          false,  // ports
+                                          false,  // portsAll
+                                          false,  // processes
+                                          false,  // hotfixes
+                                          false,  // groups
+                                          false,  // users
+                                          false,  // services
+                                          false,  // browserExtensions
+                                          true);  // notifyOnFirstScan
+
+            Syscollector::instance().start();
+        }
+    };
+
+    std::this_thread::sleep_for(std::chrono::seconds(3));
+    Syscollector::instance().destroy();
+
+    if (t.joinable())
+    {
+        t.join();
+    }
+
+    // Should have at least 2 inserts (could be more if limit change was detected)
+    EXPECT_GE(insertCount.load(), 2);
+}
+
+// Test buildOrderByClause and getFirstPrimaryKeyField through database queries
+TEST_F(SyscollectorImpTest, DocumentLimits_OrderingHelpers)
+{
+    constexpr auto PACKAGES_MIXED_CASE_JSON
+    {
+        R"([{
+            "name": "zPkg",
+            "version": "1.0",
+            "architecture": "x86_64",
+            "format": "rpm"
+        },
+        {
+            "name": "APkg",
+            "version": "2.0",
+            "architecture": "x86_64",
+            "format": "rpm"
+        },
+        {
+            "name": "mPkg",
+            "version": "3.0",
+            "architecture": "x86_64",
+            "format": "rpm"
+        }])"
+    };
+
+    auto spInfoWrapper {std::make_shared<MockSysInfo>()};
+
+    EXPECT_CALL(*spInfoWrapper, hardware()).WillRepeatedly(Return(nlohmann::json::parse("{}")));
+    EXPECT_CALL(*spInfoWrapper, os()).WillRepeatedly(Return(nlohmann::json::parse("{}")));
+    EXPECT_CALL(*spInfoWrapper, networks(_)).Times(0);
+    EXPECT_CALL(*spInfoWrapper, packages(_))
+    .WillOnce([&PACKAGES_MIXED_CASE_JSON](const std::function<void(nlohmann::json&)>& cb)
+    {
+        auto packagesData = nlohmann::json::parse(PACKAGES_MIXED_CASE_JSON);
+
+        for (auto& pkg : packagesData)
+        {
+            cb(pkg);
+        }
+    });
+    EXPECT_CALL(*spInfoWrapper, ports(_)).Times(0);
+    EXPECT_CALL(*spInfoWrapper, hotfixes()).Times(0);
+    EXPECT_CALL(*spInfoWrapper, processes(_)).Times(0);
+    EXPECT_CALL(*spInfoWrapper, groups()).Times(0);
+    EXPECT_CALL(*spInfoWrapper, users()).Times(0);
+    EXPECT_CALL(*spInfoWrapper, services()).Times(0);
+    EXPECT_CALL(*spInfoWrapper, browserExtensions()).Times(0);
+
+    CallbackMock wrapperDelta;
+    std::function<void(const std::string&)> callbackDataDelta
+    {
+        [&wrapperDelta](const std::string & data)
+        {
+            wrapperDelta.callbackMock(data);
+        }
+    };
+
+    CallbackMockPersist wrapperPersist;
+    std::vector<std::string> syncedPackageNames;
+    std::function<void(const std::string&, Operation_t, const std::string&, const std::string&, uint64_t)> callbackDataPersist
+    {
+        [&wrapperPersist, &syncedPackageNames](const std::string & id, Operation_t operation, const std::string & index, const std::string & data, uint64_t version)
+        {
+            if (operation == OPERATION_CREATE && index == "wazuh-states-inventory-packages")
+            {
+                auto pkg = nlohmann::json::parse(data);
+
+                if (pkg.contains("package") && pkg["package"].contains("name"))
+                {
+                    syncedPackageNames.push_back(pkg["package"]["name"].get<std::string>());
+                }
+            }
+
+            wrapperPersist.callbackMock(id, operation, index, data, version);
+        }
+    };
+
+    // Limit to 2 packages - should get first 2 alphabetically (case-insensitive)
+    auto mockAgentdQuery = [](const char* command, char* output_buffer, size_t buffer_size) -> bool
+    {
+        if (std::string(command) == "getdoclimits syscollector")
+        {
+            std::string response = R"({"packages": 2})";
+            std::strncpy(output_buffer, response.c_str(), buffer_size - 1);
+            output_buffer[buffer_size - 1] = '\0';
+            return true;
+        }
+
+        return false;
+    };
+
+    std::thread t
+    {
+        [&spInfoWrapper, &callbackDataDelta, &callbackDataPersist, &mockAgentdQuery]()
+        {
+            Syscollector::instance().setAgentdQueryFunction(mockAgentdQuery);
+
+            Syscollector::instance().init(spInfoWrapper,
+                                          callbackDataDelta,
+                                          callbackDataPersist,
+                                          logFunction,
+                                          SYSCOLLECTOR_DB_PATH,
+                                          "",
+                                          "",
+                                          5,
+                                          true,   // scanOnStart
+                                          false,  // hardware
+                                          false,  // os
+                                          false,  // network
+                                          true,   // packages
+                                          false,  // ports
+                                          false,  // portsAll
+                                          false,  // processes
+                                          false,  // hotfixes
+                                          false,  // groups
+                                          false,  // users
+                                          false,  // services
+                                          false,  // browserExtensions
+                                          true);  // notifyOnFirstScan
+
+            Syscollector::instance().start();
+        }
+    };
+
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+    Syscollector::instance().destroy();
+
+    if (t.joinable())
+    {
+        t.join();
+    }
+
+    // Verify we got 2 packages
+    EXPECT_EQ(syncedPackageNames.size(), 2);
+
+    // Verify case-insensitive alphabetical ordering (APkg, mPkg should be synced, zPkg should not)
+    if (syncedPackageNames.size() >= 2)
+    {
+        EXPECT_EQ(syncedPackageNames[0], "APkg");
+        EXPECT_EQ(syncedPackageNames[1], "mPkg");
+    }
 }
