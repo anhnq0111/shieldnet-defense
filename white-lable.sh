@@ -59,7 +59,8 @@ replace_in_files() {
         # Check if file is a text file
         if file "$file" | grep -q "text"; then
             if grep -q "$search" "$file" 2>/dev/null; then
-                sed -i "s|${search}|${replace}|g" "$file"
+                # Use .bak and remove: portable on both macOS (BSD sed) and Linux (GNU sed)
+                sed -i.bak "s|${search}|${replace}|g" "$file" && rm -f "$file.bak"
                 echo -e "  ${GREEN}Updated: ${file}${NC}"
             fi
         fi
