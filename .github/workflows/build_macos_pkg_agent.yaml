@@ -1,6 +1,9 @@
 name: ShieldNet MacOs Package Builder
 
 on:
+  pull_request:
+    branches:
+      - main
   push:
     tags:
       - macos-pkg-v*
