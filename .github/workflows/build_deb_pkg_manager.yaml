@@ -3,7 +3,7 @@ name: ShieldNet Linux Debian Package Builder
 on:
   push:
     tags:
-      - debian-pkg-v*
+      - debian-pkg-manager-v*
 
 jobs:
   build-deb:
