@@ -17,9 +17,6 @@ jobs:
           submodules: true
       - id: build-shieldnet
         run: |
-          echo "White-labeling the package..."
-          ./white-lable.sh
-          echo "Building the package..."
           cd packages/macos
           ./generate_shieldnet_packages.sh -i
           sudo ./generate_shieldnet_packages.sh -a arm64 -s ~/shieldnet-packages-arm64
