@@ -1,0 +1,89 @@
+name: ShieldNet Windows Package Builder
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    tags:
+      - windows-pkg-v*
+
+jobs:
+  build-compiled-windows:
+    runs-on: ubuntu-latest
+    outputs:
+      winagent-zip: ${{ steps.upload.outputs.artifact-path }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: Setup Docker
+        id: setup-docker
+        uses: docker/setup-docker-action@v4
+
+      - name: Build compiled Windows agent
+        run: |
+          cd packages/windows
+          sudo ./generate_compiled_windows_agent.sh -o winagent -s ~/shieldnet-packages-winagent
+
+      - name: Upload compiled Windows agent zip
+        id: upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: winagent-zip
+          path: ~/shieldnet-packages-winagent/winagent.zip
+
+  build-msi-window:
+    runs-on: windows-latest
+    needs: build-compiled-windows
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install WiX Toolset v3.14.1 with choco
+        run: choco install wixtoolset --version=3.14.1 -y --force
+
+      - name: Download cv2pdb.exe and add to PATH
+        run: |
+          # Download the ZIP
+          Invoke-WebRequest -Uri https://github.com/rainers/cv2pdb/releases/download/v0.54/cv2pdb-0.54.zip -OutFile cv2pdb.zip
+
+          # Extract ZIP
+          Expand-Archive -LiteralPath cv2pdb.zip -DestinationPath cv2pdb
+
+          # Add extracted folder to PATH for all next steps
+          "$env:GITHUB_WORKSPACE\cv2pdb" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        shell: powershell
+
+      - name: Download compiled agent artifact
+        id: download-compressed-agent
+        uses: actions/download-artifact@v5
+        with:
+          name: winagent-zip
+          path: ./agent-zip
+
+      - name: Unzip compiled agent
+        run: |
+          ls ${{ steps.download-compressed-agent.outputs.download-path }}
+          Expand-Archive -LiteralPath ${{ steps.download-compressed-agent.outputs.download-path }}\winagent.zip ${{ steps.download-compressed-agent.outputs.download-path }}
+        shell: powershell
+
+      - name: Copy MSI generator script
+        run: |
+          ls ${{ steps.download-compressed-agent.outputs.download-path }}
+          Copy-Item -Path ${{ steps.download-compressed-agent.outputs.download-path }}\shieldnet-defend-local-src\packages\windows\generate_shieldnet_defend_msi.ps1 -Destination ${{ steps.download-compressed-agent.outputs.download-path }}\shieldnet-defend-local-src\src\win32\
+        shell: powershell
+
+      - name: Build MSI
+        run: |
+          cd ${{ steps.download-compressed-agent.outputs.download-path }}\shieldnet-defend-local-src\src\win32\
+          .\generate_shieldnet_defend_msi.ps1 `
+            -MSI_NAME shieldnet-defend-package.msi `
+            -SIGN no `
+            -WIX_TOOLS_PATH "C:\Program Files (x86)\WiX Toolset v3.14\bin"
+        shell: powershell
+
+      - name: Upload MSI
+        uses: actions/upload-artifact@v4
+        with:
+          name: shieldnet-defend-package.msi
+          path: ${{ steps.download-compressed-agent.outputs.download-path }}\shieldnet-defend-local-src\src\win32\shieldnet-defend-package.msi
+
