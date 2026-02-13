@@ -8,8 +8,8 @@ import stat
 import sys
 import fnmatch
 
-wazuh_gid = -1
-wazuh_uid = -1
+shieldnet_defend_gid = -1
+shieldnet_defend_uid = -1
 
 HEADERS = ['full_filename', 'owner_name', 'group_name', 'mode',
            'type', 'prot_permissions', 'size_bytes', 'size_error']
@@ -73,23 +73,23 @@ class helper:
 
 
 def translate_uid(id):
-    # If wazuh_uid was not set, use the default behavior
+    # If shieldnet_defend_uid was not set, use the default behavior
     import pwd
-    if wazuh_uid == -1:
+    if shieldnet_defend_uid == -1:
         return pwd.getpwuid(id)[0]
-    elif id == wazuh_uid:
-        return "wazuh"
+    elif id == shieldnet_defend_uid:
+        return "shieldnetdefend"
     elif id == 0:
         return "root"
 
 
 def translate_gid(id):
-    # If wazuh_gid was not set, use the default behavior
+    # If shieldnet_defend_gid was not set, use the default behavior
     import grp
-    if wazuh_gid == -1:
+    if shieldnet_defend_gid == -1:
         return grp.getgrgid(id)[0]
-    elif id == wazuh_gid:
-        return "wazuh"
+    elif id == shieldnet_defend_gid:
+        return "shieldnetdefend"
     elif id == 0:
         return "root"
 
@@ -383,7 +383,7 @@ def printReport(expected_items, not_listed, not_fully_match, current_items, matc
 
 if __name__ == "__main__":
 
-    print("Wazuh File Integrity Check")
+    print("ShieldnetDefend File Integrity Check")
 
     arg_parser = argparse.ArgumentParser()
     arg_parser.add_argument("-r", "--report", type=str, default="",
@@ -394,18 +394,18 @@ if __name__ == "__main__":
                             help="Directory to scan and check, '/var/ossec' by default")
     arg_parser.add_argument("-b", "--base_file", type=str, default="",
                             help="Creates a base csv in path, not to be used with --report")
-    arg_parser.add_argument("-wg", "--wazuh_gid", type=int,
-                            help="The group id for wazuh", default=-1)
-    arg_parser.add_argument("-wu", "--wazuh_uid", type=int,
-                            help="The user id for wazuh", default=-1)
+    arg_parser.add_argument("-wg", "--shieldnet_defend_gid", type=int,
+                            help="The group id for shieldnetdefend", default=-1)
+    arg_parser.add_argument("-wu", "--shieldnet_defend_uid", type=int,
+                            help="The user id for shieldnetdefend", default=-1)
     arg_parser.add_argument("-s", "--size_check", action="store_true",
                             help="Enable size validation", default=False)
     arg_parser.add_argument("-i", "--ignore", type=str,
                             help="Paths to be ignored (separated by commas)", default=[])
 
     args = arg_parser.parse_args()
-    wazuh_gid = args.wazuh_gid
-    wazuh_uid = args.wazuh_uid
+    shieldnet_defend_gid = args.shieldnet_defend_gid
+    shieldnet_defend_uid = args.shieldnet_defend_uid
     installed_dir = args.directory
     size_check = args.size_check
     base_file_path = args.base_file

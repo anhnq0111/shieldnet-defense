@@ -1,4 +1,4 @@
-/* Copyright (C) 2015, Wazuh Inc.
+/* Copyright (C) 2015, ShieldnetDefend Inc.
  * Copyright (C) 2009 Trend Micro Inc.
  * All right reserved.
  *
@@ -12,14 +12,14 @@
 #include "../os_net/os_net.h"
 #include "remoted.h"
 #include "state.h"
-#include "../wazuh_db/helpers/wdb_global_helpers.h"
+#include "../shieldnet_defend_db/helpers/wdb_global_helpers.h"
 #include "router.h"
 #include "sym_load.h"
 #include "agent_messages_adapter.h"
 #include "indexed_queue_op.h"
 
 
-#ifdef WAZUH_UNIT_TESTING
+#ifdef SHIELDNET_DEFEND_UNIT_TESTING
 // Remove static qualifier when unit testing
 #define STATIC
 #else
@@ -167,7 +167,7 @@ static char *w_ctrl_msg_get_key(void *data) {
  * @brief Thread function to save control messages
  *
  * This function is executed by the control message thread pool. It waits for messages to be pushed into the queue and processes them.
- * Updates the agent's status in wazuhdb and sends the message to the appropriate handler.
+ * Updates the agent's status in shieldnetdefenddb and sends the message to the appropriate handler.
  * @param queue Pointer to the control message queue, which is used to store messages to be processed.
  * @return void* Null
  */
@@ -247,7 +247,7 @@ void HandleSecure()
         }
     }
 
-    // Reset all the agents' connection status in Wazuh DB
+    // Reset all the agents' connection status in ShieldnetDefend DB
     // The master will disconnect and alert the agents on its own DB. Thus, synchronization is not required.
     if (OS_SUCCESS != wdb_reset_agents_connection("synced", NULL))
         mwarn("Unable to reset the agents' connection status. Possible incorrect statuses until the agents get connected to the manager.");
@@ -546,7 +546,7 @@ STATIC void * close_fp_main(void * args) {
             }
         }
         key_unlock();
-    #ifdef WAZUH_UNIT_TESTING
+    #ifdef SHIELDNET_DEFEND_UNIT_TESTING
         break;
     #endif
     }

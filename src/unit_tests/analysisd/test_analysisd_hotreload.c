@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015, Wazuh Inc.
+ * Copyright (C) 2015, ShieldnetDefend Inc.
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General Public
@@ -14,8 +14,8 @@
 #include <cmocka.h>
 
 #include "../../analysisd/hotreload.h"
-#include "../wrappers/wazuh/os_xml/os_xml_wrappers.h"
-#include "../wrappers/wazuh/shared/debug_op_wrappers.h"
+#include "../wrappers/shieldnetdefend/os_xml/os_xml_wrappers.h"
+#include "../wrappers/shieldnetdefend/shared/debug_op_wrappers.h"
 
 // Global variables
 extern ListNode * os_analysisd_cdblists;

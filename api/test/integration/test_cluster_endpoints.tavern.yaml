@@ -202,7 +202,7 @@ stages:
         error: 0
         data:
           affected_items:
-            - cluster: wazuh
+            - cluster: shieldnetdefend
               node: master-node
               type: master
           failed_items: []
@@ -1377,10 +1377,10 @@ stages:
           total_affected_items: 1
           total_failed_items: 0
 
-  - name: Show the config of wazuh-db/internal on master
+  - name: Show the config of shieldnet-defend-db/internal on master
     request:
       verify: False
-      url: "{protocol:s}://{host:s}:{port:d}/cluster/master-node/configuration/wazuh-db/internal"
+      url: "{protocol:s}://{host:s}:{port:d}/cluster/master-node/configuration/shieldnet-defend-db/internal"
       method: GET
       headers:
         Authorization: "Bearer {test_login_token}"
@@ -1390,7 +1390,7 @@ stages:
         error: !anyint
         data:
           affected_items:
-            - wazuh_db:
+            - shieldnet_defend_db:
                 commit_time_max: !anyint
                 commit_time_min: !anyint
                 open_db_limit: !anyint
@@ -1399,10 +1399,10 @@ stages:
           total_affected_items: 1
           total_failed_items: 0
 
-  - name: Show the config of wazuh-db/wdb on master
+  - name: Show the config of shieldnet-defend-db/wdb on master
     request:
       verify: False
-      url: "{protocol:s}://{host:s}:{port:d}/cluster/master-node/configuration/wazuh-db/wdb"
+      url: "{protocol:s}://{host:s}:{port:d}/cluster/master-node/configuration/shieldnet-defend-db/wdb"
       method: GET
       headers:
         Authorization: "Bearer {test_login_token}"
@@ -1633,12 +1633,12 @@ stages:
           total_affected_items: !anyint
           total_failed_items: 0
 
-  - name: Read logs with filters -> tag=wazuh-analysisd, limit=1 {node_id}
+  - name: Read logs with filters -> tag=shieldnet-defend-analysisd, limit=1 {node_id}
     request:
       verify: False
       <<: *get_cluster_logs
       params:
-        tag: wazuh-analysisd
+        tag: shieldnet-defend-analysisd
         limit: 1
     response:
       status_code: 200
@@ -1651,12 +1651,12 @@ stages:
           total_affected_items: !anyint
           total_failed_items: 0
 
-  - name: Read logs with filters -> tag=wazuh-syscheckd, limit=2 {node_id}
+  - name: Read logs with filters -> tag=shieldnet-defend-syscheckd, limit=2 {node_id}
     request:
       verify: False
       <<: *get_cluster_logs
       params:
-        tag: wazuh-syscheckd
+        tag: shieldnet-defend-syscheckd
         limit: 2
     response:
       status_code: 200
@@ -1665,19 +1665,19 @@ stages:
         data:
           affected_items:
             - <<: *cluster_log
-              tag: wazuh-syscheckd
+              tag: shieldnet-defend-syscheckd
             - <<: *cluster_log
-              tag: wazuh-syscheckd
+              tag: shieldnet-defend-syscheckd
           failed_items: []
           total_affected_items: !anyint
           total_failed_items: 0
 
-  - name: Read logs with filters -> tag=wazuh-unknown-daemon {node_id}
+  - name: Read logs with filters -> tag=shieldnet-defend-unknown-daemon {node_id}
     request:
       verify: False
       <<: *get_cluster_logs
       params:
-        tag: wazuh-unknown-daemon
+        tag: shieldnet-defend-unknown-daemon
     response:
       status_code: 200
       json:
@@ -1707,19 +1707,19 @@ stages:
           total_affected_items: !anyint
           total_failed_items: 0
 
-  - name: Read logs with filters by query (tag=wazuh-syscheckd, level=info) {node_id}
+  - name: Read logs with filters by query (tag=shieldnet-defend-syscheckd, level=info) {node_id}
     request:
       verify: False
       <<: *get_cluster_logs
       params:
-        q: tag=wazuh-syscheckd;level=info
+        q: tag=shieldnet-defend-syscheckd;level=info
     response:
       status_code: 200
       verify_response_with:
         - function: tavern_utils:test_expected_value
           extra_kwargs:
             key: "tag"
-            expected_values: "wazuh-syscheckd"
+            expected_values: "shieldnet-defend-syscheckd"
         - function: tavern_utils:test_expected_value
           extra_kwargs:
             key: "level"
@@ -1826,14 +1826,14 @@ stages:
         error: 0
         data:
           affected_items:
-            - name: wazuh-remoted
-            - name: wazuh-analysisd
-            - name: wazuh-db
+            - name: shieldnet-defend-remoted
+            - name: shieldnet-defend-analysisd
+            - name: shieldnet-defend-db
           total_affected_items: 3
           failed_items: []
           total_failed_items: 0
 
-  # GET /cluster/{node_id}/daemons/stats?daemons_list=wazuh-remoted
+  # GET /cluster/{node_id}/daemons/stats?daemons_list=shieldnet-defend-remoted
   - name: Get statistics from a single daemon from {node_id}
     request:
       verify: False
@@ -1842,19 +1842,19 @@ stages:
       headers:
         Authorization: "Bearer {test_login_token}"
       params:
-        daemons_list: wazuh-remoted
+        daemons_list: shieldnet-defend-remoted
     response:
       status_code: 200
       json:
         error: 0
         data:
           affected_items:
-            - name: wazuh-remoted
+            - name: shieldnet-defend-remoted
           total_affected_items: 1
           failed_items: []
           total_failed_items: 0
 
-  # GET /cluster/{node_id}/daemons/stats?daemons_list=wazuh-remoted,wazuh-db,wazuh-analysisd
+  # GET /cluster/{node_id}/daemons/stats?daemons_list=shieldnet-defend-remoted,shieldnet-defend-db,shieldnet-defend-analysisd
   - name: Get statistics from a list of daemons from {node_id}
     request:
       verify: False
@@ -1863,16 +1863,16 @@ stages:
       headers:
         Authorization: "Bearer {test_login_token}"
       params:
-        daemons_list: wazuh-remoted,wazuh-db,wazuh-analysisd
+        daemons_list: shieldnet-defend-remoted,shieldnet-defend-db,shieldnet-defend-analysisd
     response:
       status_code: 200
       json:
         error: 0
         data:
           affected_items:
-            - name: wazuh-remoted
-            - name: wazuh-db
-            - name: wazuh-analysisd
+            - name: shieldnet-defend-remoted
+            - name: shieldnet-defend-db
+            - name: shieldnet-defend-analysisd
           total_affected_items: 3
           failed_items: []
           total_failed_items: 0

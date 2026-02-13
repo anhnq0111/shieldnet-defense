@@ -1,7 +1,7 @@
 #!/bin/sh
 
-# Wazuh Template Selector
-# Copyright (C) 2015, Wazuh Inc.
+# ShieldnetDefend Template Selector
+# Copyright (C) 2015, ShieldnetDefend Inc.
 # November 18, 2016.
 #
 # This program is free software; you can redistribute it

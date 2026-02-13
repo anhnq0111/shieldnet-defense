@@ -1,6 +1,6 @@
 /*
- * Wazuh router
- * Copyright (C) 2015, Wazuh Inc.
+ * ShieldnetDefend router
+ * Copyright (C) 2015, ShieldnetDefend Inc.
  * March 25, 2023.
  *
  * This program is free software; you can redistribute it
@@ -55,7 +55,7 @@ std::map<msg_type, flatbuffers::Parser> initSchemaParsers()
         SCHEMA_PARSERS[type] = flatbuffers::Parser();
         SCHEMA_PARSERS[type].opts.skip_unexpected_fields_in_json = true;
         SCHEMA_PARSERS[type].opts.zero_on_float_to_int =
-            true; // Avoids issues with float to int conversion, custom option made for Wazuh.
+            true; // Avoids issues with float to int conversion, custom option made for ShieldnetDefend.
 
         if (!SCHEMA_PARSERS[type].Parse(schema))
         {
@@ -302,7 +302,7 @@ extern "C"
                 flatbuffers::Parser parser;
                 parser.opts.skip_unexpected_fields_in_json = true;
                 parser.opts.zero_on_float_to_int =
-                    true; // Avoids issues with float to int conversion, custom option made for Wazuh.
+                    true; // Avoids issues with float to int conversion, custom option made for ShieldnetDefend.
 
                 if (!parser.Parse(schema))
                 {

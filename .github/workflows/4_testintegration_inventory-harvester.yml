@@ -12,7 +12,7 @@ on:
       - ".github/actions/build_target_cpp/action.yml"
       - "src/shared_modules/router/**"
       - "src/shared_modules/indexer_connector/**"
-      - "src/wazuh_modules/inventory_harvester/**"
+      - "src/shieldnet_defend_modules/inventory_harvester/**"
       - "src/shared_modules/utils/**"
 
 jobs:
@@ -45,10 +45,10 @@ jobs:
       # Install python dependencies
       - name: Install dependencies
         run: |
-          pip install -r src/wazuh_modules/inventory_harvester/qa/requirements.txt
+          pip install -r src/shieldnet_defend_modules/inventory_harvester/qa/requirements.txt
 
       - name: Run tests
         run: |
           cd src
           echo "{}" > states_update_mappings.json
-          python -m pytest -vv wazuh_modules/inventory_harvester/qa/ --log-cli-level=DEBUG
+          python -m pytest -vv shieldnet_defend_modules/inventory_harvester/qa/ --log-cli-level=DEBUG

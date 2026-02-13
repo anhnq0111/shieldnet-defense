@@ -1,4 +1,4 @@
-/* Copyright (C) 2015, Wazuh Inc.
+/* Copyright (C) 2015, ShieldnetDefend Inc.
  * Copyright (C) 2009 Trend Micro Inc.
  * All right reserved.
  *
@@ -49,8 +49,8 @@ int AR_ReadConfig(const char *cfgfile)
         return (OS_INVALID);
     }
     fprintf(fp, "restart-ossec0 - restart-ossec.sh - 0\nrestart-ossec0 - restart-ossec.cmd - 0\n"
-                "restart-wazuh0 - restart-ossec.sh - 0\nrestart-wazuh0 - restart-ossec.cmd - 0\n"
-                "restart-wazuh0 - restart-wazuh - 0\nrestart-wazuh0 - restart-wazuh.exe - 0\n");
+                "restart-shieldnet-defend0 - restart-ossec.sh - 0\nrestart-shieldnet-defend0 - restart-ossec.cmd - 0\n"
+                "restart-shieldnet-defend0 - restart-shieldnet-defend - 0\nrestart-shieldnet-defend0 - restart-shieldnet-defend.exe - 0\n");
     fclose(fp);
 
 #ifndef WIN32

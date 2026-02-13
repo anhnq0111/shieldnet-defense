@@ -1,5 +1,5 @@
-# Copyright (C) 2015, Wazuh Inc.
-# Created by Wazuh, Inc. <info@wazuh.com>.
+# Copyright (C) 2015, ShieldnetDefend Inc.
+# Created by ShieldnetDefend, Inc. <info@shieldnetdefend.com>.
 # This program is a free software; you can redistribute it and/or modify it under the terms of GPLv2
 
 import os
@@ -10,8 +10,8 @@ from typing import Dict, List
 from defusedxml import ElementTree as ET
 from jsonschema import Draft4Validator
 
-from wazuh.core import common
-from wazuh.core.exception import WazuhError
+from shieldnetdefend.core import common
+from shieldnetdefend.core.exception import ShieldnetDefendError
 
 _alphanumeric_param = re.compile(r'^[\w,\-.+\s:]+$')
 _symbols_alphanumeric_param = re.compile(r'^[\w,*<>!\-.+\s:/()\[\]\'\"|=~#]+$')
@@ -35,8 +35,8 @@ _iso8601_date_time = re.compile(
 _names = re.compile(r'^[\w\-.%]+$', re.ASCII)
 _numbers = re.compile(r'^\d+$')
 _numbers_or_all = re.compile(r'^(\d+|all)$')
-_wazuh_key = re.compile(r'[a-zA-Z0-9]+$')
-_wazuh_version = re.compile(r'^(?:wazuh |)v?\d+\.\d+\.\d+$', re.IGNORECASE)
+_shieldnet_defend_key = re.compile(r'[a-zA-Z0-9]+$')
+_shieldnet_defend_version = re.compile(r'^(?:shieldnetdefend |)v?\d+\.\d+\.\d+$', re.IGNORECASE)
 _paths = re.compile(r'^[\w\-.\\/:]+$')
 _cdb_filename_path = re.compile(r'^[\-\w]+$')
 _xml_filename_path = re.compile(r'^[\w\-]+\.xml$')
@@ -241,7 +241,7 @@ api_config_schema = {
     }
 }
 
-WAZUH_COMPONENT_CONFIGURATION_MAPPING = MappingProxyType(
+SHIELDNET_DEFEND_COMPONENT_CONFIGURATION_MAPPING = MappingProxyType(
     {
         'agent': {"client", "buffer", "labels", "internal", "anti_tampering"},
         'agentless': {"agentless"},
@@ -255,7 +255,7 @@ WAZUH_COMPONENT_CONFIGURATION_MAPPING = MappingProxyType(
         'monitor': {"global", "internal", "reports"},
         'request': {"global", "remote", "internal"},
         'syscheck': {"syscheck", "rootcheck", "internal"},
-        'wazuh-db': {"wdb", "internal"},
+        'shieldnet-defend-db': {"wdb", "internal"},
         'wmodules': {"wmodules"}
     }
 )
@@ -320,7 +320,7 @@ def allowed_fields(filters: Dict) -> List:
     return [field for field in filters]
 
 
-def is_safe_path(path: str, basedir: str = common.WAZUH_PATH, relative: bool = True) -> bool:
+def is_safe_path(path: str, basedir: str = common.SHIELDNET_DEFEND_PATH, relative: bool = True) -> bool:
     """Check if a path is correct.
 
     Parameters
@@ -328,7 +328,7 @@ def is_safe_path(path: str, basedir: str = common.WAZUH_PATH, relative: bool = T
     path : str
         Path to be checked.
     basedir : str
-        Wazuh installation directory.
+        ShieldnetDefend installation directory.
     relative : bool
         True if path is relative. False otherwise (absolute).
 
@@ -349,25 +349,25 @@ def is_safe_path(path: str, basedir: str = common.WAZUH_PATH, relative: bool = T
     return os.path.commonpath([full_path, full_basedir]) == full_basedir
 
 
-def check_component_configuration_pair(component: str, configuration: str) -> WazuhError:
+def check_component_configuration_pair(component: str, configuration: str) -> ShieldnetDefendError:
     """
 
     Parameters
     ----------
     component : str
-        Wazuh component name.
+        ShieldnetDefend component name.
     configuration : str
         Component configuration.
 
     Returns
     -------
-    WazuhError
-        It can either return a `WazuhError` or `None`, depending on the given component and configuration. The exception
+    ShieldnetDefendError
+        It can either return a `ShieldnetDefendError` or `None`, depending on the given component and configuration. The exception
         is returned and not raised because we use the object to create a problem on API level.
     """
-    if configuration not in WAZUH_COMPONENT_CONFIGURATION_MAPPING[component]:
-        return WazuhError(1128, extra_message=f"Valid configuration values for '{component}': "
-                                              f"{WAZUH_COMPONENT_CONFIGURATION_MAPPING[component]}")
+    if configuration not in SHIELDNET_DEFEND_COMPONENT_CONFIGURATION_MAPPING[component]:
+        return ShieldnetDefendError(1128, extra_message=f"Valid configuration values for '{component}': "
+                                              f"{SHIELDNET_DEFEND_COMPONENT_CONFIGURATION_MAPPING[component]}")
 
 
 @Draft4Validator.FORMAT_CHECKER.checks("alphanumeric")
@@ -474,14 +474,14 @@ def format_timeframe(value):
     return check_exp(value, _timeframe_type)
 
 
-@Draft4Validator.FORMAT_CHECKER.checks("wazuh_key")
-def format_wazuh_key(value):
-    return check_exp(value, _wazuh_key)
+@Draft4Validator.FORMAT_CHECKER.checks("shieldnet_defend_key")
+def format_shieldnet_defend_key(value):
+    return check_exp(value, _shieldnet_defend_key)
 
 
-@Draft4Validator.FORMAT_CHECKER.checks("wazuh_version")
-def format_wazuh_version(value):
-    return check_exp(value, _wazuh_version)
+@Draft4Validator.FORMAT_CHECKER.checks("shieldnet_defend_version")
+def format_shieldnet_defend_version(value):
+    return check_exp(value, _shieldnet_defend_version)
 
 
 @Draft4Validator.FORMAT_CHECKER.checks("date")

@@ -1,23 +1,23 @@
 #!/bin/sh
 
-# Copyright (C) 2015, Wazuh Inc.
-# OSSEC         Controls Wazuh
+# Copyright (C) 2015, ShieldnetDefend Inc.
+# OSSEC         Controls ShieldnetDefend
 # Author:       Daniel B. Cid <dcid@ossec.net>
 # Modified for slackware by Jack S. Lai
 
-WAZUH_HOME=WAZUH_HOME_TMP
-WAZUH_CONTROL="$WAZUH_HOME/bin/wazuh-control"
+SHIELDNET_DEFEND_HOME=SHIELDNET_DEFEND_HOME_TMP
+SHIELDNET_DEFEND_CONTROL="$SHIELDNET_DEFEND_HOME/bin/shieldnet-defend-control"
 
 start() {
-    ${WAZUH_CONTROL} start
+    ${SHIELDNET_DEFEND_CONTROL} start
 }
 
 stop() {
-    ${WAZUH_CONTROL} stop
+    ${SHIELDNET_DEFEND_CONTROL} stop
 }
 
 status() {
-    ${WAZUH_CONTROL} status
+    ${SHIELDNET_DEFEND_CONTROL} status
 }
 
 case "$1" in

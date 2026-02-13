@@ -1,7 +1,7 @@
 """
-copyright: Copyright (C) 2015-2024, Wazuh Inc.
+copyright: Copyright (C) 2015-2024, ShieldnetDefend Inc.
 
-           Created by Wazuh, Inc. <info@wazuh.com>.
+           Created by ShieldnetDefend, Inc. <info@shieldnetdefend.com>.
 
            This program is free software; you can redistribute it and/or modify it under the terms of GPLv2
 
@@ -21,12 +21,12 @@ targets:
     - manager
 
 daemons:
-    - wazuh-apid
-    - wazuh-modulesd
-    - wazuh-analysisd
-    - wazuh-execd
-    - wazuh-db
-    - wazuh-remoted
+    - shieldnet-defend-apid
+    - shieldnet-defend-modulesd
+    - shieldnet-defend-analysisd
+    - shieldnet-defend-execd
+    - shieldnet-defend-db
+    - shieldnet-defend-remoted
 
 os_platform:
     - linux
@@ -43,8 +43,8 @@ os_version:
     - Ubuntu Bionic
 
 references:
-    - https://documentation.wazuh.com/current/user-manual/api/getting-started.html
-    - https://documentation.wazuh.com/current/user-manual/api/reference.html#tag/Security
+    - https://documentation.shieldnetdefend.com/current/user-manual/api/getting-started.html
+    - https://documentation.shieldnetdefend.com/current/user-manual/api/reference.html#tag/Security
     - https://en.wikipedia.org/wiki/Role-based_access_control
 
 tags:
@@ -54,9 +54,9 @@ import pytest
 from pathlib import Path
 
 from . import TEST_CASES_FOLDER_PATH
-from wazuh_testing.constants.daemons import API_DAEMONS_REQUIREMENTS
-from wazuh_testing.modules.api.utils import manage_security_resources
-from wazuh_testing.utils.configuration import get_test_cases_data
+from shieldnet_defend_testing.constants.daemons import API_DAEMONS_REQUIREMENTS
+from shieldnet_defend_testing.modules.api.utils import manage_security_resources
+from shieldnet_defend_testing.utils.configuration import get_test_cases_data
 
 
 # Marks
@@ -79,7 +79,7 @@ def test_add_old_resource(test_configuration, test_metadata, truncate_monitored_
     description: Check if the security relationships of a previous user are removed from the system after adding a
                  new user with the same ID.
 
-    wazuh_min_version: 4.2.0
+    shieldnet_defend_min_version: 4.2.0
 
     test_phases:
         - setup:
@@ -111,7 +111,7 @@ def test_add_old_resource(test_configuration, test_metadata, truncate_monitored_
             brief: Truncate all the log files and json alerts files before and after the test execution.
         - daemons_handler:
             type: fixture
-            brief: Wrapper of a helper function to handle Wazuh daemons.
+            brief: Wrapper of a helper function to handle ShieldnetDefend daemons.
         - wait_for_api_start:
             type: fixture
             brief: Monitor the API log file to detect whether it has been started or not.

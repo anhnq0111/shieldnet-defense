@@ -11,7 +11,7 @@ sock.connect(ADDR)
 
 
 def send_msg(msg):
-    """Send message to wazuh-db socket
+    """Send message to shieldnet-defend-db socket
 
     Parameters
     ----------

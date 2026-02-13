@@ -20,7 +20,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${LIB_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 add_library(fimebpf SHARED src/ebpf_whodata.cpp )
-target_link_libraries(fimebpf wazuh)
+target_link_libraries(fimebpf shieldnetdefend)
 
 # Set additional compile flags for the loader (if needed)
 target_compile_options(fimebpf PRIVATE -Wall -Wextra)

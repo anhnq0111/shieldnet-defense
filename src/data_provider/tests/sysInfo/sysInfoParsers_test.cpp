@@ -1,6 +1,6 @@
 /*
- * Wazuh SysInfoParsers
- * Copyright (C) 2015, Wazuh Inc.
+ * ShieldnetDefend SysInfoParsers
+ * Copyright (C) 2015, ShieldnetDefend Inc.
  * October 19, 2020.
  *
  * This program is free software; you can redistribute it

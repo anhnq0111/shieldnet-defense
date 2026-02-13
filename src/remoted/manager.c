@@ -1,4 +1,4 @@
-/* Copyright (C) 2015, Wazuh Inc.
+/* Copyright (C) 2015, ShieldnetDefend Inc.
  * Copyright (C) 2009 Trend Micro Inc.
  * All right reserved.
  *
@@ -12,7 +12,7 @@
 #include "remoted.h"
 #include "state.h"
 #include "remoted_op.h"
-#include "../wazuh_db/helpers/wdb_global_helpers.h"
+#include "../shieldnet_defend_db/helpers/wdb_global_helpers.h"
 #include "../os_net/os_net.h"
 #include "shared_download.h"
 #include "../os_crypto/sha256/sha256_op.h"
@@ -22,7 +22,7 @@
 #define HOST_NAME_MAX 64
 #endif
 
-#ifdef WAZUH_UNIT_TESTING
+#ifdef SHIELDNET_DEFEND_UNIT_TESTING
 // Remove STATIC qualifier from tests
   #define STATIC
 
@@ -147,7 +147,7 @@ STATIC bool group_changed(const char *multi_group);
  * @param agent_id. Agent id to assign a group
  * @param msg. Message from agent to process and validate current configuration files
  * @param group. Name of the found group, it will include the name of the group or 'default' group or NULL if it fails.
- * @param wdb_sock Wazuh-DB socket.
+ * @param wdb_sock Shieldnet-Defend-DB socket.
  * @return OS_SUCCESS if it found or assigned a group, OS_INVALID otherwise
  */
 STATIC int lookfor_agent_group(const char *agent_id, char *msg, char **group, int *wdb_sock);
@@ -197,7 +197,7 @@ STATIC void copy_directory(const char *src_path, const char *dst_path, char *gro
  * @param msg Message to send
  * @param status_code Status code to set
  * @param version Agent version to set
- * @param wdb_sock Wazuh-DB socket
+ * @param wdb_sock Shieldnet-Defend-DB socket
  */
 STATIC void send_wrong_version_response(const char *agent_id, char *msg, agent_status_code_t status_code, char *version, int *wdb_sock);
 
@@ -300,7 +300,7 @@ int validate_control_msg(const keyentry * key, char *r_msg, size_t msg_length, c
                     // Update agent data to keep context of events to forward
                     OSHash_Set_ex(agent_data_hash, key->id, strdup(version->valuestring));
                     if (!logr.allow_higher_versions &&
-                        compare_wazuh_versions(__ossec_version, version->valuestring, false) < 0) {
+                        compare_shieldnet_defend_versions(__ossec_version, version->valuestring, false) < 0) {
 
                         // For version errors, we need database access, so queue the message
                         cJSON_Delete(agent_info);
@@ -390,7 +390,7 @@ void save_controlmsg(const keyentry * key, char *r_msg, int *wdb_sock, bool *pos
     const char * agent_ip_label = "#\"_agent_ip\":";
     const char * manager_label = "#\"_manager_hostname\":";
     const char * node_label = "#\"_node_name\":";
-    const char * version_label = "#\"_wazuh_version\":";
+    const char * version_label = "#\"_shieldnet_defend_version\":";
     int agent_id = 0;
     int result = 0;
 
@@ -406,7 +406,7 @@ void save_controlmsg(const keyentry * key, char *r_msg, int *wdb_sock, bool *pos
                 cJSON *version = NULL;
                 if (version = cJSON_GetObjectItem(agent_info, "version"), cJSON_IsString(version)) {
                     if (!logr.allow_higher_versions &&
-                        compare_wazuh_versions(__ossec_version, version->valuestring, false) < 0) {
+                        compare_shieldnet_defend_versions(__ossec_version, version->valuestring, false) < 0) {
 
                         send_wrong_version_response(key->id, HC_INVALID_VERSION,
                                                     INVALID_VERSION, version->valuestring,

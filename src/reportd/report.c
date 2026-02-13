@@ -1,4 +1,4 @@
-/* Copyright (C) 2015, Wazuh Inc.
+/* Copyright (C) 2015, ShieldnetDefend Inc.
  * Copyright (C) 2010 Trend Micro Inc.
  * All rights reserved.
  *
@@ -159,7 +159,7 @@ int main(int argc, char **argv)
 
     }
 
-    mdebug1(WAZUH_HOMEDIR, home_path);
+    mdebug1(SHIELDNET_DEFEND_HOMEDIR, home_path);
 
     /* Check if the user/group given are valid */
     uid = Privsep_GetUser(user);

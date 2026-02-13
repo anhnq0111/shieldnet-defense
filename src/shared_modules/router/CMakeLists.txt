@@ -42,7 +42,7 @@ add_library(router SHARED
     ${ROUTER_SRC}
     )
 
-target_link_libraries(router gcc_s flatbuffers wazuhext simdjson)
+target_link_libraries(router gcc_s flatbuffers shieldnetdefendext simdjson)
 
 set_target_properties(router PROPERTIES
         BUILD_RPATH_USE_ORIGIN TRUE
@@ -50,7 +50,7 @@ set_target_properties(router PROPERTIES
 )
 
 if (TARGET compile_schemas_input)
-    # If target isn't defined, only this project is being built and not the whole Wazuh project.
+    # If target isn't defined, only this project is being built and not the whole ShieldnetDefend project.
     # The schemas must be compiled manually before building this project in that case.
     add_dependencies(router compile_schemas_input)
 endif()

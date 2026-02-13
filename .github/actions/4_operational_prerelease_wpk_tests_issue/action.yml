@@ -34,7 +34,7 @@ runs:
         MAIN_ISSUE="${{ inputs.main_issue }}"
         PREV_ISSUE="${{ inputs.prev_issue }}"
 
-        REPO="wazuh/wazuh"
+        REPO="shieldnetdefend/shieldnetdefend"
         LABEL="level/task,type/test"
         TITLE="Release $RELEASE - $STAGE - WPK Upgrade Tests"
         TAG="v$RELEASE-$(echo ${STAGE// /} | tr '[:upper:]' '[:lower:]')"
@@ -42,7 +42,7 @@ runs:
         BODY=$(cat <<EOF
         |Main RC issue|Version|Stage|Tag|Previous issue|
         |---|---|---|---|---|
-        |#$MAIN_ISSUE|$RELEASE|$STAGE|[$TAG](https://github.com/wazuh/wazuh/tree/$TAG)|#$PREV_ISSUE|
+        |#$MAIN_ISSUE|$RELEASE|$STAGE|[$TAG](https://github.com/shieldnetdefend/shieldnetdefend/tree/$TAG)|#$PREV_ISSUE|
 
         The purpose of this issue is to perform remote upgrade (WPK) tests for the current release candidate, report the results, and open new issues for any errors encountered.
 
@@ -55,7 +55,7 @@ runs:
         1. Set up the previous released version of the agent: install it and connect it to the manager.
         2. Perform a remote upgrade:
            \`\`\`shell
-           /var/ossec/bin/agent_upgrade -a <ID> -f /var/ossec/tmp/wazuh_agent_v$RELEASE_<PLATFORM>.wpk
+           /var/ossec/bin/agent_upgrade -a <ID> -f /var/ossec/tmp/shieldnet_defend_agent_v$RELEASE_<PLATFORM>.wpk
            \`\`\`
         3. Verify that the upgrade completes successfully and that the agent version is updated correctly.
 
@@ -78,10 +78,10 @@ runs:
 
         \`\`\`shell
         cd /var/ossec/tmp
-        curl -LsO https://packages-dev.wazuh.com/pre-release/wpk/linux/deb/amd64/wazuh_agent_v$RELEASE_linux_amd64.deb.wpk
-        curl -LsO https://packages-dev.wazuh.com/pre-release/wpk/linux/rpm/x86_64/wazuh_agent_v$RELEASE_linux_x86_64.rpm.wpk
-        curl -LsO https://packages-dev.wazuh.com/pre-release/wpk/macos/pkg/intel64/wazuh_agent_v$RELEASE_macos_intel64.pkg.wpk
-        curl -LsO https://packages-dev.wazuh.com/pre-release/wpk/windows/wazuh_agent_v$RELEASE_windows.wpk
+        curl -LsO https://packages-dev.shieldnetdefend.com/pre-release/wpk/linux/deb/amd64/shieldnet_defend_agent_v$RELEASE_linux_amd64.deb.wpk
+        curl -LsO https://packages-dev.shieldnetdefend.com/pre-release/wpk/linux/rpm/x86_64/shieldnet_defend_agent_v$RELEASE_linux_x86_64.rpm.wpk
+        curl -LsO https://packages-dev.shieldnetdefend.com/pre-release/wpk/macos/pkg/intel64/shieldnet_defend_agent_v$RELEASE_macos_intel64.pkg.wpk
+        curl -LsO https://packages-dev.shieldnetdefend.com/pre-release/wpk/windows/shieldnet_defend_agent_v$RELEASE_windows.wpk
         \`\`\`
 
         ## Report procedure
@@ -135,8 +135,8 @@ runs:
 
         All of the following must be approved in order to close this issue:
 
-        - [ ] @wazuh/devel-xdrsiem-agent
-        - [ ] @wazuh/devel-xdrsiem-qa-release
+        - [ ] @shieldnetdefend/devel-xdrsiem-agent
+        - [ ] @shieldnetdefend/devel-xdrsiem-qa-release
         EOF
         )
 

@@ -1,17 +1,17 @@
-FROM public.ecr.aws/o5x5t0j3/amd64/api_development:integration_test_wazuh-generic
+FROM public.ecr.aws/o5x5t0j3/amd64/api_development:integration_test_shieldnet-defend-generic
 
 # ENV_MODE needs to be assigned to an environment variable as it is going to be used at run time (CMD)
 ARG ENV_MODE
 ENV ENV_MODE ${ENV_MODE}
 
 # INSTALL MANAGER
-ARG WAZUH_BRANCH
+ARG SHIELDNET_DEFEND_BRANCH
 
 ADD base/manager/supervisord.conf /etc/supervisor/conf.d/
 
-RUN mkdir wazuh && curl -sL https://github.com/wazuh/wazuh/tarball/${WAZUH_BRANCH} | tar zx --strip-components=1 -C wazuh
-COPY base/manager/preloaded-vars.conf /wazuh/etc/preloaded-vars.conf
-RUN /wazuh/install.sh
+RUN mkdir shieldnetdefend && curl -sL https://github.com/shieldnetdefend/shieldnetdefend/tarball/${SHIELDNET_DEFEND_BRANCH} | tar zx --strip-components=1 -C shieldnetdefend
+COPY base/manager/preloaded-vars.conf /shieldnetdefend/etc/preloaded-vars.conf
+RUN /shieldnetdefend/install.sh
 COPY base/manager/entrypoint.sh /scripts/entrypoint.sh
 
 # HEALTHCHECK

@@ -1,4 +1,4 @@
-/* Copyright (C) 2015, Wazuh Inc.
+/* Copyright (C) 2015, ShieldnetDefend Inc.
  * Copyright (C) 2009 Trend Micro Inc.
  * All rights reserved.
  *
@@ -726,12 +726,12 @@ int w_uncompress_bz2_gz_file(const char * path, const char * dest);
 #endif /* CLIENT */
 
 /**
- * @brief Get the Wazuh installation directory
+ * @brief Get the ShieldnetDefend installation directory
  *
- * It is obtained from the /proc directory, argv[0], or the env variable WAZUH_HOME
+ * It is obtained from the /proc directory, argv[0], or the env variable SHIELDNET_DEFEND_HOME
  *
  * @param arg ARGV0 - Program name
- * @return Pointer to the Wazuh installation path on success
+ * @return Pointer to the ShieldnetDefend installation path on success
  */
 char *w_homedir(char *arg);
 #endif /* FILE_OP_H */

@@ -1,11 +1,11 @@
-# Copyright (C) 2015-2024, Wazuh Inc.
-# Created by Wazuh, Inc. <info@wazuh.com>.
+# Copyright (C) 2015-2024, ShieldnetDefend Inc.
+# Created by ShieldnetDefend, Inc. <info@shieldnetdefend.com>.
 # This program is free software; you can redistribute it and/or modify it under the terms of GPLv2
 import os
 import time
 
-from wazuh_testing.constants.paths.sockets import QUEUE_AGENTS_TIMESTAMP_PATH, QUEUE_DIFF_PATH, QUEUE_RIDS_PATH
-from wazuh_testing.utils.file import truncate_file, remove_file, recursive_directory_creation
+from shieldnet_defend_testing.constants.paths.sockets import QUEUE_AGENTS_TIMESTAMP_PATH, QUEUE_DIFF_PATH, QUEUE_RIDS_PATH
+from shieldnet_defend_testing.utils.file import truncate_file, remove_file, recursive_directory_creation
 
 
 def clean_diff():

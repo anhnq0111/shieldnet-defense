@@ -1,0 +1,10 @@
+shieldnet-defend-agent: embedded-library
+shieldnet-defend-agent: embedded-zlib
+shieldnet-defend-agent: possible-gpl-code-linked-with-openssl
+shieldnet-defend-agent: new-package-should-close-itp-bug
+shieldnet-defend-agent: possibly-insecure-handling-of-tmp-files-in-maintainer-script
+shieldnet-defend-agent: non-standard-dir-in-var
+shieldnet-defend-agent: file-in-unusual-dir
+shieldnet-defend-agent: hardening-no-fortify-functions
+shieldnet-defend-agent: hardening-no-relro
+shieldnet-defend-agent: binary-from-other-architecture var/ossec/lib/modern.bpf.o

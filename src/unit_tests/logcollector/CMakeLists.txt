@@ -13,14 +13,14 @@ set_target_properties(
     PROPERTIES
     LINKER_LANGUAGE C
 )
-target_link_libraries(LOGCOLLECTOR_O ${WAZUHLIB} ${WAZUHEXT} -lpthread)
+target_link_libraries(LOGCOLLECTOR_O ${SHIELDNETDEFENDLIB} ${SHIELDNETDEFENDEXT} -lpthread)
 
 if(${TARGET} STREQUAL "winagent")
     link_directories(${SRC_FOLDER}/syscheckd/build/bin)
 endif(${TARGET} STREQUAL "winagent")
 
 #include wrappers
-include(${SRC_FOLDER}/unit_tests/wrappers/wazuh/shared/shared.cmake)
+include(${SRC_FOLDER}/unit_tests/wrappers/shieldnetdefend/shared/shared.cmake)
 
 # Generate logcollector tests
 if(${TARGET} STREQUAL "winagent")
@@ -156,8 +156,8 @@ foreach(counter RANGE ${count})
     add_executable(${logcollector_test_name} ${logcollector_test_name}.c)
     target_link_libraries(
         ${logcollector_test_name}
-        ${WAZUHLIB}
-        ${WAZUHEXT}
+        ${SHIELDNETDEFENDLIB}
+        ${SHIELDNETDEFENDEXT}
         LOGCOLLECTOR_O
         ${TEST_DEPS}
     )

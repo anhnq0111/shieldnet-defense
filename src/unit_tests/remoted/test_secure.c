@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015, Wazuh Inc.
+ * Copyright (C) 2015, ShieldnetDefend Inc.
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General Public
@@ -23,20 +23,20 @@
 #include "../wrappers/linux/socket_wrappers.h"
 #include "../wrappers/posix/stat_wrappers.h"
 #include "../wrappers/posix/unistd_wrappers.h"
-#include "../wrappers/wazuh/os_crypto/keys_wrappers.h"
-#include "../wrappers/wazuh/os_crypto/msgs_wrappers.h"
-#include "../wrappers/wazuh/remoted/manager_wrappers.h"
-#include "../wrappers/wazuh/remoted/netbuffer_wrappers.h"
-#include "../wrappers/wazuh/remoted/netcounter_wrappers.h"
-#include "../wrappers/wazuh/remoted/queue_wrappers.h"
-#include "../wrappers/wazuh/remoted/state_wrappers.h"
-#include "../wrappers/wazuh/shared/debug_op_wrappers.h"
-#include "../wrappers/wazuh/shared/hash_op_wrappers.h"
-#include "../wrappers/wazuh/shared/queue_linked_op_wrappers.h"
-#include "../wrappers/wazuh/shared/validate_op_wrappers.h"
-#include "../wrappers/wazuh/shared_modules/router_wrappers.h"
-#include "../wrappers/wazuh/wazuh_db/wdb_metadata_wrappers.h"
-#include "../wrappers/wazuh/wazuh_db/wdb_wrappers.h"
+#include "../wrappers/shieldnetdefend/os_crypto/keys_wrappers.h"
+#include "../wrappers/shieldnetdefend/os_crypto/msgs_wrappers.h"
+#include "../wrappers/shieldnetdefend/remoted/manager_wrappers.h"
+#include "../wrappers/shieldnetdefend/remoted/netbuffer_wrappers.h"
+#include "../wrappers/shieldnetdefend/remoted/netcounter_wrappers.h"
+#include "../wrappers/shieldnetdefend/remoted/queue_wrappers.h"
+#include "../wrappers/shieldnetdefend/remoted/state_wrappers.h"
+#include "../wrappers/shieldnetdefend/shared/debug_op_wrappers.h"
+#include "../wrappers/shieldnetdefend/shared/hash_op_wrappers.h"
+#include "../wrappers/shieldnetdefend/shared/queue_linked_op_wrappers.h"
+#include "../wrappers/shieldnetdefend/shared/validate_op_wrappers.h"
+#include "../wrappers/shieldnetdefend/shared_modules/router_wrappers.h"
+#include "../wrappers/shieldnetdefend/shieldnet_defend_db/wdb_metadata_wrappers.h"
+#include "../wrappers/shieldnetdefend/shieldnet_defend_db/wdb_wrappers.h"
 
 typedef struct test_agent_info
 {

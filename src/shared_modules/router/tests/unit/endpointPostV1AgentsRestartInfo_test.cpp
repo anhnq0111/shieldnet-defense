@@ -1,6 +1,6 @@
 /*
- * Wazuh router
- * Copyright (C) 2015, Wazuh Inc.
+ * ShieldnetDefend router
+ * Copyright (C) 2015, ShieldnetDefend Inc.
  * May 5, 2025.
  *
  * This program is free software; you can redistribute it
@@ -9,7 +9,7 @@
  * Foundation.
  */
 
-#include "shared_modules/router/src/wazuh-db/endpointPostV1AgentsRestartInfo.hpp"
+#include "shared_modules/router/src/shieldnet-defend-db/endpointPostV1AgentsRestartInfo.hpp"
 #include "shared_modules/utils/mocks/sqlite3WrapperMock.hpp"
 
 #include <gmock/gmock.h>

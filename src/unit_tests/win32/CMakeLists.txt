@@ -21,11 +21,11 @@ set_target_properties(
     LINKER_LANGUAGE C
 )
 
-target_link_libraries(WIN32 ${WAZUHLIB} ${WAZUHEXT} -lpthread)
+target_link_libraries(WIN32 ${SHIELDNETDEFENDLIB} ${SHIELDNETDEFENDEXT} -lpthread)
 link_directories(${SRC_FOLDER}/syscheckd/build/bin)
 
 #include wrappers
-include(${SRC_FOLDER}/unit_tests/wrappers/wazuh/shared/shared.cmake)
+include(${SRC_FOLDER}/unit_tests/wrappers/shieldnetdefend/shared/shared.cmake)
 
 # Generate win32 tests
 list(APPEND win32_names "test_win_utils")
@@ -48,8 +48,8 @@ foreach(counter RANGE ${count})
 
     target_link_libraries(
         ${win32_test_name}
-        ${WAZUHLIB}
-        ${WAZUHEXT}
+        ${SHIELDNETDEFENDLIB}
+        ${SHIELDNETDEFENDEXT}
         WIN32
         ${TEST_DEPS}
         fimdb

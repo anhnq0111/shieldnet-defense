@@ -1,5 +1,5 @@
-# Copyright (C) 2015, Wazuh Inc.
-# Created by Wazuh, Inc. <info@wazuh.com>.
+# Copyright (C) 2015, ShieldnetDefend Inc.
+# Created by ShieldnetDefend, Inc. <info@shieldnetdefend.com>.
 # This program is a free software; you can redistribute it and/or modify it under the terms of GPLv2
 
 import datetime
@@ -8,9 +8,9 @@ import logging
 from connexion import request
 from connexion.lifecycle import ConnexionResponse
 
-import wazuh.analysis as analysis
-import wazuh.manager as manager
-import wazuh.stats as stats
+import shieldnetdefend.analysis as analysis
+import shieldnetdefend.manager as manager
+import shieldnetdefend.stats as stats
 from api.constants import INSTALLATION_UID_KEY, UPDATE_INFORMATION_KEY
 from api.controllers.util import json_response, XML_CONTENT_TYPE
 from api.models.base_model_ import Body
@@ -19,17 +19,17 @@ from api.util import (
 )
 from api.validator import check_component_configuration_pair
 from api.signals import cti_context
-from wazuh.core import common
-from wazuh.core import configuration
-from wazuh.core.cluster.dapi.dapi import DistributedAPI
-from wazuh.core.manager import query_update_check_service
-from wazuh.core.results import AffectedItemsWazuhResult
+from shieldnetdefend.core import common
+from shieldnetdefend.core import configuration
+from shieldnetdefend.core.cluster.dapi.dapi import DistributedAPI
+from shieldnetdefend.core.manager import query_update_check_service
+from shieldnetdefend.core.results import AffectedItemsShieldnetDefendResult
 
-logger = logging.getLogger('wazuh-api')
+logger = logging.getLogger('shieldnet-defend-api')
 
 
 async def get_status(pretty: bool = False, wait_for_complete: bool = False) -> ConnexionResponse:
-    """Get manager's or local_node's Wazuh daemons status
+    """Get manager's or local_node's ShieldnetDefend daemons status
 
     Parameters
     ----------
@@ -100,7 +100,7 @@ async def get_configuration(pretty: bool = False, wait_for_complete: bool = Fals
     wait_for_complete : bool, optional
         Disable response timeout or not. Default `False`
     section : str
-        Indicates the wazuh configuration section
+        Indicates the shieldnetdefend configuration section
     field : str
         Indicates a section child, e.g, fields for rule section are include, decoder_dir, etc.
     raw : bool, optional
@@ -131,7 +131,7 @@ async def get_configuration(pretty: bool = False, wait_for_complete: bool = Fals
                           )
     data = raise_if_exc(await dapi.distribute_function())
 
-    if isinstance(data, AffectedItemsWazuhResult):
+    if isinstance(data, AffectedItemsShieldnetDefendResult):
         response = json_response(data, pretty=pretty)
     else:
         response = ConnexionResponse(body=data["message"],
@@ -140,7 +140,7 @@ async def get_configuration(pretty: bool = False, wait_for_complete: bool = Fals
 
 
 async def get_daemon_stats(pretty: bool = False, wait_for_complete: bool = False, daemons_list: list = None):
-    """Get Wazuh statistical information from the specified manager's daemons.
+    """Get ShieldnetDefend statistical information from the specified manager's daemons.
 
     Parameters
     ----------
@@ -169,7 +169,7 @@ async def get_daemon_stats(pretty: bool = False, wait_for_complete: bool = False
 async def get_stats(pretty: bool = False, wait_for_complete: bool = False, date: str = None) -> ConnexionResponse:
     """Get manager's or local_node's stats.
 
-    Returns Wazuh statistical information for the current or specified date.
+    Returns ShieldnetDefend statistical information for the current or specified date.
 
     Parameters
     ----------
@@ -208,7 +208,7 @@ async def get_stats(pretty: bool = False, wait_for_complete: bool = False, date:
 async def get_stats_hourly(pretty: bool = False, wait_for_complete: bool = False) -> ConnexionResponse:
     """Get manager's or local_node's stats by hour.
 
-    Returns Wazuh statistical information per hour. Each number in the averages field represents the average of alerts
+    Returns ShieldnetDefend statistical information per hour. Each number in the averages field represents the average of alerts
     per hour.
 
     Parameters
@@ -241,7 +241,7 @@ async def get_stats_hourly(pretty: bool = False, wait_for_complete: bool = False
 async def get_stats_weekly(pretty: bool = False, wait_for_complete: bool = False) -> ConnexionResponse:
     """Get manager's or local_node's stats by week.
 
-    Returns Wazuh statistical information per week. Each number in the averages field represents the average of alerts
+    Returns ShieldnetDefend statistical information per week. Each number in the averages field represents the average of alerts
     per hour for that specific day.
 
     Parameters
@@ -342,7 +342,7 @@ async def get_stats_remoted(pretty: bool = False, wait_for_complete: bool = Fals
 async def get_log(pretty: bool = False, wait_for_complete: bool = False, offset: int = 0, limit: int = None,
                   sort: str = None, search: str = None, tag: str = None, level: str = None,
                   q: str = None, select: str = None, distinct: bool = False) -> ConnexionResponse:
-    """Get manager's or local_node's last 2000 wazuh log entries.
+    """Get manager's or local_node's last 2000 shieldnetdefend log entries.
 
     Parameters
     ----------
@@ -401,7 +401,7 @@ async def get_log(pretty: bool = False, wait_for_complete: bool = False, offset:
 
 
 async def get_log_summary(pretty: bool = False, wait_for_complete: bool = False) -> ConnexionResponse:
-    """Get manager's or local_node's summary of the last 2000 wazuh log entries.
+    """Get manager's or local_node's summary of the last 2000 shieldnetdefend log entries.
 
     Parameters
     ----------
@@ -520,7 +520,7 @@ async def put_reload_analysisd(pretty: bool = False, wait_for_complete: bool = F
 
 
 async def get_conf_validation(pretty: bool = False, wait_for_complete: bool = False) -> ConnexionResponse:
-    """Check if Wazuh configuration is correct in manager or local_node.
+    """Check if ShieldnetDefend configuration is correct in manager or local_node.
 
     Parameters
     ----------

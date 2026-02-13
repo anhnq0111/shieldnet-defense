@@ -25,4 +25,4 @@ jobs:
       - name: Inventory harvester - Coding style
         uses: ./.github/actions/clang_format
         with:
-          path: src/wazuh_modules/inventory_harvester
+          path: src/shieldnet_defend_modules/inventory_harvester

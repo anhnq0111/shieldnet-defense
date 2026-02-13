@@ -2,14 +2,14 @@
 
 ## Overview
 
-The **InventoryHarvester** module receives inventory data events as flatbuffer messages through the router IPC mechanism and stores it in the Wazuh Indexer. By centralizing information about system inventory—such as hardware, software, network details, and File Integrity Monitoring (FIM) events, this module makes the data readily available for querying, visualization, and deeper analysis. Offloading this information to the Wazuh Indexer, rather than storing it on the Manager, helps prevent performance bottlenecks.
+The **InventoryHarvester** module receives inventory data events as flatbuffer messages through the router IPC mechanism and stores it in the ShieldnetDefend Indexer. By centralizing information about system inventory—such as hardware, software, network details, and File Integrity Monitoring (FIM) events, this module makes the data readily available for querying, visualization, and deeper analysis. Offloading this information to the ShieldnetDefend Indexer, rather than storing it on the Manager, helps prevent performance bottlenecks.
 
 ### Key Responsibilities
 
 - **Receive** inventory data (e.g., hardware/software/network details) via flatbuffer messages.
-- **Index** all collected data in the Wazuh Indexer in accordance with global state requirements.
+- **Index** all collected data in the ShieldnetDefend Indexer in accordance with global state requirements.
 - **Manage** bulk operations, reducing overhead and improving overall performance.
-- **Integrate** seamlessly with other Wazuh modules that rely on inventory data.
+- **Integrate** seamlessly with other ShieldnetDefend modules that rely on inventory data.
 
 ### Data Flow
 
@@ -24,11 +24,11 @@ The **InventoryHarvester** module receives inventory data events as flatbuffer m
 
 3. **Indexer Connector**
 
-   - Validated data is batched and sent to the Wazuh Indexer in bulk, minimizing overhead.
+   - Validated data is batched and sent to the ShieldnetDefend Indexer in bulk, minimizing overhead.
 
 4. **Storage**
 
-   - The data is stored in a dedicated global state index, following Wazuh Common Schemas (WCS). There is one index for each type of inventory data.
+   - The data is stored in a dedicated global state index, following ShieldnetDefend Common Schemas (WCS). There is one index for each type of inventory data.
 
 5. **Monitoring & Feedback**
    - Any indexing issues or failures are reported to the relevant components for retries or error handling.
@@ -58,10 +58,10 @@ The **InventoryHarvester** module receives inventory data events as flatbuffer m
 
 ## Related Epic
 
-Inventory modules can leverage global queries in the Wazuh Indexer to perform complex searches and filtering on collected data. This capability significantly enhances Wazuh’s security and compliance features.
+Inventory modules can leverage global queries in the ShieldnetDefend Indexer to perform complex searches and filtering on collected data. This capability significantly enhances ShieldnetDefend’s security and compliance features.
 
-- **Epic**: [#27894 – Global Queries for FIM and Inventory Modules](https://github.com/wazuh/wazuh/issues/27894)
-- **Responsible Team**: [@wazuh/devel-xdrsiem-server](https://github.com/orgs/wazuh/teams/devel-xdrsiem-server)
+- **Epic**: [#27894 – Global Queries for FIM and Inventory Modules](https://github.com/shieldnetdefend/shieldnetdefend/issues/27894)
+- **Responsible Team**: [@shieldnetdefend/devel-xdrsiem-server](https://github.com/orgs/shieldnetdefend/teams/devel-xdrsiem-server)
 
 ---
 
@@ -71,12 +71,12 @@ Inventory modules can leverage global queries in the Wazuh Indexer to perform co
 - Users can create **custom** visualizations and queries for the same data.
 - Users **cannot edit or delete** a global state index or its data directly.
 - When an **agent is removed**, the global state data reflects the removal.
-- Supports both **Wazuh server cluster** and **Wazuh server standalone** deployments.
+- Supports both **ShieldnetDefend server cluster** and **ShieldnetDefend server standalone** deployments.
 - **System Inventory** schemas must comply with **WCS**.
 
 ## Non-Functional Requirements
 
-- Global state changes are reflected in the Wazuh Indexer based on whichever of the following occurs first:
+- Global state changes are reflected in the ShieldnetDefend Indexer based on whichever of the following occurs first:
   - **25,000** accumulated change events.
   - **20 seconds** after the last bulk operation.
 - Hardware resource usage (CPU, memory, storage) must stay within acceptable limits.
@@ -84,13 +84,13 @@ Inventory modules can leverage global queries in the Wazuh Indexer to perform co
 
 ## Implementation Restrictions
 
-- **System inventory** global state data resides in the Wazuh Indexer.
+- **System inventory** global state data resides in the ShieldnetDefend Indexer.
 - The **Indexer connector** handles the creation of required indices.
 - Permissions to edit or delete **global state indices** differ from regular user permissions.
-- **Manager-Indexer synchronization** is guaranteed when both operate under the same Wazuh version.
+- **Manager-Indexer synchronization** is guaranteed when both operate under the same ShieldnetDefend version.
 - System inventory fields follow a **common schema** wherever possible.
 - The **UI** for system inventory is designed to mirror the **Vulnerability Detector** interface for consistency.
 
 ## Implementation Missing Features
 
-- Currently, the events indexation for **agent 000 (Wazuh manager)** is not supported.
+- Currently, the events indexation for **agent 000 (ShieldnetDefend manager)** is not supported.

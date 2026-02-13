@@ -7,7 +7,7 @@ assignees: ''
 
 ---
 
-|Wazuh version| Component | Action type |
+|ShieldnetDefend version| Component | Action type |
 |---| --- | --- |
 | X.Y.Z-rev | Rules/Decoders | New/Error/Improve |
 

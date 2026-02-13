@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Send messages to the main Wazuh queue (analysisd/agentd).
+Send messages to the main ShieldnetDefend queue (analysisd/agentd).
 Created: November 1, 2016
 
 Usage:
@@ -53,7 +53,7 @@ def get_message(args):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Send messages to the main Wazuh queue (analysisd/agentd)."
+        description="Send messages to the main ShieldnetDefend queue (analysisd/agentd)."
     )
     parser.add_argument(
         '-L', action='store_true',

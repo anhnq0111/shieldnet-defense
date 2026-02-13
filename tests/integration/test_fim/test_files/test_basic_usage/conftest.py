@@ -1,15 +1,15 @@
-# Copyright (C) 2015-2024, Wazuh Inc.
-# Created by Wazuh, Inc. <info@wazuh.com>.
+# Copyright (C) 2015-2024, ShieldnetDefend Inc.
+# Created by ShieldnetDefend, Inc. <info@shieldnetdefend.com>.
 # This program is free software; you can redistribute it and/or modify it under the terms of GPLv2
 import pytest
 
 from pathlib import Path
 
-from wazuh_testing.constants.paths.logs import WAZUH_LOG_PATH
-from wazuh_testing.modules.fim.patterns import EVENT_TYPE_ADDED
-from wazuh_testing.tools.monitors.file_monitor import FileMonitor
-from wazuh_testing.utils import file
-from wazuh_testing.utils.callbacks import generate_callback
+from shieldnet_defend_testing.constants.paths.logs import SHIELDNET_DEFEND_LOG_PATH
+from shieldnet_defend_testing.modules.fim.patterns import EVENT_TYPE_ADDED
+from shieldnet_defend_testing.tools.monitors.file_monitor import FileMonitor
+from shieldnet_defend_testing.utils import file
+from shieldnet_defend_testing.utils.callbacks import generate_callback
 
 
 @pytest.fixture()
@@ -23,7 +23,7 @@ def path_to_edit(test_metadata: dict) -> str:
     else:
         file.write_file(to_edit, 'test')
 
-    FileMonitor(WAZUH_LOG_PATH).start(generate_callback(EVENT_TYPE_ADDED))
+    FileMonitor(SHIELDNET_DEFEND_LOG_PATH).start(generate_callback(EVENT_TYPE_ADDED))
 
     yield to_edit
 

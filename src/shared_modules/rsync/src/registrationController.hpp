@@ -1,6 +1,6 @@
 /*
- * Wazuh RSYNC
- * Copyright (C) 2015, Wazuh Inc.
+ * ShieldnetDefend RSYNC
+ * Copyright (C) 2015, ShieldnetDefend Inc.
  * July 4, 2022.
  *
  * This program is free software; you can redistribute it

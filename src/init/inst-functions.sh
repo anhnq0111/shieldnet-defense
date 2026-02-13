@@ -1,7 +1,7 @@
 #!/bin/sh
 
-# Wazuh Installer Functions
-# Copyright (C) 2015, Wazuh Inc.
+# ShieldnetDefend Installer Functions
+# Copyright (C) 2015, ShieldnetDefend Inc.
 # November 18, 2016.
 #
 # This program is free software; you can redistribute it
@@ -77,7 +77,7 @@ WriteSyscheck()
 ##########
 DisableAuthd()
 {
-    echo "  <!-- Configuration for wazuh-authd -->" >> $NEWCONFIG
+    echo "  <!-- Configuration for shieldnet-defend-authd -->" >> $NEWCONFIG
     echo "  <auth>" >> $NEWCONFIG
     echo "    <disabled>yes</disabled>" >> $NEWCONFIG
     echo "    <port>1515</port>" >> $NEWCONFIG
@@ -196,7 +196,7 @@ InstallSecurityConfigurationAssessmentFiles()
         CONFIGURATION_ASSESSMENT_FILES=$(cat .$CONFIGURATION_ASSESSMENT_FILES_PATH)
         for FILE in $CONFIGURATION_ASSESSMENT_FILES; do
             if [ -f "../ruleset/sca/$FILE" ]; then
-                ${INSTALL} -m 0640 -o root -g ${WAZUH_GROUP} ../ruleset/sca/$FILE ${INSTALLDIR}/ruleset/sca
+                ${INSTALL} -m 0640 -o root -g ${SHIELDNET_DEFEND_GROUP} ../ruleset/sca/$FILE ${INSTALLDIR}/ruleset/sca
             else
                 echo "ERROR: SCA policy not found: ../ruleset/sca/$FILE"
             fi
@@ -209,7 +209,7 @@ InstallSecurityConfigurationAssessmentFiles()
         for FILE in $CONFIGURATION_ASSESSMENT_FILES; do
             FILENAME=$(basename $FILE)
             if [ -f "../ruleset/sca/$FILE" ] && [ ! -f "${INSTALLDIR}/ruleset/sca/$FILENAME" ]; then
-                ${INSTALL} -m 0640 -o root -g ${WAZUH_GROUP} ../ruleset/sca/$FILE ${INSTALLDIR}/ruleset/sca/
+                ${INSTALL} -m 0640 -o root -g ${SHIELDNET_DEFEND_GROUP} ../ruleset/sca/$FILE ${INSTALLDIR}/ruleset/sca/
                 mv ${INSTALLDIR}/ruleset/sca/$FILENAME ${INSTALLDIR}/ruleset/sca/$FILENAME.disabled
             fi
         done
@@ -225,8 +225,8 @@ GenerateAuthCert()
         # Generation auto-signed certificate if not exists
         if [ ! -f "${INSTALLDIR}/etc/sslmanager.key" ] && [ ! -f "${INSTALLDIR}/etc/sslmanager.cert" ]; then
             if [ ! "X${USER_GENERATE_AUTHD_CERT}" = "Xn" ]; then
-                    echo "Generating self-signed certificate for wazuh-authd..."
-                    ${INSTALLDIR}/bin/wazuh-authd -C 365 -B 2048 -K ${INSTALLDIR}/etc/sslmanager.key -X ${INSTALLDIR}/etc/sslmanager.cert -S "/C=US/ST=California/CN=wazuh/"
+                    echo "Generating self-signed certificate for shieldnet-defend-authd..."
+                    ${INSTALLDIR}/bin/shieldnet-defend-authd -C 365 -B 2048 -K ${INSTALLDIR}/etc/sslmanager.key -X ${INSTALLDIR}/etc/sslmanager.cert -S "/C=US/ST=California/CN=shieldnetdefend/"
                     chmod 640 ${INSTALLDIR}/etc/sslmanager.key
                     chmod 640 ${INSTALLDIR}/etc/sslmanager.cert
             fi
@@ -323,7 +323,7 @@ WriteLogs()
 ##########
 SetHeaders()
 {
-    HEADERS_TMP="/tmp/wazuh-headers.tmp"
+    HEADERS_TMP="/tmp/shieldnet-defend-headers.tmp"
     if [ "$DIST_VER" = "0" ]; then
         sed -e "s/TYPE/$1/g; s/DISTRIBUTION/${DIST_NAME}/g; s/VERSION//g" "$HEADER_TEMPLATE" > $HEADERS_TMP
     else
@@ -343,7 +343,7 @@ SetHeaders()
 GenerateService()
 {
     SERVICE_TEMPLATE=./src/init/templates/${1}
-    sed "s|WAZUH_HOME_TMP|${INSTALLDIR}|g" ${SERVICE_TEMPLATE}
+    sed "s|SHIELDNET_DEFEND_HOME_TMP|${INSTALLDIR}|g" ${SERVICE_TEMPLATE}
 }
 
 ##########
@@ -485,9 +485,9 @@ WriteManager()
 
     if [ "$EMAILNOTIFY" = "yes"   ]; then
         GLOBAL_CONTENT=$(sed -e "s|<email_notification>no</email_notification>|<email_notification>yes</email_notification>|g; \
-        s|<smtp_server>smtp.example.wazuh.com</smtp_server>|<smtp_server>${SMTP}</smtp_server>|g; \
-        s|<email_from>wazuh@example.wazuh.com</email_from>|<email_from>wazuh@${HOST}</email_from>|g; \
-        s|<email_to>recipient@example.wazuh.com</email_to>|<email_to>${EMAIL}</email_to>|g;" "${GLOBAL_TEMPLATE}")
+        s|<smtp_server>smtp.example.shieldnetdefend.com</smtp_server>|<smtp_server>${SMTP}</smtp_server>|g; \
+        s|<email_from>shieldnetdefend@example.shieldnetdefend.com</email_from>|<email_from>shieldnetdefend@${HOST}</email_from>|g; \
+        s|<email_to>recipient@example.shieldnetdefend.com</email_to>|<email_to>${EMAIL}</email_to>|g;" "${GLOBAL_TEMPLATE}")
     else
         GLOBAL_CONTENT=$(cat ${GLOBAL_TEMPLATE})
     fi
@@ -604,7 +604,7 @@ WriteManager()
     cat ${RULES_TEMPLATE} >> $NEWCONFIG
     echo "" >> $NEWCONFIG
 
-    # Writting wazuh-logtest configuration
+    # Writting shieldnet-defend-logtest configuration
     cat ${RULE_TEST_TEMPLATE} >> $NEWCONFIG
     echo "" >> $NEWCONFIG
 
@@ -639,9 +639,9 @@ WriteLocal()
 
     if [ "$EMAILNOTIFY" = "yes"   ]; then
         sed -e "s|<email_notification>no</email_notification>|<email_notification>yes</email_notification>|g; \
-        s|<smtp_server>smtp.example.wazuh.com</smtp_server>|<smtp_server>${SMTP}</smtp_server>|g; \
-        s|<email_from>wazuh@example.wazuh.com</email_from>|<email_from>wazuh@${HOST}</email_from>|g; \
-        s|<email_to>recipient@example.wazuh.com</email_to>|<email_to>${EMAIL}</email_to>|g;" "${GLOBAL_TEMPLATE}" >> $NEWCONFIG
+        s|<smtp_server>smtp.example.shieldnetdefend.com</smtp_server>|<smtp_server>${SMTP}</smtp_server>|g; \
+        s|<email_from>shieldnetdefend@example.shieldnetdefend.com</email_from>|<email_from>shieldnetdefend@${HOST}</email_from>|g; \
+        s|<email_to>recipient@example.shieldnetdefend.com</email_to>|<email_to>${EMAIL}</email_to>|g;" "${GLOBAL_TEMPLATE}" >> $NEWCONFIG
     else
         cat ${GLOBAL_TEMPLATE} >> $NEWCONFIG
     fi
@@ -739,7 +739,7 @@ WriteLocal()
     cat ${RULES_TEMPLATE} >> $NEWCONFIG
     echo "" >> $NEWCONFIG
 
-    # Writting wazuh-logtest configuration
+    # Writting shieldnet-defend-logtest configuration
     cat ${RULE_TEST_TEMPLATE} >> $NEWCONFIG
     echo "" >> $NEWCONFIG
 
@@ -749,18 +749,18 @@ WriteLocal()
 InstallCommon()
 {
 
-    WAZUH_GROUP='wazuh'
-    WAZUH_USER='wazuh'
+    SHIELDNET_DEFEND_GROUP='shieldnetdefend'
+    SHIELDNET_DEFEND_USER='shieldnetdefend'
     INSTALL="install"
 
     if [ ${INSTYPE} = 'server' ]; then
-        OSSEC_CONTROL_SRC='./init/wazuh-server.sh'
+        OSSEC_CONTROL_SRC='./init/shieldnet-defend-server.sh'
         OSSEC_CONF_SRC='../etc/ossec-server.conf'
     elif [ ${INSTYPE} = 'agent' ]; then
-        OSSEC_CONTROL_SRC='./init/wazuh-client.sh'
+        OSSEC_CONTROL_SRC='./init/shieldnet-defend-client.sh'
         OSSEC_CONF_SRC='../etc/ossec-agent.conf'
     elif [ ${INSTYPE} = 'local' ]; then
-        OSSEC_CONTROL_SRC='./init/wazuh-local.sh'
+        OSSEC_CONTROL_SRC='./init/shieldnet-defend-local.sh'
         OSSEC_CONF_SRC='../etc/ossec-local.conf'
     fi
 
@@ -772,36 +772,36 @@ InstallCommon()
         INSTALL="/opt/freeware/bin/install"
     fi
 
-    ./init/adduser.sh ${WAZUH_USER} ${WAZUH_GROUP} ${INSTALLDIR}
+    ./init/adduser.sh ${SHIELDNET_DEFEND_USER} ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}
 
-  ${INSTALL} -d -m 0750 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/
+  ${INSTALL} -d -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/
 
   # Install VERSION.json and append commit id if any
-  ${INSTALL} -m 440 -o ${WAZUH_USER} -g ${WAZUH_GROUP} ../VERSION.json ${INSTALLDIR}/VERSION.json
+  ${INSTALL} -m 440 -o ${SHIELDNET_DEFEND_USER} -g ${SHIELDNET_DEFEND_GROUP} ../VERSION.json ${INSTALLDIR}/VERSION.json
 
-  ${INSTALL} -d -m 0770 -o ${WAZUH_USER} -g ${WAZUH_GROUP} ${INSTALLDIR}/logs
-  ${INSTALL} -d -m 0750 -o ${WAZUH_USER} -g ${WAZUH_GROUP} ${INSTALLDIR}/logs/wazuh
-  ${INSTALL} -m 0660 -o ${WAZUH_USER} -g ${WAZUH_GROUP} /dev/null ${INSTALLDIR}/logs/ossec.log
-  ${INSTALL} -m 0660 -o ${WAZUH_USER} -g ${WAZUH_GROUP} /dev/null ${INSTALLDIR}/logs/ossec.json
-  ${INSTALL} -m 0660 -o ${WAZUH_USER} -g ${WAZUH_GROUP} /dev/null ${INSTALLDIR}/logs/active-responses.log
+  ${INSTALL} -d -m 0770 -o ${SHIELDNET_DEFEND_USER} -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/logs
+  ${INSTALL} -d -m 0750 -o ${SHIELDNET_DEFEND_USER} -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/logs/shieldnetdefend
+  ${INSTALL} -m 0660 -o ${SHIELDNET_DEFEND_USER} -g ${SHIELDNET_DEFEND_GROUP} /dev/null ${INSTALLDIR}/logs/ossec.log
+  ${INSTALL} -m 0660 -o ${SHIELDNET_DEFEND_USER} -g ${SHIELDNET_DEFEND_GROUP} /dev/null ${INSTALLDIR}/logs/ossec.json
+  ${INSTALL} -m 0660 -o ${SHIELDNET_DEFEND_USER} -g ${SHIELDNET_DEFEND_GROUP} /dev/null ${INSTALLDIR}/logs/active-responses.log
 
     if [ ${INSTYPE} = 'agent' ]; then
         ${INSTALL} -d -m 0750 -o root -g 0 ${INSTALLDIR}/bin
     else
-        ${INSTALL} -d -m 0750 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/bin
+        ${INSTALL} -d -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/bin
     fi
 
-  ${INSTALL} -d -m 0750 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/lib
+  ${INSTALL} -d -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/lib
 
     if [ ${NUNAME} = 'Darwin' ]
     then
-        if [ -f libwazuhext.dylib ]
+        if [ -f libshieldnetdefendext.dylib ]
         then
-            ${INSTALL} -m 0750 -o root -g 0 libwazuhext.dylib ${INSTALLDIR}/lib
+            ${INSTALL} -m 0750 -o root -g 0 libshieldnetdefendext.dylib ${INSTALLDIR}/lib
         fi
     elif [ -f libwazuhext.so ]
     then
-        ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} libwazuhext.so ${INSTALLDIR}/lib
+        ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} libwazuhext.so ${INSTALLDIR}/lib
 
         if ([ "X${DIST_NAME}" = "Xrhel" ] || [ "X${DIST_NAME}" = "Xcentos" ] || [ "X${DIST_NAME}" = "XCentOS" ]) && [ ${DIST_VER} -le 5 ]; then
             chcon -t textrel_shlib_t ${INSTALLDIR}/lib/libwazuhext.so
@@ -810,16 +810,16 @@ InstallCommon()
 
     if [ ${NUNAME} = 'Darwin' ]
     then
-        if [ -f libwazuhshared.dylib ]
+        if [ -f libshieldnetdefendshared.dylib ]
         then
-            ${INSTALL} -m 0750 -o root -g 0 libwazuhshared.dylib ${INSTALLDIR}/lib
+            ${INSTALL} -m 0750 -o root -g 0 libshieldnetdefendshared.dylib ${INSTALLDIR}/lib
         fi
-    elif [ -f libwazuhshared.so ]
+    elif [ -f libshieldnetdefendshared.so ]
     then
-        ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} libwazuhshared.so ${INSTALLDIR}/lib
+        ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} libshieldnetdefendshared.so ${INSTALLDIR}/lib
 
         if ([ "X${DIST_NAME}" = "Xrhel" ] || [ "X${DIST_NAME}" = "Xcentos" ] || [ "X${DIST_NAME}" = "XCentOS" ]) && [ ${DIST_VER} -le 5 ]; then
-            chcon -t textrel_shlib_t ${INSTALLDIR}/lib/libwazuhshared.so
+            chcon -t textrel_shlib_t ${INSTALLDIR}/lib/libshieldnetdefendshared.so
         fi
     fi
 
@@ -832,7 +832,7 @@ InstallCommon()
         fi
     elif [ -f shared_modules/dbsync/build/lib/libdbsync.so ]
     then
-        ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} shared_modules/dbsync/build/lib/libdbsync.so ${INSTALLDIR}/lib
+        ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} shared_modules/dbsync/build/lib/libdbsync.so ${INSTALLDIR}/lib
 
         if ([ "X${DIST_NAME}" = "Xrhel" ] || [ "X${DIST_NAME}" = "Xcentos" ] || [ "X${DIST_NAME}" = "XCentOS" ]) && [ ${DIST_VER} -le 5 ]; then
             chcon -t textrel_shlib_t ${INSTALLDIR}/lib/libdbsync.so
@@ -849,7 +849,7 @@ InstallCommon()
         fi
     elif [ -f shared_modules/rsync/build/lib/librsync.so ]
     then
-        ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} shared_modules/rsync/build/lib/librsync.so ${INSTALLDIR}/lib
+        ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} shared_modules/rsync/build/lib/librsync.so ${INSTALLDIR}/lib
 
         if ([ "X${DIST_NAME}" = "Xrhel" ] || [ "X${DIST_NAME}" = "Xcentos" ] || [ "X${DIST_NAME}" = "XCentOS" ]) && [ ${DIST_VER} -le 5 ]; then
             chcon -t textrel_shlib_t ${INSTALLDIR}/lib/librsync.so
@@ -865,7 +865,7 @@ InstallCommon()
         fi
     elif [ -f data_provider/build/lib/libsysinfo.so ]
     then
-        ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} data_provider/build/lib/libsysinfo.so ${INSTALLDIR}/lib
+        ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} data_provider/build/lib/libsysinfo.so ${INSTALLDIR}/lib
 
         if ([ "X${DIST_NAME}" = "Xrhel" ] || [ "X${DIST_NAME}" = "Xcentos" ] || [ "X${DIST_NAME}" = "XCentOS" ]) && [ ${DIST_VER} -le 5 ]; then
             chcon -t textrel_shlib_t ${INSTALLDIR}/lib/libsysinfo.so
@@ -881,7 +881,7 @@ InstallCommon()
         fi
     elif [ -f syscheckd/build/lib/libfimdb.so ]
     then
-        ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} syscheckd/build/lib/libfimdb.so ${INSTALLDIR}/lib
+        ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} syscheckd/build/lib/libfimdb.so ${INSTALLDIR}/lib
 
         if ([ "X${DIST_NAME}" = "Xrhel" ] || [ "X${DIST_NAME}" = "Xcentos" ] || [ "X${DIST_NAME}" = "XCentOS" ]) && [ ${DIST_VER} -le 5 ]; then
             chcon -t textrel_shlib_t ${INSTALLDIR}/lib/libfimdb.so
@@ -892,7 +892,7 @@ InstallCommon()
     then
     	if [ -f syscheckd/build/lib/libfimebpf.so ]
     	then
-       		${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} syscheckd/build/lib/libfimebpf.so ${INSTALLDIR}/lib
+       		${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} syscheckd/build/lib/libfimebpf.so ${INSTALLDIR}/lib
 
        		if ([ "X${DIST_NAME}" = "Xrhel" ] || [ "X${DIST_NAME}" = "Xcentos" ] || [ "X${DIST_NAME}" = "XCentOS" ]) && [ ${DIST_VER} -le 5 ]; then
        		    chcon -t textrel_shlib_t ${INSTALLDIR}/lib/libfimebpf.so
@@ -901,7 +901,7 @@ InstallCommon()
 
       if [ -f external/libbpf-bootstrap/build/libbpf/libbpf.so ]
           then
-              ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} external/libbpf-bootstrap/build/libbpf/libbpf.so ${INSTALLDIR}/lib
+              ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} external/libbpf-bootstrap/build/libbpf/libbpf.so ${INSTALLDIR}/lib
 
               if ([ "X${DIST_NAME}" = "Xrhel" ] || [ "X${DIST_NAME}" = "Xcentos" ] || [ "X${DIST_NAME}" = "XCentOS" ]) && [ ${DIST_VER} -le 5 ]; then
                   chcon -t textrel_shlib_t ${INSTALLDIR}/lib/libbpf.so
@@ -910,7 +910,7 @@ InstallCommon()
 
       if [ -f external/libbpf-bootstrap/build/modern.bpf.o ]
           then
-              ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} external/libbpf-bootstrap/build/modern.bpf.o ${INSTALLDIR}/lib
+              ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} external/libbpf-bootstrap/build/modern.bpf.o ${INSTALLDIR}/lib
 
               if ([ "X${DIST_NAME}" = "Xrhel" ] || [ "X${DIST_NAME}" = "Xcentos" ] || [ "X${DIST_NAME}" = "XCentOS" ]) && [ ${DIST_VER} -le 5 ]; then
                   chcon -t textrel_shlib_t ${INSTALLDIR}/lib/modern.bpf.o
@@ -920,17 +920,17 @@ InstallCommon()
 
     if [ ${NUNAME} = 'Darwin' ]
     then
-        if [ -f wazuh_modules/syscollector/build/lib/libsyscollector.dylib ]
+        if [ -f shieldnet_defend_modules/syscollector/build/lib/libsyscollector.dylib ]
         then
-            ${INSTALL} -m 0750 -o root -g 0 wazuh_modules/syscollector/build/lib/libsyscollector.dylib ${INSTALLDIR}/lib
+            ${INSTALL} -m 0750 -o root -g 0 shieldnet_defend_modules/syscollector/build/lib/libsyscollector.dylib ${INSTALLDIR}/lib
             install_name_tool -id @rpath/../lib/libsyscollector.dylib ${INSTALLDIR}/lib/libsyscollector.dylib
             install_name_tool -change $(PWD)/data_provider/build/lib/libsysinfo.dylib @rpath/../lib/libsysinfo.dylib ${INSTALLDIR}/lib/libsyscollector.dylib
             install_name_tool -change $(PWD)/shared_modules/rsync/build/lib/librsync.dylib @rpath/../lib/librsync.dylib ${INSTALLDIR}/lib/libsyscollector.dylib
             install_name_tool -change $(PWD)/shared_modules/dbsync/build/lib/libdbsync.dylib @rpath/../lib/libdbsync.dylib ${INSTALLDIR}/lib/libsyscollector.dylib
         fi
-    elif [ -f wazuh_modules/syscollector/build/lib/libsyscollector.so ]
+    elif [ -f shieldnet_defend_modules/syscollector/build/lib/libsyscollector.so ]
     then
-        ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} wazuh_modules/syscollector/build/lib/libsyscollector.so ${INSTALLDIR}/lib
+        ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} shieldnet_defend_modules/syscollector/build/lib/libsyscollector.so ${INSTALLDIR}/lib
 
         if ([ "X${DIST_NAME}" = "Xrhel" ] || [ "X${DIST_NAME}" = "Xcentos" ] || [ "X${DIST_NAME}" = "XCentOS" ]) && [ ${DIST_VER} -le 5 ]; then
             chcon -t textrel_shlib_t ${INSTALLDIR}/lib/libsyscollector.so
@@ -941,17 +941,17 @@ InstallCommon()
     then
         if [ -f libstdc++.a ]
         then
-            ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} libstdc++.a ${INSTALLDIR}/lib
+            ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} libstdc++.a ${INSTALLDIR}/lib
         fi
 
         if [ -f libgcc_s.a ]
         then
-            ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} libgcc_s.a ${INSTALLDIR}/lib
+            ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} libgcc_s.a ${INSTALLDIR}/lib
         fi
     else
         if [ -f libstdc++.so.6 ]
         then
-            ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} libstdc++.so.6 ${INSTALLDIR}/lib
+            ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} libstdc++.so.6 ${INSTALLDIR}/lib
 
             if ([ "X${DIST_NAME}" = "Xrhel" ] || [ "X${DIST_NAME}" = "Xcentos" ] || [ "X${DIST_NAME}" = "XCentOS" ]) && [ ${DIST_VER} -le 5 ]; then
                 chcon -t textrel_shlib_t ${INSTALLDIR}/lib/libstdc++.so.6
@@ -960,7 +960,7 @@ InstallCommon()
 
         if [ -f libgcc_s.so.1 ]
         then
-            ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} libgcc_s.so.1 ${INSTALLDIR}/lib
+            ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} libgcc_s.so.1 ${INSTALLDIR}/lib
 
             if ([ "X${DIST_NAME}" = "Xrhel" ] || [ "X${DIST_NAME}" = "Xcentos" ] || [ "X${DIST_NAME}" = "XCentOS" ]) && [ ${DIST_VER} -le 5 ]; then
                 chcon -t textrel_shlib_t ${INSTALLDIR}/lib/libgcc_s.so.1
@@ -968,111 +968,111 @@ InstallCommon()
         fi
     fi
 
-  ${INSTALL} -m 0750 -o root -g 0 wazuh-logcollector ${INSTALLDIR}/bin
-  ${INSTALL} -m 0750 -o root -g 0 syscheckd/build/bin/wazuh-syscheckd ${INSTALLDIR}/bin
-  ${INSTALL} -m 0750 -o root -g 0 wazuh-execd ${INSTALLDIR}/bin
+  ${INSTALL} -m 0750 -o root -g 0 shieldnet-defend-logcollector ${INSTALLDIR}/bin
+  ${INSTALL} -m 0750 -o root -g 0 syscheckd/build/bin/shieldnet-defend-syscheckd ${INSTALLDIR}/bin
+  ${INSTALL} -m 0750 -o root -g 0 shieldnet-defend-execd ${INSTALLDIR}/bin
   ${INSTALL} -m 0750 -o root -g 0 manage_agents ${INSTALLDIR}/bin
-  ${INSTALL} -m 0750 -o root -g 0 ${OSSEC_CONTROL_SRC} ${INSTALLDIR}/bin/wazuh-control
-  ${INSTALL} -m 0750 -o root -g 0 wazuh-modulesd ${INSTALLDIR}/bin/
+  ${INSTALL} -m 0750 -o root -g 0 ${OSSEC_CONTROL_SRC} ${INSTALLDIR}/bin/shieldnet-defend-control
+  ${INSTALL} -m 0750 -o root -g 0 shieldnet-defend-modulesd ${INSTALLDIR}/bin/
 
-  ${INSTALL} -d -m 0750 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/queue
-  ${INSTALL} -d -m 0770 -o ${WAZUH_USER} -g ${WAZUH_GROUP} ${INSTALLDIR}/queue/alerts
-  ${INSTALL} -d -m 0770 -o ${WAZUH_USER} -g ${WAZUH_GROUP} ${INSTALLDIR}/queue/sockets
-  ${INSTALL} -d -m 0750 -o ${WAZUH_USER} -g ${WAZUH_GROUP} ${INSTALLDIR}/queue/diff
-  ${INSTALL} -d -m 0750 -o ${WAZUH_USER} -g ${WAZUH_GROUP} ${INSTALLDIR}/queue/fim
-  ${INSTALL} -d -m 0750 -o ${WAZUH_USER} -g ${WAZUH_GROUP} ${INSTALLDIR}/queue/fim/db
-  ${INSTALL} -d -m 0750 -o ${WAZUH_USER} -g ${WAZUH_GROUP} ${INSTALLDIR}/queue/syscollector
-  ${INSTALL} -d -m 0750 -o ${WAZUH_USER} -g ${WAZUH_GROUP} ${INSTALLDIR}/queue/syscollector/db
-  ${INSTALL} -d -m 0750 -o ${WAZUH_USER} -g ${WAZUH_GROUP} ${INSTALLDIR}/queue/logcollector
+  ${INSTALL} -d -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/queue
+  ${INSTALL} -d -m 0770 -o ${SHIELDNET_DEFEND_USER} -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/queue/alerts
+  ${INSTALL} -d -m 0770 -o ${SHIELDNET_DEFEND_USER} -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/queue/sockets
+  ${INSTALL} -d -m 0750 -o ${SHIELDNET_DEFEND_USER} -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/queue/diff
+  ${INSTALL} -d -m 0750 -o ${SHIELDNET_DEFEND_USER} -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/queue/fim
+  ${INSTALL} -d -m 0750 -o ${SHIELDNET_DEFEND_USER} -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/queue/fim/db
+  ${INSTALL} -d -m 0750 -o ${SHIELDNET_DEFEND_USER} -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/queue/syscollector
+  ${INSTALL} -d -m 0750 -o ${SHIELDNET_DEFEND_USER} -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/queue/syscollector/db
+  ${INSTALL} -d -m 0750 -o ${SHIELDNET_DEFEND_USER} -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/queue/logcollector
 
-  ${INSTALL} -d -m 0750 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/ruleset
-  ${INSTALL} -d -m 0750 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/ruleset/sca
+  ${INSTALL} -d -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/ruleset
+  ${INSTALL} -d -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/ruleset/sca
 
-  ${INSTALL} -d -m 0750 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/wodles
-  ${INSTALL} -d -m 0770 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/var/wodles
+  ${INSTALL} -d -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/wodles
+  ${INSTALL} -d -m 0770 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/var/wodles
 
-  ${INSTALL} -d -m 0770 -o ${WAZUH_USER} -g ${WAZUH_GROUP} ${INSTALLDIR}/etc
+  ${INSTALL} -d -m 0770 -o ${SHIELDNET_DEFEND_USER} -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/etc
 
     if [ -f /etc/localtime ]
     then
-         ${INSTALL} -m 0640 -o root -g ${WAZUH_GROUP} /etc/localtime ${INSTALLDIR}/etc
+         ${INSTALL} -m 0640 -o root -g ${SHIELDNET_DEFEND_GROUP} /etc/localtime ${INSTALLDIR}/etc
     fi
 
-  ${INSTALL} -d -m 1770 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/tmp
+  ${INSTALL} -d -m 1770 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/tmp
 
     if [ -f /etc/TIMEZONE ]; then
-         ${INSTALL} -m 0640 -o root -g ${WAZUH_GROUP} /etc/TIMEZONE ${INSTALLDIR}/etc/
+         ${INSTALL} -m 0640 -o root -g ${SHIELDNET_DEFEND_GROUP} /etc/TIMEZONE ${INSTALLDIR}/etc/
     fi
     # Solaris Needs some extra files
     if [ ${DIST_NAME} = "SunOS" ]; then
-      ${INSTALL} -d -m 0750 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/usr/share/lib/zoneinfo/
+      ${INSTALL} -d -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/usr/share/lib/zoneinfo/
         cp -rf /usr/share/lib/zoneinfo/* ${INSTALLDIR}/usr/share/lib/zoneinfo/
-        chown root:${WAZUH_GROUP} ${INSTALLDIR}/usr/share/lib/zoneinfo/*
+        chown root:${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/usr/share/lib/zoneinfo/*
         find ${INSTALLDIR}/usr/share/lib/zoneinfo/ -type d -exec chmod 0750 {} +
         find ${INSTALLDIR}/usr/share/lib/zoneinfo/ -type f -exec chmod 0640 {} +
     fi
 
-    ${INSTALL} -m 0640 -o root -g ${WAZUH_GROUP} -b ../etc/internal_options.conf ${INSTALLDIR}/etc/
-    ${INSTALL} -m 0640 -o root -g ${WAZUH_GROUP} wazuh_modules/syscollector/norm_config.json ${INSTALLDIR}/queue/syscollector
+    ${INSTALL} -m 0640 -o root -g ${SHIELDNET_DEFEND_GROUP} -b ../etc/internal_options.conf ${INSTALLDIR}/etc/
+    ${INSTALL} -m 0640 -o root -g ${SHIELDNET_DEFEND_GROUP} shieldnet_defend_modules/syscollector/norm_config.json ${INSTALLDIR}/queue/syscollector
 
     if [ ! -f ${INSTALLDIR}/etc/local_internal_options.conf ]; then
-        ${INSTALL} -m 0640 -o root -g ${WAZUH_GROUP} ../etc/local_internal_options.conf ${INSTALLDIR}/etc/local_internal_options.conf
+        ${INSTALL} -m 0640 -o root -g ${SHIELDNET_DEFEND_GROUP} ../etc/local_internal_options.conf ${INSTALLDIR}/etc/local_internal_options.conf
     fi
 
     if [ ! -f ${INSTALLDIR}/etc/client.keys ]; then
         if [ ${INSTYPE} = 'agent' ]; then
-            ${INSTALL} -m 0640 -o root -g ${WAZUH_GROUP} /dev/null ${INSTALLDIR}/etc/client.keys
+            ${INSTALL} -m 0640 -o root -g ${SHIELDNET_DEFEND_GROUP} /dev/null ${INSTALLDIR}/etc/client.keys
         else
-            ${INSTALL} -m 0640 -o wazuh -g ${WAZUH_GROUP} /dev/null ${INSTALLDIR}/etc/client.keys
+            ${INSTALL} -m 0640 -o shieldnetdefend -g ${SHIELDNET_DEFEND_GROUP} /dev/null ${INSTALLDIR}/etc/client.keys
         fi
     fi
 
     if [ ! -f ${INSTALLDIR}/etc/ossec.conf ]; then
         if [ -f  ../etc/ossec.mc ]; then
-            ${INSTALL} -m 0660 -o root -g ${WAZUH_GROUP} ../etc/ossec.mc ${INSTALLDIR}/etc/ossec.conf
+            ${INSTALL} -m 0660 -o root -g ${SHIELDNET_DEFEND_GROUP} ../etc/ossec.mc ${INSTALLDIR}/etc/ossec.conf
         else
             echo "WARNING: unable to generate ossec.conf file with desired configurations, using default configurations from ${OSSEC_CONF_SRC}"
-            ${INSTALL} -m 0660 -o root -g ${WAZUH_GROUP} ${OSSEC_CONF_SRC} ${INSTALLDIR}/etc/ossec.conf
+            ${INSTALL} -m 0660 -o root -g ${SHIELDNET_DEFEND_GROUP} ${OSSEC_CONF_SRC} ${INSTALLDIR}/etc/ossec.conf
         fi
     fi
 
-  ${INSTALL} -d -m 0770 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/etc/shared
-  ${INSTALL} -d -m 0750 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/active-response
-  ${INSTALL} -d -m 0750 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/active-response/bin
-  ${INSTALL} -d -m 0750 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/agentless
-  ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} agentlessd/scripts/* ${INSTALLDIR}/agentless/
+  ${INSTALL} -d -m 0770 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/etc/shared
+  ${INSTALL} -d -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/active-response
+  ${INSTALL} -d -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/active-response/bin
+  ${INSTALL} -d -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/agentless
+  ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} agentlessd/scripts/* ${INSTALLDIR}/agentless/
 
-  ${INSTALL} -d -m 0770 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/.ssh
+  ${INSTALL} -d -m 0770 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/.ssh
 
   ./init/fw-check.sh execute
-  ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} active-response/*.sh ${INSTALLDIR}/active-response/bin/
-  ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} active-response/*.py ${INSTALLDIR}/active-response/bin/
-  ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} firewall-drop ${INSTALLDIR}/active-response/bin/
-  ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} default-firewall-drop ${INSTALLDIR}/active-response/bin/
-  ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} pf ${INSTALLDIR}/active-response/bin/
-  ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} npf ${INSTALLDIR}/active-response/bin/
-  ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ipfw ${INSTALLDIR}/active-response/bin/
-  ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} firewalld-drop ${INSTALLDIR}/active-response/bin/
-  ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} disable-account ${INSTALLDIR}/active-response/bin/
-  ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} host-deny ${INSTALLDIR}/active-response/bin/
-  ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ip-customblock ${INSTALLDIR}/active-response/bin/
-  ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} restart-wazuh ${INSTALLDIR}/active-response/bin/
-  ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} route-null ${INSTALLDIR}/active-response/bin/
-  ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} kaspersky ${INSTALLDIR}/active-response/bin/
-  ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} wazuh-slack ${INSTALLDIR}/active-response/bin/
+  ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} active-response/*.sh ${INSTALLDIR}/active-response/bin/
+  ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} active-response/*.py ${INSTALLDIR}/active-response/bin/
+  ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} firewall-drop ${INSTALLDIR}/active-response/bin/
+  ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} default-firewall-drop ${INSTALLDIR}/active-response/bin/
+  ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} pf ${INSTALLDIR}/active-response/bin/
+  ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} npf ${INSTALLDIR}/active-response/bin/
+  ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ipfw ${INSTALLDIR}/active-response/bin/
+  ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} firewalld-drop ${INSTALLDIR}/active-response/bin/
+  ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} disable-account ${INSTALLDIR}/active-response/bin/
+  ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} host-deny ${INSTALLDIR}/active-response/bin/
+  ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ip-customblock ${INSTALLDIR}/active-response/bin/
+  ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} restart-shieldnet-defend ${INSTALLDIR}/active-response/bin/
+  ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} route-null ${INSTALLDIR}/active-response/bin/
+  ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} kaspersky ${INSTALLDIR}/active-response/bin/
+  ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} shieldnet-defend-slack ${INSTALLDIR}/active-response/bin/
 
-  ${INSTALL} -d -m 0750 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/var
-  ${INSTALL} -d -m 0770 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/var/run
-  ${INSTALL} -d -m 0770 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/var/upgrade
-  ${INSTALL} -d -m 0770 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/var/selinux
+  ${INSTALL} -d -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/var
+  ${INSTALL} -d -m 0770 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/var/run
+  ${INSTALL} -d -m 0770 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/var/upgrade
+  ${INSTALL} -d -m 0770 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/var/selinux
 
-  if [ -f selinux/wazuh.pp ]
+  if [ -f selinux/shieldnetdefend.pp ]
   then
-    ${INSTALL} -m 0640 -o root -g ${WAZUH_GROUP} selinux/wazuh.pp ${INSTALLDIR}/var/selinux/
+    ${INSTALL} -m 0640 -o root -g ${SHIELDNET_DEFEND_GROUP} selinux/shieldnetdefend.pp ${INSTALLDIR}/var/selinux/
     InstallSELinuxPolicyPackage
   fi
 
-  ${INSTALL} -d -m 0750 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/backup
+  ${INSTALL} -d -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/backup
 
 }
 
@@ -1081,114 +1081,114 @@ InstallLocal()
 
     InstallCommon
 
-    ${INSTALL} -d -m 0770 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/etc/decoders
-    ${INSTALL} -d -m 0770 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/etc/rules
-    ${INSTALL} -d -m 0770 -o ${WAZUH_USER} -g ${WAZUH_GROUP} ${INSTALLDIR}/var/multigroups
-    ${INSTALL} -d -m 0770 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/var/db
-    ${INSTALL} -d -m 0770 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/var/download
-    ${INSTALL} -d -m 0750 -o ${WAZUH_USER} -g ${WAZUH_GROUP} ${INSTALLDIR}/logs/archives
-    ${INSTALL} -d -m 0750 -o ${WAZUH_USER} -g ${WAZUH_GROUP} ${INSTALLDIR}/logs/alerts
-    ${INSTALL} -d -m 0750 -o ${WAZUH_USER} -g ${WAZUH_GROUP} ${INSTALLDIR}/logs/firewall
-    ${INSTALL} -d -m 0750 -o ${WAZUH_USER} -g ${WAZUH_GROUP} ${INSTALLDIR}/logs/api
-    ${INSTALL} -d -m 0770 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/etc/rootcheck
+    ${INSTALL} -d -m 0770 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/etc/decoders
+    ${INSTALL} -d -m 0770 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/etc/rules
+    ${INSTALL} -d -m 0770 -o ${SHIELDNET_DEFEND_USER} -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/var/multigroups
+    ${INSTALL} -d -m 0770 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/var/db
+    ${INSTALL} -d -m 0770 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/var/download
+    ${INSTALL} -d -m 0750 -o ${SHIELDNET_DEFEND_USER} -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/logs/archives
+    ${INSTALL} -d -m 0750 -o ${SHIELDNET_DEFEND_USER} -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/logs/alerts
+    ${INSTALL} -d -m 0750 -o ${SHIELDNET_DEFEND_USER} -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/logs/firewall
+    ${INSTALL} -d -m 0750 -o ${SHIELDNET_DEFEND_USER} -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/logs/api
+    ${INSTALL} -d -m 0770 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/etc/rootcheck
 
-    ${INSTALL} -m 0750 -o root -g 0 wazuh-agentlessd ${INSTALLDIR}/bin
-    ${INSTALL} -m 0750 -o root -g 0 wazuh-analysisd ${INSTALLDIR}/bin
-    ${INSTALL} -m 0750 -o root -g 0 wazuh-monitord ${INSTALLDIR}/bin
-    ${INSTALL} -m 0750 -o root -g 0 wazuh-reportd ${INSTALLDIR}/bin
-    ${INSTALL} -m 0750 -o root -g 0 wazuh-maild ${INSTALLDIR}/bin
-    ${INSTALL} -m 0750 -o root -g 0 wazuh-logtest-legacy ${INSTALLDIR}/bin
-    ${INSTALL} -m 0750 -o root -g 0 wazuh-csyslogd ${INSTALLDIR}/bin
-    ${INSTALL} -m 0750 -o root -g 0 wazuh-dbd ${INSTALLDIR}/bin
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} verify-agent-conf ${INSTALLDIR}/bin/
+    ${INSTALL} -m 0750 -o root -g 0 shieldnet-defend-agentlessd ${INSTALLDIR}/bin
+    ${INSTALL} -m 0750 -o root -g 0 shieldnet-defend-analysisd ${INSTALLDIR}/bin
+    ${INSTALL} -m 0750 -o root -g 0 shieldnet-defend-monitord ${INSTALLDIR}/bin
+    ${INSTALL} -m 0750 -o root -g 0 shieldnet-defend-reportd ${INSTALLDIR}/bin
+    ${INSTALL} -m 0750 -o root -g 0 shieldnet-defend-maild ${INSTALLDIR}/bin
+    ${INSTALL} -m 0750 -o root -g 0 shieldnet-defend-logtest-legacy ${INSTALLDIR}/bin
+    ${INSTALL} -m 0750 -o root -g 0 shieldnet-defend-csyslogd ${INSTALLDIR}/bin
+    ${INSTALL} -m 0750 -o root -g 0 shieldnet-defend-dbd ${INSTALLDIR}/bin
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} verify-agent-conf ${INSTALLDIR}/bin/
     ${INSTALL} -m 0750 -o root -g 0 clear_stats ${INSTALLDIR}/bin/
-    ${INSTALL} -m 0750 -o root -g 0 wazuh-regex ${INSTALLDIR}/bin/
+    ${INSTALL} -m 0750 -o root -g 0 shieldnet-defend-regex ${INSTALLDIR}/bin/
     ${INSTALL} -m 0750 -o root -g 0 agent_control ${INSTALLDIR}/bin/
-    ${INSTALL} -m 0750 -o root -g 0 wazuh-integratord ${INSTALLDIR}/bin/
-    ${INSTALL} -m 0750 -o root -g 0 wazuh-db ${INSTALLDIR}/bin/
+    ${INSTALL} -m 0750 -o root -g 0 shieldnet-defend-integratord ${INSTALLDIR}/bin/
+    ${INSTALL} -m 0750 -o root -g 0 shieldnet-defend-db ${INSTALLDIR}/bin/
 
-    ${INSTALL} -d -m 0750 -o ${WAZUH_USER} -g ${WAZUH_GROUP} ${INSTALLDIR}/stats
-    ${INSTALL} -d -m 0750 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/ruleset/decoders
-    ${INSTALL} -d -m 0750 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/ruleset/rules
+    ${INSTALL} -d -m 0750 -o ${SHIELDNET_DEFEND_USER} -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/stats
+    ${INSTALL} -d -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/ruleset/decoders
+    ${INSTALL} -d -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/ruleset/rules
 
-    ${INSTALL} -m 0640 -o root -g ${WAZUH_GROUP} -b ../ruleset/rules/*.xml ${INSTALLDIR}/ruleset/rules
-    ${INSTALL} -m 0640 -o root -g ${WAZUH_GROUP} -b ../ruleset/decoders/*.xml ${INSTALLDIR}/ruleset/decoders
-    ${INSTALL} -m 0660 -o root -g ${WAZUH_GROUP} ../ruleset/rootcheck/db/*.txt ${INSTALLDIR}/etc/rootcheck
+    ${INSTALL} -m 0640 -o root -g ${SHIELDNET_DEFEND_GROUP} -b ../ruleset/rules/*.xml ${INSTALLDIR}/ruleset/rules
+    ${INSTALL} -m 0640 -o root -g ${SHIELDNET_DEFEND_GROUP} -b ../ruleset/decoders/*.xml ${INSTALLDIR}/ruleset/decoders
+    ${INSTALL} -m 0660 -o root -g ${SHIELDNET_DEFEND_GROUP} ../ruleset/rootcheck/db/*.txt ${INSTALLDIR}/etc/rootcheck
 
     InstallSecurityConfigurationAssessmentFiles "manager"
 
     if [ ! -f ${INSTALLDIR}/etc/decoders/local_decoder.xml ]; then
-        ${INSTALL} -m 0660 -o ${WAZUH_USER} -g ${WAZUH_GROUP} -b ../etc/local_decoder.xml ${INSTALLDIR}/etc/decoders/local_decoder.xml
+        ${INSTALL} -m 0660 -o ${SHIELDNET_DEFEND_USER} -g ${SHIELDNET_DEFEND_GROUP} -b ../etc/local_decoder.xml ${INSTALLDIR}/etc/decoders/local_decoder.xml
     fi
     if [ ! -f ${INSTALLDIR}/etc/rules/local_rules.xml ]; then
-        ${INSTALL} -m 0660 -o ${WAZUH_USER} -g ${WAZUH_GROUP} -b ../etc/local_rules.xml ${INSTALLDIR}/etc/rules/local_rules.xml
+        ${INSTALL} -m 0660 -o ${SHIELDNET_DEFEND_USER} -g ${SHIELDNET_DEFEND_GROUP} -b ../etc/local_rules.xml ${INSTALLDIR}/etc/rules/local_rules.xml
     fi
     if [ ! -f ${INSTALLDIR}/etc/lists ]; then
-        ${INSTALL} -d -m 0770 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/etc/lists
+        ${INSTALL} -d -m 0770 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/etc/lists
     fi
     if [ ! -f ${INSTALLDIR}/etc/lists/amazon ]; then
-        ${INSTALL} -d -m 0770 -o ${WAZUH_USER} -g ${WAZUH_GROUP} ${INSTALLDIR}/etc/lists/amazon
-        ${INSTALL} -m 0660 -o ${WAZUH_USER} -g ${WAZUH_GROUP} -b ../ruleset/lists/amazon/* ${INSTALLDIR}/etc/lists/amazon/
+        ${INSTALL} -d -m 0770 -o ${SHIELDNET_DEFEND_USER} -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/etc/lists/amazon
+        ${INSTALL} -m 0660 -o ${SHIELDNET_DEFEND_USER} -g ${SHIELDNET_DEFEND_GROUP} -b ../ruleset/lists/amazon/* ${INSTALLDIR}/etc/lists/amazon/
     fi
     if [ ! -f ${INSTALLDIR}/etc/lists/audit-keys ]; then
-        ${INSTALL} -m 0660 -o ${WAZUH_USER} -g ${WAZUH_GROUP} -b ../ruleset/lists/audit-keys ${INSTALLDIR}/etc/lists/audit-keys
+        ${INSTALL} -m 0660 -o ${SHIELDNET_DEFEND_USER} -g ${SHIELDNET_DEFEND_GROUP} -b ../ruleset/lists/audit-keys ${INSTALLDIR}/etc/lists/audit-keys
     fi
     if [ ! -f ${INSTALLDIR}/etc/lists/malicious-ioc/malicious-ip ]; then
-        ${INSTALL} -d -m 0770 -o ${WAZUH_USER} -g ${WAZUH_GROUP} ${INSTALLDIR}/etc/lists/malicious-ioc
-        ${INSTALL} -m 0660 -o ${WAZUH_USER} -g ${WAZUH_GROUP} -b ../ruleset/lists/malicious-ioc/* ${INSTALLDIR}/etc/lists/malicious-ioc/
+        ${INSTALL} -d -m 0770 -o ${SHIELDNET_DEFEND_USER} -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/etc/lists/malicious-ioc
+        ${INSTALL} -m 0660 -o ${SHIELDNET_DEFEND_USER} -g ${SHIELDNET_DEFEND_GROUP} -b ../ruleset/lists/malicious-ioc/* ${INSTALLDIR}/etc/lists/malicious-ioc/
     fi
     if [ ! -f ${INSTALLDIR}/etc/lists/security-eventchannel ]; then
-        ${INSTALL} -m 0660 -o ${WAZUH_USER} -g ${WAZUH_GROUP} -b ../ruleset/lists/security-eventchannel ${INSTALLDIR}/etc/lists/security-eventchannel
+        ${INSTALL} -m 0660 -o ${SHIELDNET_DEFEND_USER} -g ${SHIELDNET_DEFEND_GROUP} -b ../ruleset/lists/security-eventchannel ${INSTALLDIR}/etc/lists/security-eventchannel
     fi
 
-    ${INSTALL} -d -m 0750 -o ${WAZUH_USER} -g ${WAZUH_GROUP} ${INSTALLDIR}/queue/fts
-    ${INSTALL} -d -m 0750 -o ${WAZUH_USER} -g ${WAZUH_GROUP} ${INSTALLDIR}/queue/agentless
-    ${INSTALL} -d -m 0750 -o ${WAZUH_USER} -g ${WAZUH_GROUP} ${INSTALLDIR}/queue/db
+    ${INSTALL} -d -m 0750 -o ${SHIELDNET_DEFEND_USER} -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/queue/fts
+    ${INSTALL} -d -m 0750 -o ${SHIELDNET_DEFEND_USER} -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/queue/agentless
+    ${INSTALL} -d -m 0750 -o ${SHIELDNET_DEFEND_USER} -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/queue/db
 
-    ${INSTALL} -d -m 0750 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/integrations
-    ${INSTALL} -m 750 -o root -g ${WAZUH_GROUP} ../integrations/pagerduty.py ${INSTALLDIR}/integrations/pagerduty.py
-    ${INSTALL} -m 750 -o root -g ${WAZUH_GROUP} ../integrations/slack.py ${INSTALLDIR}/integrations/slack.py
-    ${INSTALL} -m 750 -o root -g ${WAZUH_GROUP} ../integrations/virustotal.py ${INSTALLDIR}/integrations/virustotal.py
-    ${INSTALL} -m 750 -o root -g ${WAZUH_GROUP} ../integrations/shuffle.py ${INSTALLDIR}/integrations/shuffle.py
-    ${INSTALL} -m 750 -o root -g ${WAZUH_GROUP} ../integrations/maltiverse.py ${INSTALLDIR}/integrations/maltiverse.py
+    ${INSTALL} -d -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/integrations
+    ${INSTALL} -m 750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../integrations/pagerduty.py ${INSTALLDIR}/integrations/pagerduty.py
+    ${INSTALL} -m 750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../integrations/slack.py ${INSTALLDIR}/integrations/slack.py
+    ${INSTALL} -m 750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../integrations/virustotal.py ${INSTALLDIR}/integrations/virustotal.py
+    ${INSTALL} -m 750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../integrations/shuffle.py ${INSTALLDIR}/integrations/shuffle.py
+    ${INSTALL} -m 750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../integrations/maltiverse.py ${INSTALLDIR}/integrations/maltiverse.py
     touch ${INSTALLDIR}/logs/integrations.log
     chmod 640 ${INSTALLDIR}/logs/integrations.log
-    chown ${WAZUH_USER}:${WAZUH_GROUP} ${INSTALLDIR}/logs/integrations.log
+    chown ${SHIELDNET_DEFEND_USER}:${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/logs/integrations.log
 
     if [ "X${OPTIMIZE_CPYTHON}" = "Xy" ]; then
         CPYTHON_FLAGS="OPTIMIZE_CPYTHON=yes"
     fi
 
     # Install Vulnerability Detector files
-    ${INSTALL} -d -m 0660 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/queue/vd
-    ${INSTALL} -d -m 0660 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/queue/indexer
+    ${INSTALL} -d -m 0660 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/queue/vd
+    ${INSTALL} -d -m 0660 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/queue/indexer
 
     # Install templates files
-    ${INSTALL} -d -m 0440 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/templates
-    ${INSTALL} -m 0440 -o root -g ${WAZUH_GROUP} wazuh_modules/vulnerability_scanner/indexer/template/index-template.json ${INSTALLDIR}/templates/vd_states_template.json
-    ${INSTALL} -m 0440 -o root -g ${WAZUH_GROUP} wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-packages.json ${INSTALLDIR}/templates/wazuh-states-inventory-packages.json
-    ${INSTALL} -m 0440 -o root -g ${WAZUH_GROUP} wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-processes.json ${INSTALLDIR}/templates/wazuh-states-inventory-processes.json
-    ${INSTALL} -m 0440 -o root -g ${WAZUH_GROUP} wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-system.json ${INSTALLDIR}/templates/wazuh-states-inventory-system.json
-    ${INSTALL} -m 0440 -o root -g ${WAZUH_GROUP} wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-hardware.json ${INSTALLDIR}/templates/wazuh-states-inventory-hardware.json
-    ${INSTALL} -m 0440 -o root -g ${WAZUH_GROUP} wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-networks.json ${INSTALLDIR}/templates/wazuh-states-inventory-networks.json
-    ${INSTALL} -m 0440 -o root -g ${WAZUH_GROUP} wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-protocols.json ${INSTALLDIR}/templates/wazuh-states-inventory-protocols.json
-    ${INSTALL} -m 0440 -o root -g ${WAZUH_GROUP} wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-interfaces.json ${INSTALLDIR}/templates/wazuh-states-inventory-interfaces.json
-    ${INSTALL} -m 0440 -o root -g ${WAZUH_GROUP} wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-hotfixes.json ${INSTALLDIR}/templates/wazuh-states-inventory-hotfixes.json
-    ${INSTALL} -m 0440 -o root -g ${WAZUH_GROUP} wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-ports.json ${INSTALLDIR}/templates/wazuh-states-inventory-ports.json
+    ${INSTALL} -d -m 0440 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/templates
+    ${INSTALL} -m 0440 -o root -g ${SHIELDNET_DEFEND_GROUP} shieldnet_defend_modules/vulnerability_scanner/indexer/template/index-template.json ${INSTALLDIR}/templates/vd_states_template.json
+    ${INSTALL} -m 0440 -o root -g ${SHIELDNET_DEFEND_GROUP} shieldnet_defend_modules/inventory_harvester/indexer/template/shieldnet-defend-states-inventory-packages.json ${INSTALLDIR}/templates/shieldnet-defend-states-inventory-packages.json
+    ${INSTALL} -m 0440 -o root -g ${SHIELDNET_DEFEND_GROUP} shieldnet_defend_modules/inventory_harvester/indexer/template/shieldnet-defend-states-inventory-processes.json ${INSTALLDIR}/templates/shieldnet-defend-states-inventory-processes.json
+    ${INSTALL} -m 0440 -o root -g ${SHIELDNET_DEFEND_GROUP} shieldnet_defend_modules/inventory_harvester/indexer/template/shieldnet-defend-states-inventory-system.json ${INSTALLDIR}/templates/shieldnet-defend-states-inventory-system.json
+    ${INSTALL} -m 0440 -o root -g ${SHIELDNET_DEFEND_GROUP} shieldnet_defend_modules/inventory_harvester/indexer/template/shieldnet-defend-states-inventory-hardware.json ${INSTALLDIR}/templates/shieldnet-defend-states-inventory-hardware.json
+    ${INSTALL} -m 0440 -o root -g ${SHIELDNET_DEFEND_GROUP} shieldnet_defend_modules/inventory_harvester/indexer/template/shieldnet-defend-states-inventory-networks.json ${INSTALLDIR}/templates/shieldnet-defend-states-inventory-networks.json
+    ${INSTALL} -m 0440 -o root -g ${SHIELDNET_DEFEND_GROUP} shieldnet_defend_modules/inventory_harvester/indexer/template/shieldnet-defend-states-inventory-protocols.json ${INSTALLDIR}/templates/shieldnet-defend-states-inventory-protocols.json
+    ${INSTALL} -m 0440 -o root -g ${SHIELDNET_DEFEND_GROUP} shieldnet_defend_modules/inventory_harvester/indexer/template/shieldnet-defend-states-inventory-interfaces.json ${INSTALLDIR}/templates/shieldnet-defend-states-inventory-interfaces.json
+    ${INSTALL} -m 0440 -o root -g ${SHIELDNET_DEFEND_GROUP} shieldnet_defend_modules/inventory_harvester/indexer/template/shieldnet-defend-states-inventory-hotfixes.json ${INSTALLDIR}/templates/shieldnet-defend-states-inventory-hotfixes.json
+    ${INSTALL} -m 0440 -o root -g ${SHIELDNET_DEFEND_GROUP} shieldnet_defend_modules/inventory_harvester/indexer/template/shieldnet-defend-states-inventory-ports.json ${INSTALLDIR}/templates/shieldnet-defend-states-inventory-ports.json
 
-    ${INSTALL} -m 0440 -o root -g ${WAZUH_GROUP} wazuh_modules/vulnerability_scanner/indexer/template/update-mappings.json ${INSTALLDIR}/templates/vd_states_update_mappings.json
-    ${INSTALL} -m 0440 -o root -g ${WAZUH_GROUP} wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-packages-update.json ${INSTALLDIR}/templates/wazuh-states-inventory-packages-update.json
-    ${INSTALL} -m 0440 -o root -g ${WAZUH_GROUP} wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-processes-update.json ${INSTALLDIR}/templates/wazuh-states-inventory-processes-update.json
-    ${INSTALL} -m 0440 -o root -g ${WAZUH_GROUP} wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-system-update.json ${INSTALLDIR}/templates/wazuh-states-inventory-system-update.json
-    ${INSTALL} -m 0440 -o root -g ${WAZUH_GROUP} wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-hardware-update.json ${INSTALLDIR}/templates/wazuh-states-inventory-hardware-update.json
-    ${INSTALL} -m 0440 -o root -g ${WAZUH_GROUP} wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-networks-update.json ${INSTALLDIR}/templates/wazuh-states-inventory-networks-update.json
-    ${INSTALL} -m 0440 -o root -g ${WAZUH_GROUP} wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-protocols-update.json ${INSTALLDIR}/templates/wazuh-states-inventory-protocols-update.json
-    ${INSTALL} -m 0440 -o root -g ${WAZUH_GROUP} wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-interfaces-update.json ${INSTALLDIR}/templates/wazuh-states-inventory-interfaces-update.json
-    ${INSTALL} -m 0440 -o root -g ${WAZUH_GROUP} wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-hotfixes-update.json ${INSTALLDIR}/templates/wazuh-states-inventory-hotfixes-update.json
-    ${INSTALL} -m 0440 -o root -g ${WAZUH_GROUP} wazuh_modules/inventory_harvester/indexer/template/wazuh-states-inventory-ports-update.json ${INSTALLDIR}/templates/wazuh-states-inventory-ports-update.json
+    ${INSTALL} -m 0440 -o root -g ${SHIELDNET_DEFEND_GROUP} shieldnet_defend_modules/vulnerability_scanner/indexer/template/update-mappings.json ${INSTALLDIR}/templates/vd_states_update_mappings.json
+    ${INSTALL} -m 0440 -o root -g ${SHIELDNET_DEFEND_GROUP} shieldnet_defend_modules/inventory_harvester/indexer/template/shieldnet-defend-states-inventory-packages-update.json ${INSTALLDIR}/templates/shieldnet-defend-states-inventory-packages-update.json
+    ${INSTALL} -m 0440 -o root -g ${SHIELDNET_DEFEND_GROUP} shieldnet_defend_modules/inventory_harvester/indexer/template/shieldnet-defend-states-inventory-processes-update.json ${INSTALLDIR}/templates/shieldnet-defend-states-inventory-processes-update.json
+    ${INSTALL} -m 0440 -o root -g ${SHIELDNET_DEFEND_GROUP} shieldnet_defend_modules/inventory_harvester/indexer/template/shieldnet-defend-states-inventory-system-update.json ${INSTALLDIR}/templates/shieldnet-defend-states-inventory-system-update.json
+    ${INSTALL} -m 0440 -o root -g ${SHIELDNET_DEFEND_GROUP} shieldnet_defend_modules/inventory_harvester/indexer/template/shieldnet-defend-states-inventory-hardware-update.json ${INSTALLDIR}/templates/shieldnet-defend-states-inventory-hardware-update.json
+    ${INSTALL} -m 0440 -o root -g ${SHIELDNET_DEFEND_GROUP} shieldnet_defend_modules/inventory_harvester/indexer/template/shieldnet-defend-states-inventory-networks-update.json ${INSTALLDIR}/templates/shieldnet-defend-states-inventory-networks-update.json
+    ${INSTALL} -m 0440 -o root -g ${SHIELDNET_DEFEND_GROUP} shieldnet_defend_modules/inventory_harvester/indexer/template/shieldnet-defend-states-inventory-protocols-update.json ${INSTALLDIR}/templates/shieldnet-defend-states-inventory-protocols-update.json
+    ${INSTALL} -m 0440 -o root -g ${SHIELDNET_DEFEND_GROUP} shieldnet_defend_modules/inventory_harvester/indexer/template/shieldnet-defend-states-inventory-interfaces-update.json ${INSTALLDIR}/templates/shieldnet-defend-states-inventory-interfaces-update.json
+    ${INSTALL} -m 0440 -o root -g ${SHIELDNET_DEFEND_GROUP} shieldnet_defend_modules/inventory_harvester/indexer/template/shieldnet-defend-states-inventory-hotfixes-update.json ${INSTALLDIR}/templates/shieldnet-defend-states-inventory-hotfixes-update.json
+    ${INSTALL} -m 0440 -o root -g ${SHIELDNET_DEFEND_GROUP} shieldnet_defend_modules/inventory_harvester/indexer/template/shieldnet-defend-states-inventory-ports-update.json ${INSTALLDIR}/templates/shieldnet-defend-states-inventory-ports-update.json
 
     # Install Task Manager files
-    ${INSTALL} -d -m 0770 -o ${WAZUH_USER} -g ${WAZUH_GROUP} ${INSTALLDIR}/queue/tasks
+    ${INSTALL} -d -m 0770 -o ${SHIELDNET_DEFEND_USER} -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/queue/tasks
 
     ### Install Python
     ${MAKEBIN} wpython INSTALLDIR=${INSTALLDIR} TARGET=${INSTYPE}
@@ -1226,7 +1226,7 @@ checkDownloadContent()
         wget -O ${VD_FULL_PATH} http://packages.wazuh.com/deps/vulnerability_model_database/${VD_FILENAME}
 
         chmod 640 ${VD_FULL_PATH}
-        chown ${WAZUH_USER}:${WAZUH_GROUP} ${VD_FULL_PATH}
+        chown ${SHIELDNET_DEFEND_USER}:${SHIELDNET_DEFEND_GROUP} ${VD_FULL_PATH}
     fi
 }
 
@@ -1236,7 +1236,7 @@ InstallServer()
     InstallLocal
     if [ -f external/jemalloc/lib/libjemalloc.so.2 ]
     then
-        ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} external/jemalloc/lib/libjemalloc.so.2 ${INSTALLDIR}/lib
+        ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} external/jemalloc/lib/libjemalloc.so.2 ${INSTALLDIR}/lib
 
         if ([ "X${DIST_NAME}" = "Xrhel" ] || [ "X${DIST_NAME}" = "Xcentos" ] || [ "X${DIST_NAME}" = "XCentOS" ]); then
             chcon -t textrel_shlib_t ${INSTALLDIR}/lib/libjemalloc.so.2
@@ -1244,7 +1244,7 @@ InstallServer()
     fi
     if [ -f build/shared_modules/router/librouter.so ]
     then
-        ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} build/shared_modules/router/librouter.so ${INSTALLDIR}/lib
+        ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} build/shared_modules/router/librouter.so ${INSTALLDIR}/lib
 
         if ([ "X${DIST_NAME}" = "Xrhel" ] || [ "X${DIST_NAME}" = "Xcentos" ] || [ "X${DIST_NAME}" = "XCentOS" ]); then
             chcon -t textrel_shlib_t ${INSTALLDIR}/lib/librouter.so
@@ -1252,23 +1252,23 @@ InstallServer()
     fi
     if [ -f build/shared_modules/content_manager/libcontent_manager.so ]
     then
-        ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} build/shared_modules/content_manager/libcontent_manager.so ${INSTALLDIR}/lib
+        ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} build/shared_modules/content_manager/libcontent_manager.so ${INSTALLDIR}/lib
 
         if ([ "X${DIST_NAME}" = "Xrhel" ] || [ "X${DIST_NAME}" = "Xcentos" ] || [ "X${DIST_NAME}" = "XCentOS" ]); then
             chcon -t textrel_shlib_t ${INSTALLDIR}/lib/libcontent_manager.so
         fi
     fi
-    if [ -f build/wazuh_modules/vulnerability_scanner/libvulnerability_scanner.so ]
+    if [ -f build/shieldnet_defend_modules/vulnerability_scanner/libvulnerability_scanner.so ]
     then
-        ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} build/wazuh_modules/vulnerability_scanner/libvulnerability_scanner.so ${INSTALLDIR}/lib
+        ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} build/shieldnet_defend_modules/vulnerability_scanner/libvulnerability_scanner.so ${INSTALLDIR}/lib
 
         if ([ "X${DIST_NAME}" = "Xrhel" ] || [ "X${DIST_NAME}" = "Xcentos" ] || [ "X${DIST_NAME}" = "XCentOS" ]); then
             chcon -t textrel_shlib_t ${INSTALLDIR}/lib/libvulnerability_scanner.so
         fi
     fi
-    if [ -f build/wazuh_modules/inventory_harvester/libinventory_harvester.so ]
+    if [ -f build/shieldnet_defend_modules/inventory_harvester/libinventory_harvester.so ]
     then
-        ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} build/wazuh_modules/inventory_harvester/libinventory_harvester.so ${INSTALLDIR}/lib
+        ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} build/shieldnet_defend_modules/inventory_harvester/libinventory_harvester.so ${INSTALLDIR}/lib
 
         if ([ "X${DIST_NAME}" = "Xrhel" ] || [ "X${DIST_NAME}" = "Xcentos" ] || [ "X${DIST_NAME}" = "XCentOS" ]); then
             chcon -t textrel_shlib_t ${INSTALLDIR}/lib/libinventory_harvester.so
@@ -1276,7 +1276,7 @@ InstallServer()
     fi
     if [ -f build/shared_modules/indexer_connector/libindexer_connector.so ]
     then
-        ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} build/shared_modules/indexer_connector/libindexer_connector.so ${INSTALLDIR}/lib
+        ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} build/shared_modules/indexer_connector/libindexer_connector.so ${INSTALLDIR}/lib
 
         if ([ "X${DIST_NAME}" = "Xrhel" ] || [ "X${DIST_NAME}" = "Xcentos" ] || [ "X${DIST_NAME}" = "XCentOS" ]); then
             chcon -t textrel_shlib_t ${INSTALLDIR}/lib/libindexer_connector.so
@@ -1284,7 +1284,7 @@ InstallServer()
     fi
     if [ -f external/rocksdb/build/librocksdb.so.8 ]
     then
-        ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} external/rocksdb/build/librocksdb.so.8 ${INSTALLDIR}/lib
+        ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} external/rocksdb/build/librocksdb.so.8 ${INSTALLDIR}/lib
 
         if ([ "X${DIST_NAME}" = "Xrhel" ] || [ "X${DIST_NAME}" = "Xcentos" ] || [ "X${DIST_NAME}" = "XCentOS" ]); then
             chcon -t textrel_shlib_t ${INSTALLDIR}/lib/librocksdb.so.8
@@ -1295,111 +1295,111 @@ InstallServer()
     checkDownloadContent
 
     # Install cluster files
-    ${INSTALL} -d -m 0770 -o ${WAZUH_USER} -g ${WAZUH_GROUP} ${INSTALLDIR}/queue/cluster
-    ${INSTALL} -d -m 0750 -o ${WAZUH_USER} -g ${WAZUH_GROUP} ${INSTALLDIR}/logs/cluster
+    ${INSTALL} -d -m 0770 -o ${SHIELDNET_DEFEND_USER} -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/queue/cluster
+    ${INSTALL} -d -m 0750 -o ${SHIELDNET_DEFEND_USER} -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/logs/cluster
 
-    ${INSTALL} -d -m 0770 -o ${WAZUH_USER} -g ${WAZUH_GROUP} ${INSTALLDIR}/etc/shared/default
-    ${INSTALL} -d -m 0750 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/backup/shared
+    ${INSTALL} -d -m 0770 -o ${SHIELDNET_DEFEND_USER} -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/etc/shared/default
+    ${INSTALL} -d -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/backup/shared
 
     TransferShared
 
-    ${INSTALL} -m 0750 -o root -g 0 wazuh-remoted ${INSTALLDIR}/bin
-    ${INSTALL} -m 0750 -o root -g 0 wazuh-authd ${INSTALLDIR}/bin
+    ${INSTALL} -m 0750 -o root -g 0 shieldnet-defend-remoted ${INSTALLDIR}/bin
+    ${INSTALL} -m 0750 -o root -g 0 shieldnet-defend-authd ${INSTALLDIR}/bin
 
-    ${INSTALL} -d -m 0770 -o ${WAZUH_USER} -g ${WAZUH_GROUP} ${INSTALLDIR}/queue/rids
-    ${INSTALL} -d -m 0770 -o ${WAZUH_USER} -g ${WAZUH_GROUP} ${INSTALLDIR}/queue/router
+    ${INSTALL} -d -m 0770 -o ${SHIELDNET_DEFEND_USER} -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/queue/rids
+    ${INSTALL} -d -m 0770 -o ${SHIELDNET_DEFEND_USER} -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/queue/router
 
     if [ ! -f ${INSTALLDIR}/queue/agents-timestamp ]; then
-        ${INSTALL} -m 0600 -o root -g ${WAZUH_GROUP} /dev/null ${INSTALLDIR}/queue/agents-timestamp
+        ${INSTALL} -m 0600 -o root -g ${SHIELDNET_DEFEND_GROUP} /dev/null ${INSTALLDIR}/queue/agents-timestamp
     fi
 
-    ${INSTALL} -d -m 0750 -o ${WAZUH_USER} -g ${WAZUH_GROUP} ${INSTALLDIR}/backup/agents
-    ${INSTALL} -d -m 0750 -o ${WAZUH_USER} -g ${WAZUH_GROUP} ${INSTALLDIR}/backup/db
+    ${INSTALL} -d -m 0750 -o ${SHIELDNET_DEFEND_USER} -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/backup/agents
+    ${INSTALL} -d -m 0750 -o ${SHIELDNET_DEFEND_USER} -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/backup/db
 
-    ${INSTALL} -m 0660 -o ${WAZUH_USER} -g ${WAZUH_GROUP} ../ruleset/rootcheck/db/*.txt ${INSTALLDIR}/etc/shared/default
+    ${INSTALL} -m 0660 -o ${SHIELDNET_DEFEND_USER} -g ${SHIELDNET_DEFEND_GROUP} ../ruleset/rootcheck/db/*.txt ${INSTALLDIR}/etc/shared/default
 
     if [ ! -f ${INSTALLDIR}/etc/shared/default/agent.conf ]; then
-        ${INSTALL} -m 0660 -o ${WAZUH_USER} -g ${WAZUH_GROUP} ../etc/agent.conf ${INSTALLDIR}/etc/shared/default
+        ${INSTALL} -m 0660 -o ${SHIELDNET_DEFEND_USER} -g ${SHIELDNET_DEFEND_GROUP} ../etc/agent.conf ${INSTALLDIR}/etc/shared/default
     fi
 
     if [ ! -f ${INSTALLDIR}/etc/shared/agent-template.conf ]; then
-        ${INSTALL} -m 0660 -o ${WAZUH_USER} -g ${WAZUH_GROUP} ../etc/agent.conf ${INSTALLDIR}/etc/shared/agent-template.conf
+        ${INSTALL} -m 0660 -o ${SHIELDNET_DEFEND_USER} -g ${SHIELDNET_DEFEND_GROUP} ../etc/agent.conf ${INSTALLDIR}/etc/shared/agent-template.conf
     fi
 
     # Install the plugins files
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/__init__.py ${INSTALLDIR}/wodles/__init__.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/utils.py ${INSTALLDIR}/wodles/utils.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/__init__.py ${INSTALLDIR}/wodles/__init__.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/utils.py ${INSTALLDIR}/wodles/utils.py
 
-    ${INSTALL} -d -m 0750 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/wodles/aws
-    ${INSTALL} -d -m 0750 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/wodles/aws/buckets_s3
-    ${INSTALL} -d -m 0750 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/wodles/aws/services
-    ${INSTALL} -d -m 0750 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/wodles/aws/subscribers
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/aws/aws_s3.py ${INSTALLDIR}/wodles/aws/aws-s3.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/aws/__init__.py ${INSTALLDIR}/wodles/aws/__init__.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/aws/aws_tools.py ${INSTALLDIR}/wodles/aws/aws_tools.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/aws/wazuh_integration.py ${INSTALLDIR}/wodles/aws/wazuh_integration.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/aws/buckets_s3/aws_bucket.py ${INSTALLDIR}/wodles/aws/buckets_s3/aws_bucket.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/aws/buckets_s3/cloudtrail.py ${INSTALLDIR}/wodles/aws/buckets_s3/cloudtrail.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/aws/buckets_s3/config.py ${INSTALLDIR}/wodles/aws/buckets_s3/config.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/aws/buckets_s3/guardduty.py ${INSTALLDIR}/wodles/aws/buckets_s3/guardduty.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/aws/buckets_s3/__init__.py ${INSTALLDIR}/wodles/aws/buckets_s3/__init__.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/aws/buckets_s3/load_balancers.py ${INSTALLDIR}/wodles/aws/buckets_s3/load_balancers.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/aws/buckets_s3/server_access.py ${INSTALLDIR}/wodles/aws/buckets_s3/server_access.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/aws/buckets_s3/umbrella.py ${INSTALLDIR}/wodles/aws/buckets_s3/umbrella.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/aws/buckets_s3/vpcflow.py ${INSTALLDIR}/wodles/aws/buckets_s3/vpcflow.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/aws/buckets_s3/waf.py ${INSTALLDIR}/wodles/aws/buckets_s3/waf.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/aws/services/aws_service.py ${INSTALLDIR}/wodles/aws/services/aws_service.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/aws/services/cloudwatchlogs.py ${INSTALLDIR}/wodles/aws/services/cloudwatchlogs.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/aws/services/__init__.py ${INSTALLDIR}/wodles/aws/services/__init__.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/aws/services/inspector.py ${INSTALLDIR}/wodles/aws/services/inspector.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/aws/subscribers/__init__.py ${INSTALLDIR}/wodles/aws/subscribers/__init__.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/aws/subscribers/sqs_queue.py ${INSTALLDIR}/wodles/aws/subscribers/sqs_queue.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/aws/subscribers/s3_log_handler.py ${INSTALLDIR}/wodles/aws/subscribers/s3_log_handler.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/aws/subscribers/sqs_message_processor.py ${INSTALLDIR}/wodles/aws/subscribers/sqs_message_processor.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../framework/wrappers/generic_wrapper.sh ${INSTALLDIR}/wodles/aws/aws-s3
+    ${INSTALL} -d -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/wodles/aws
+    ${INSTALL} -d -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/wodles/aws/buckets_s3
+    ${INSTALL} -d -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/wodles/aws/services
+    ${INSTALL} -d -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/wodles/aws/subscribers
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/aws/aws_s3.py ${INSTALLDIR}/wodles/aws/aws-s3.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/aws/__init__.py ${INSTALLDIR}/wodles/aws/__init__.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/aws/aws_tools.py ${INSTALLDIR}/wodles/aws/aws_tools.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/aws/shieldnet_defend_integration.py ${INSTALLDIR}/wodles/aws/shieldnet_defend_integration.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/aws/buckets_s3/aws_bucket.py ${INSTALLDIR}/wodles/aws/buckets_s3/aws_bucket.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/aws/buckets_s3/cloudtrail.py ${INSTALLDIR}/wodles/aws/buckets_s3/cloudtrail.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/aws/buckets_s3/config.py ${INSTALLDIR}/wodles/aws/buckets_s3/config.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/aws/buckets_s3/guardduty.py ${INSTALLDIR}/wodles/aws/buckets_s3/guardduty.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/aws/buckets_s3/__init__.py ${INSTALLDIR}/wodles/aws/buckets_s3/__init__.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/aws/buckets_s3/load_balancers.py ${INSTALLDIR}/wodles/aws/buckets_s3/load_balancers.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/aws/buckets_s3/server_access.py ${INSTALLDIR}/wodles/aws/buckets_s3/server_access.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/aws/buckets_s3/umbrella.py ${INSTALLDIR}/wodles/aws/buckets_s3/umbrella.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/aws/buckets_s3/vpcflow.py ${INSTALLDIR}/wodles/aws/buckets_s3/vpcflow.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/aws/buckets_s3/waf.py ${INSTALLDIR}/wodles/aws/buckets_s3/waf.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/aws/services/aws_service.py ${INSTALLDIR}/wodles/aws/services/aws_service.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/aws/services/cloudwatchlogs.py ${INSTALLDIR}/wodles/aws/services/cloudwatchlogs.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/aws/services/__init__.py ${INSTALLDIR}/wodles/aws/services/__init__.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/aws/services/inspector.py ${INSTALLDIR}/wodles/aws/services/inspector.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/aws/subscribers/__init__.py ${INSTALLDIR}/wodles/aws/subscribers/__init__.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/aws/subscribers/sqs_queue.py ${INSTALLDIR}/wodles/aws/subscribers/sqs_queue.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/aws/subscribers/s3_log_handler.py ${INSTALLDIR}/wodles/aws/subscribers/s3_log_handler.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/aws/subscribers/sqs_message_processor.py ${INSTALLDIR}/wodles/aws/subscribers/sqs_message_processor.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../framework/wrappers/generic_wrapper.sh ${INSTALLDIR}/wodles/aws/aws-s3
 
-    ${INSTALL} -d -m 0750 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/wodles/gcloud
-    ${INSTALL} -d -m 0750 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/wodles/gcloud/buckets
-    ${INSTALL} -d -m 0750 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/wodles/gcloud/pubsub
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/gcloud/gcloud.py ${INSTALLDIR}/wodles/gcloud/gcloud.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/gcloud/integration.py ${INSTALLDIR}/wodles/gcloud/integration.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/gcloud/tools.py ${INSTALLDIR}/wodles/gcloud/tools.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/gcloud/exceptions.py ${INSTALLDIR}/wodles/gcloud/exceptions.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/gcloud/buckets/bucket.py ${INSTALLDIR}/wodles/gcloud/buckets/bucket.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/gcloud/buckets/access_logs.py ${INSTALLDIR}/wodles/gcloud/buckets/access_logs.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/gcloud/pubsub/subscriber.py ${INSTALLDIR}/wodles/gcloud/pubsub/subscriber.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../framework/wrappers/generic_wrapper.sh ${INSTALLDIR}/wodles/gcloud/gcloud
+    ${INSTALL} -d -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/wodles/gcloud
+    ${INSTALL} -d -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/wodles/gcloud/buckets
+    ${INSTALL} -d -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/wodles/gcloud/pubsub
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/gcloud/gcloud.py ${INSTALLDIR}/wodles/gcloud/gcloud.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/gcloud/integration.py ${INSTALLDIR}/wodles/gcloud/integration.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/gcloud/tools.py ${INSTALLDIR}/wodles/gcloud/tools.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/gcloud/exceptions.py ${INSTALLDIR}/wodles/gcloud/exceptions.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/gcloud/buckets/bucket.py ${INSTALLDIR}/wodles/gcloud/buckets/bucket.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/gcloud/buckets/access_logs.py ${INSTALLDIR}/wodles/gcloud/buckets/access_logs.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/gcloud/pubsub/subscriber.py ${INSTALLDIR}/wodles/gcloud/pubsub/subscriber.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../framework/wrappers/generic_wrapper.sh ${INSTALLDIR}/wodles/gcloud/gcloud
 
-    ${INSTALL} -d -m 0750 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/wodles/docker
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/docker-listener/DockerListener.py ${INSTALLDIR}/wodles/docker/DockerListener.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../framework/wrappers/generic_wrapper.sh ${INSTALLDIR}/wodles/docker/DockerListener
+    ${INSTALL} -d -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/wodles/docker
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/docker-listener/DockerListener.py ${INSTALLDIR}/wodles/docker/DockerListener.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../framework/wrappers/generic_wrapper.sh ${INSTALLDIR}/wodles/docker/DockerListener
 
-    ${INSTALL} -d -m 0750 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/wodles/azure
-    ${INSTALL} -d -m 0750 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/wodles/azure/azure_services
-    ${INSTALL} -d -m 0750 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/wodles/azure/db
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/azure/azure-logs.py ${INSTALLDIR}/wodles/azure/azure-logs.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/azure/azure_utils.py ${INSTALLDIR}/wodles/azure/azure_utils.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/azure/azure_services/__init__.py ${INSTALLDIR}/wodles/azure/azure_services/__init__.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/azure/azure_services/analytics.py ${INSTALLDIR}/wodles/azure/azure_services/analytics.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/azure/azure_services/graph.py ${INSTALLDIR}/wodles/azure/azure_services/graph.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/azure/azure_services/storage.py ${INSTALLDIR}/wodles/azure/azure_services/storage.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/azure/db/__init__.py ${INSTALLDIR}/wodles/azure/db/__init__.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/azure/db/orm.py ${INSTALLDIR}/wodles/azure/db/orm.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/azure/db/utils.py ${INSTALLDIR}/wodles/azure/db/utils.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../framework/wrappers/generic_wrapper.sh ${INSTALLDIR}/wodles/azure/azure-logs
+    ${INSTALL} -d -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/wodles/azure
+    ${INSTALL} -d -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/wodles/azure/azure_services
+    ${INSTALL} -d -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/wodles/azure/db
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/azure/azure-logs.py ${INSTALLDIR}/wodles/azure/azure-logs.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/azure/azure_utils.py ${INSTALLDIR}/wodles/azure/azure_utils.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/azure/azure_services/__init__.py ${INSTALLDIR}/wodles/azure/azure_services/__init__.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/azure/azure_services/analytics.py ${INSTALLDIR}/wodles/azure/azure_services/analytics.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/azure/azure_services/graph.py ${INSTALLDIR}/wodles/azure/azure_services/graph.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/azure/azure_services/storage.py ${INSTALLDIR}/wodles/azure/azure_services/storage.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/azure/db/__init__.py ${INSTALLDIR}/wodles/azure/db/__init__.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/azure/db/orm.py ${INSTALLDIR}/wodles/azure/db/orm.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/azure/db/utils.py ${INSTALLDIR}/wodles/azure/db/utils.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../framework/wrappers/generic_wrapper.sh ${INSTALLDIR}/wodles/azure/azure-logs
 
     GenerateAuthCert
 
     # Add the wrappers for python script in active-response
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../framework/wrappers/generic_wrapper.sh ${INSTALLDIR}/integrations/pagerduty
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../framework/wrappers/generic_wrapper.sh ${INSTALLDIR}/integrations/slack
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../framework/wrappers/generic_wrapper.sh ${INSTALLDIR}/integrations/virustotal
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../framework/wrappers/generic_wrapper.sh ${INSTALLDIR}/integrations/shuffle
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../framework/wrappers/generic_wrapper.sh ${INSTALLDIR}/integrations/maltiverse
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../framework/wrappers/generic_wrapper.sh ${INSTALLDIR}/integrations/pagerduty
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../framework/wrappers/generic_wrapper.sh ${INSTALLDIR}/integrations/slack
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../framework/wrappers/generic_wrapper.sh ${INSTALLDIR}/integrations/virustotal
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../framework/wrappers/generic_wrapper.sh ${INSTALLDIR}/integrations/shuffle
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../framework/wrappers/generic_wrapper.sh ${INSTALLDIR}/integrations/maltiverse
 
     # Keystore
-    ${INSTALL} -d -m 0750 -o ${WAZUH_USER} -g ${WAZUH_GROUP} ${INSTALLDIR}/queue/keystore
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} wazuh-keystore ${INSTALLDIR}/bin/
+    ${INSTALL} -d -m 0750 -o ${SHIELDNET_DEFEND_USER} -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/queue/keystore
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} shieldnet-defend-keystore ${INSTALLDIR}/bin/
 }
 
 InstallAgent()
@@ -1409,76 +1409,76 @@ InstallAgent()
 
     InstallSecurityConfigurationAssessmentFiles "agent"
 
-    ${INSTALL} -m 0750 -o root -g 0 wazuh-agentd ${INSTALLDIR}/bin
+    ${INSTALL} -m 0750 -o root -g 0 shieldnet-defend-agentd ${INSTALLDIR}/bin
     ${INSTALL} -m 0750 -o root -g 0 agent-auth ${INSTALLDIR}/bin
 
-    ${INSTALL} -d -m 0750 -o ${WAZUH_USER} -g ${WAZUH_GROUP} ${INSTALLDIR}/queue/rids
-    ${INSTALL} -d -m 0770 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/var/incoming
-    ${INSTALL} -m 0660 -o root -g ${WAZUH_GROUP} ../ruleset/rootcheck/db/*.txt ${INSTALLDIR}/etc/shared/
-    ${INSTALL} -m 0640 -o root -g ${WAZUH_GROUP} ../etc/wpk_root.pem ${INSTALLDIR}/etc/
+    ${INSTALL} -d -m 0750 -o ${SHIELDNET_DEFEND_USER} -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/queue/rids
+    ${INSTALL} -d -m 0770 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/var/incoming
+    ${INSTALL} -m 0660 -o root -g ${SHIELDNET_DEFEND_GROUP} ../ruleset/rootcheck/db/*.txt ${INSTALLDIR}/etc/shared/
+    ${INSTALL} -m 0640 -o root -g ${SHIELDNET_DEFEND_GROUP} ../etc/wpk_root.pem ${INSTALLDIR}/etc/
 
     # Install the plugins files
     # Don't install the plugins if they are already installed. This check affects
     # hybrid installation mode
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/__init__.py ${INSTALLDIR}/wodles/__init__.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/utils.py ${INSTALLDIR}/wodles/utils.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/__init__.py ${INSTALLDIR}/wodles/__init__.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/utils.py ${INSTALLDIR}/wodles/utils.py
 
-    ${INSTALL} -d -m 0750 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/wodles/aws
-    ${INSTALL} -d -m 0750 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/wodles/aws/buckets_s3
-    ${INSTALL} -d -m 0750 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/wodles/aws/services
-    ${INSTALL} -d -m 0750 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/wodles/aws/subscribers
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/aws/aws_s3.py ${INSTALLDIR}/wodles/aws/aws-s3
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/aws/__init__.py ${INSTALLDIR}/wodles/aws/__init__.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/aws/aws_tools.py ${INSTALLDIR}/wodles/aws/aws_tools.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/aws/wazuh_integration.py ${INSTALLDIR}/wodles/aws/wazuh_integration.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/aws/buckets_s3/aws_bucket.py ${INSTALLDIR}/wodles/aws/buckets_s3/aws_bucket.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/aws/buckets_s3/cloudtrail.py ${INSTALLDIR}/wodles/aws/buckets_s3/cloudtrail.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/aws/buckets_s3/config.py ${INSTALLDIR}/wodles/aws/buckets_s3/config.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/aws/buckets_s3/guardduty.py ${INSTALLDIR}/wodles/aws/buckets_s3/guardduty.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/aws/buckets_s3/__init__.py ${INSTALLDIR}/wodles/aws/buckets_s3/__init__.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/aws/buckets_s3/load_balancers.py ${INSTALLDIR}/wodles/aws/buckets_s3/load_balancers.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/aws/buckets_s3/server_access.py ${INSTALLDIR}/wodles/aws/buckets_s3/server_access.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/aws/buckets_s3/umbrella.py ${INSTALLDIR}/wodles/aws/buckets_s3/umbrella.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/aws/buckets_s3/vpcflow.py ${INSTALLDIR}/wodles/aws/buckets_s3/vpcflow.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/aws/buckets_s3/waf.py ${INSTALLDIR}/wodles/aws/buckets_s3/waf.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/aws/services/aws_service.py ${INSTALLDIR}/wodles/aws/services/aws_service.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/aws/services/cloudwatchlogs.py ${INSTALLDIR}/wodles/aws/services/cloudwatchlogs.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/aws/services/__init__.py ${INSTALLDIR}/wodles/aws/services/__init__.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/aws/services/inspector.py ${INSTALLDIR}/wodles/aws/services/inspector.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/aws/subscribers/__init__.py ${INSTALLDIR}/wodles/aws/subscribers/__init__.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/aws/subscribers/sqs_queue.py ${INSTALLDIR}/wodles/aws/subscribers/sqs_queue.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/aws/subscribers/s3_log_handler.py ${INSTALLDIR}/wodles/aws/subscribers/s3_log_handler.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/aws/subscribers/sqs_message_processor.py ${INSTALLDIR}/wodles/aws/subscribers/sqs_message_processor.py
+    ${INSTALL} -d -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/wodles/aws
+    ${INSTALL} -d -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/wodles/aws/buckets_s3
+    ${INSTALL} -d -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/wodles/aws/services
+    ${INSTALL} -d -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/wodles/aws/subscribers
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/aws/aws_s3.py ${INSTALLDIR}/wodles/aws/aws-s3
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/aws/__init__.py ${INSTALLDIR}/wodles/aws/__init__.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/aws/aws_tools.py ${INSTALLDIR}/wodles/aws/aws_tools.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/aws/shieldnet_defend_integration.py ${INSTALLDIR}/wodles/aws/shieldnet_defend_integration.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/aws/buckets_s3/aws_bucket.py ${INSTALLDIR}/wodles/aws/buckets_s3/aws_bucket.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/aws/buckets_s3/cloudtrail.py ${INSTALLDIR}/wodles/aws/buckets_s3/cloudtrail.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/aws/buckets_s3/config.py ${INSTALLDIR}/wodles/aws/buckets_s3/config.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/aws/buckets_s3/guardduty.py ${INSTALLDIR}/wodles/aws/buckets_s3/guardduty.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/aws/buckets_s3/__init__.py ${INSTALLDIR}/wodles/aws/buckets_s3/__init__.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/aws/buckets_s3/load_balancers.py ${INSTALLDIR}/wodles/aws/buckets_s3/load_balancers.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/aws/buckets_s3/server_access.py ${INSTALLDIR}/wodles/aws/buckets_s3/server_access.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/aws/buckets_s3/umbrella.py ${INSTALLDIR}/wodles/aws/buckets_s3/umbrella.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/aws/buckets_s3/vpcflow.py ${INSTALLDIR}/wodles/aws/buckets_s3/vpcflow.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/aws/buckets_s3/waf.py ${INSTALLDIR}/wodles/aws/buckets_s3/waf.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/aws/services/aws_service.py ${INSTALLDIR}/wodles/aws/services/aws_service.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/aws/services/cloudwatchlogs.py ${INSTALLDIR}/wodles/aws/services/cloudwatchlogs.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/aws/services/__init__.py ${INSTALLDIR}/wodles/aws/services/__init__.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/aws/services/inspector.py ${INSTALLDIR}/wodles/aws/services/inspector.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/aws/subscribers/__init__.py ${INSTALLDIR}/wodles/aws/subscribers/__init__.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/aws/subscribers/sqs_queue.py ${INSTALLDIR}/wodles/aws/subscribers/sqs_queue.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/aws/subscribers/s3_log_handler.py ${INSTALLDIR}/wodles/aws/subscribers/s3_log_handler.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/aws/subscribers/sqs_message_processor.py ${INSTALLDIR}/wodles/aws/subscribers/sqs_message_processor.py
 
-    ${INSTALL} -d -m 0750 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/wodles/gcloud
-    ${INSTALL} -d -m 0750 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/wodles/gcloud/pubsub
-    ${INSTALL} -d -m 0750 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/wodles/gcloud/buckets
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/gcloud/gcloud.py ${INSTALLDIR}/wodles/gcloud/gcloud
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/gcloud/integration.py ${INSTALLDIR}/wodles/gcloud/integration.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/gcloud/tools.py ${INSTALLDIR}/wodles/gcloud/tools.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/gcloud/exceptions.py ${INSTALLDIR}/wodles/gcloud/exceptions.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/gcloud/buckets/bucket.py ${INSTALLDIR}/wodles/gcloud/buckets/bucket.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/gcloud/buckets/access_logs.py ${INSTALLDIR}/wodles/gcloud/buckets/access_logs.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/gcloud/pubsub/subscriber.py ${INSTALLDIR}/wodles/gcloud/pubsub/subscriber.py
+    ${INSTALL} -d -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/wodles/gcloud
+    ${INSTALL} -d -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/wodles/gcloud/pubsub
+    ${INSTALL} -d -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/wodles/gcloud/buckets
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/gcloud/gcloud.py ${INSTALLDIR}/wodles/gcloud/gcloud
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/gcloud/integration.py ${INSTALLDIR}/wodles/gcloud/integration.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/gcloud/tools.py ${INSTALLDIR}/wodles/gcloud/tools.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/gcloud/exceptions.py ${INSTALLDIR}/wodles/gcloud/exceptions.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/gcloud/buckets/bucket.py ${INSTALLDIR}/wodles/gcloud/buckets/bucket.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/gcloud/buckets/access_logs.py ${INSTALLDIR}/wodles/gcloud/buckets/access_logs.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/gcloud/pubsub/subscriber.py ${INSTALLDIR}/wodles/gcloud/pubsub/subscriber.py
 
-    ${INSTALL} -d -m 0750 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/wodles/docker
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/docker-listener/DockerListener.py ${INSTALLDIR}/wodles/docker/DockerListener
+    ${INSTALL} -d -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/wodles/docker
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/docker-listener/DockerListener.py ${INSTALLDIR}/wodles/docker/DockerListener
 
-    ${INSTALL} -d -m 0750 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/wodles/azure
-    ${INSTALL} -d -m 0750 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/wodles/azure/azure_services
-    ${INSTALL} -d -m 0750 -o root -g ${WAZUH_GROUP} ${INSTALLDIR}/wodles/azure/db
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/azure/azure-logs.py ${INSTALLDIR}/wodles/azure/azure-logs
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/azure/azure_utils.py ${INSTALLDIR}/wodles/azure/azure_utils.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/azure/azure_services/__init__.py ${INSTALLDIR}/wodles/azure/azure_services/__init__.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/azure/azure_services/analytics.py ${INSTALLDIR}/wodles/azure/azure_services/analytics.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/azure/azure_services/graph.py ${INSTALLDIR}/wodles/azure/azure_services/graph.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/azure/azure_services/storage.py ${INSTALLDIR}/wodles/azure/azure_services/storage.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/azure/db/__init__.py ${INSTALLDIR}/wodles/azure/db/__init__.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/azure/db/orm.py ${INSTALLDIR}/wodles/azure/db/orm.py
-    ${INSTALL} -m 0750 -o root -g ${WAZUH_GROUP} ../wodles/azure/db/utils.py ${INSTALLDIR}/wodles/azure/db/utils.py
+    ${INSTALL} -d -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/wodles/azure
+    ${INSTALL} -d -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/wodles/azure/azure_services
+    ${INSTALL} -d -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ${INSTALLDIR}/wodles/azure/db
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/azure/azure-logs.py ${INSTALLDIR}/wodles/azure/azure-logs
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/azure/azure_utils.py ${INSTALLDIR}/wodles/azure/azure_utils.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/azure/azure_services/__init__.py ${INSTALLDIR}/wodles/azure/azure_services/__init__.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/azure/azure_services/analytics.py ${INSTALLDIR}/wodles/azure/azure_services/analytics.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/azure/azure_services/graph.py ${INSTALLDIR}/wodles/azure/azure_services/graph.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/azure/azure_services/storage.py ${INSTALLDIR}/wodles/azure/azure_services/storage.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/azure/db/__init__.py ${INSTALLDIR}/wodles/azure/db/__init__.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/azure/db/orm.py ${INSTALLDIR}/wodles/azure/db/orm.py
+    ${INSTALL} -m 0750 -o root -g ${SHIELDNET_DEFEND_GROUP} ../wodles/azure/db/utils.py ${INSTALLDIR}/wodles/azure/db/utils.py
 }
 
-InstallWazuh()
+InstallShieldnetDefend()
 {
     if [ "X$INSTYPE" = "Xagent" ]; then
         InstallAgent

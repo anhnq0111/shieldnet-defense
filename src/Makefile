@@ -1,7 +1,7 @@
-# Copyright (C) 2015, Wazuh Inc.
+# Copyright (C) 2015, ShieldnetDefend Inc.
 # TODO: mysql and postgresql?
 #
-# Copyright (C) 2015, Wazuh Inc.
+# Copyright (C) 2015, ShieldnetDefend Inc.
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@ uname_M := $(shell sh -c 'uname -m 2>/dev/null || echo not')
 
 
 ifeq (${TARGET}, winagent)
-WAZUH_LIB_OUTPUT_PATH := win32/
+SHIELDNET_DEFEND_LIB_OUTPUT_PATH := win32/
 STRIP_TOOL := i686-w64-mingw32-strip
 DLLTOOL := i686-w64-mingw32-dlltool
 libstdc++_path := $(shell sh -c 'i686-w64-mingw32-g++-posix --print-file-name=libstdc++-6.dll 2>/dev/null || echo not')
@@ -92,21 +92,21 @@ endif
 PG_CONFIG?=pg_config
 MY_CONFIG?=mysql_config
 PRELUDE_CONFIG?=libprelude-config
-WAZUH_GROUP?=wazuh
-WAZUH_USER?=wazuh
+SHIELDNET_DEFEND_GROUP?=shieldnetdefend
+SHIELDNET_DEFEND_USER?=shieldnetdefend
 SHARED=so
-SELINUX_MODULE=selinux/wazuh.mod
-SELINUX_ENFORCEMENT=selinux/wazuh.te
-SELINUX_POLICY=selinux/wazuh.pp
+SELINUX_MODULE=selinux/shieldnetdefend.mod
+SELINUX_ENFORCEMENT=selinux/shieldnetdefend.te
+SELINUX_POLICY=selinux/shieldnetdefend.pp
 SHARED_MODULES=shared_modules/
-WAZUH_MODULES=wazuh_modules/
+SHIELDNET_DEFEND_MODULES=shieldnet_defend_modules/
 DBSYNC=${SHARED_MODULES}dbsync/
 RSYNC=${SHARED_MODULES}rsync/
-SYSCOLLECTOR=wazuh_modules/syscollector/
+SYSCOLLECTOR=shieldnet_defend_modules/syscollector/
 ROUTER=shared_modules/router/
 CONTENT_MANAGER=shared_modules/content_manager/
-VULNERABILITY_SCANNER=wazuh_modules/vulnerability_scanner/
-INVENTORY_HARVESTER=wazuh_modules/inventory_harvester/
+VULNERABILITY_SCANNER=shieldnet_defend_modules/vulnerability_scanner/
+INVENTORY_HARVESTER=shieldnet_defend_modules/inventory_harvester/
 SYSINFO=data_provider/
 SYSCHECK=syscheckd/
 USE_PRELUDE?=no
@@ -144,7 +144,7 @@ DBSYNC_TEST=-DUNIT_TEST=ON #--coverage
 RSYNC_TEST=-DUNIT_TEST=ON #--coverage
 SYSCOLLECTOR_TEST=-DUNIT_TEST=ON #--coverage
 SYSINFO_TEST=-DUNIT_TEST=ON #--coverage
-WAZUH_TEST=-DUNIT_TEST=ON #--coverage
+SHIELDNET_DEFEND_TEST=-DUNIT_TEST=ON #--coverage
 endif
 ifneq (,$(filter ${DEBUG},YES yes y Y 1))
 SHARED_MODULES_RELEASE_TYPE=-DCMAKE_BUILD_TYPE=Debug
@@ -152,7 +152,7 @@ GTEST_RELEASE_TYPE=-DCMAKE_BUILD_TYPE=Debug
 SYSCOLLECTOR_RELEASE_TYPE=-DCMAKE_BUILD_TYPE=Debug
 SYSINFO_RELEASE_TYPE=-DCMAKE_BUILD_TYPE=Debug
 SYSCHECK_RELEASE_TYPE=-DCMAKE_BUILD_TYPE=Debug
-WAZUH_RELEASE_TYPE=-DCMAKE_BUILD_TYPE=Debug
+SHIELDNET_DEFEND_RELEASE_TYPE=-DCMAKE_BUILD_TYPE=Debug
 endif
 
 ifeq (${COVERITY}, YES)
@@ -174,8 +174,8 @@ ONEWAY?=no
 CLEANFULL?=no
 
 DEFINES=-DOSSECHIDS
-DEFINES+=-DUSER=\"${WAZUH_USER}\"
-DEFINES+=-DGROUPGLOBAL=\"${WAZUH_GROUP}\"
+DEFINES+=-DUSER=\"${SHIELDNET_DEFEND_USER}\"
+DEFINES+=-DGROUPGLOBAL=\"${SHIELDNET_DEFEND_GROUP}\"
 
 ifneq (${TARGET},winagent)
 		DEFINES+=-D${uname_S}
@@ -305,8 +305,8 @@ ifeq (${uname_S},HP-UX)
 		DEFINES+=-DHIGHFIRST
 		DEFINES+=-DOS_BIG_ENDIAN
 		OSSEC_CFLAGS+=-pthread
-		OSSEC_LDFLAGS+=-lrt -pthread -L. -lwazuhext
-		AR_LDFLAGS+=-lrt -pthread -L. -lwazuhext -lwazuhshared
+		OSSEC_LDFLAGS+=-lrt -pthread -L. -lshieldnetdefendext
+		AR_LDFLAGS+=-lrt -pthread -L. -lshieldnetdefendext -lshieldnetdefendshared
 ifeq ($(INSTALLDIR),)
 	INSTALLDIR = /var/ossec
 endif
@@ -414,8 +414,8 @@ else
 endif
 
 ifeq (${TARGET},server)
-	WAZUH_LIBS+=-lrouter
-	WAZUH_LDFLAGS+=-Lbuild/shared_modules/router
+	SHIELDNET_DEFEND_LIBS+=-lrouter
+	SHIELDNET_DEFEND_LDFLAGS+=-Lbuild/shared_modules/router
 endif
 
 ifneq (,$(filter ${CLEANFULL},YES yes y Y 1))
@@ -696,12 +696,12 @@ help: failtarget
 	@echo "General options: "
 	@echo "   make V=yes                   						Display full compiler messages. Allowed values are 1, yes, YES, y and Y, otherwise, the flag is ignored"
 	@echo "   make DEBUG=yes               						Build with symbols and without optimization. Allowed values are 1, yes, YES, y and Y, otherwise, the flag is ignored"
-	@echo "   make DEBUGAD=yes             						Enables extra debugging logging in wazuh-analysisd. Allowed values are 1, yes, YES, y and Y, otherwise, the flag is ignored"
-	@echo "   make INSTALLDIR=/path        						Wazuh's installation path. Mandatory when compiling the python interpreter from sources using PYTHON_SOURCE."
+	@echo "   make DEBUGAD=yes             						Enables extra debugging logging in shieldnet-defend-analysisd. Allowed values are 1, yes, YES, y and Y, otherwise, the flag is ignored"
+	@echo "   make INSTALLDIR=/path        						ShieldnetDefend's installation path. Mandatory when compiling the python interpreter from sources using PYTHON_SOURCE."
 	@echo "   make ONEWAY=yes              						Disables manager's ACK towards agent. It allows connecting agents without backward connection from manager. Allowed values are 1, yes, YES, y and Y, otherwise, the flag is ignored"
 	@echo "   make CLEANFULL=yes           						Makes the alert mailing subject clear in the format: '<location> - <level> - <description>'. Allowed values are 1, yes, YES, y and Y, otherwise, the flag is ignored"
-	@echo "   make RESOURCES_URL           						Set the Wazuh resources URL"
-	@echo "   make EXTERNAL_SRC_ONLY=yes   						Combined with 'deps', it downloads only the external source code to be compiled as part of Wazuh building."
+	@echo "   make RESOURCES_URL           						Set the ShieldnetDefend resources URL"
+	@echo "   make EXTERNAL_SRC_ONLY=yes   						Combined with 'deps', it downloads only the external source code to be compiled as part of ShieldnetDefend building."
 	@echo "   make USE_ZEROMQ=yes          						Build with zeromq support. Allowed values are auto, 1, yes, YES, y and Y, otherwise, the flag is ignored"
 	@echo "   make USE_PRELUDE=yes         						Build with prelude support. Allowed values are auto, 1, yes, YES, y and Y, otherwise, the flag is ignored"
 	@echo "   make USE_INOTIFY=yes         						Build with inotify support. Allowed values are auto, 1, yes, YES, y and Y, otherwise, the flag is ignored"
@@ -729,8 +729,8 @@ help: failtarget
 	@echo "   make USE_GEOIP=yes           Build with GeoIP support. Allowed values are auto 1, yes, YES, y and Y, otherwise, the flag is ignored"
 	@echo
 	@echo "User options: "
-	@echo "   make WAZUH_GROUP=wazuh       Set wazuh group"
-	@echo "   make WAZUH_USER=wazuh        Set wazuh user"
+	@echo "   make SHIELDNET_DEFEND_GROUP=shieldnetdefend       Set shieldnetdefend group"
+	@echo "   make SHIELDNET_DEFEND_USER=shieldnetdefend        Set shieldnetdefend user"
 	@echo
 	@echo "Examples: Client with debugging enabled"
 	@echo "   make TARGET=agent DEBUG=yes"
@@ -751,8 +751,8 @@ settings:
 	@echo "    EXTERNAL_SRC_ONLY:  ${EXTERNAL_SRC_ONLY}"
 	@echo "    HTTP_REQUEST_BRANCH:${HTTP_REQUEST_BRANCH}"
 	@echo "User settings:"
-	@echo "    WAZUH_GROUP:        ${WAZUH_GROUP}"
-	@echo "    WAZUH_USER:         ${WAZUH_USER}"
+	@echo "    SHIELDNET_DEFEND_GROUP:        ${SHIELDNET_DEFEND_GROUP}"
+	@echo "    SHIELDNET_DEFEND_USER:         ${SHIELDNET_DEFEND_USER}"
 	@echo "USE settings:"
 	@echo "    USE_ZEROMQ:         ${USE_ZEROMQ}"
 	@echo "    USE_GEOIP:          ${USE_GEOIP}"
@@ -780,41 +780,41 @@ settings:
 	@echo "    CC                ${CC}"
 	@echo "    MAKE              ${MAKE}"
 
-BUILD_SERVER+=wazuh-maild -
-BUILD_SERVER+=wazuh-csyslogd -
-BUILD_SERVER+=wazuh-agentlessd -
-BUILD_SERVER+=wazuh-execd -
-BUILD_SERVER+=wazuh-logcollector -
-BUILD_SERVER+=wazuh-remoted
-BUILD_SERVER+=wazuh-agentd
+BUILD_SERVER+=shieldnet-defend-maild -
+BUILD_SERVER+=shieldnet-defend-csyslogd -
+BUILD_SERVER+=shieldnet-defend-agentlessd -
+BUILD_SERVER+=shieldnet-defend-execd -
+BUILD_SERVER+=shieldnet-defend-logcollector -
+BUILD_SERVER+=shieldnet-defend-remoted
+BUILD_SERVER+=shieldnet-defend-agentd
 BUILD_SERVER+=manage_agents
 BUILD_SERVER+=utils
 BUILD_SERVER+=active-responses
-BUILD_SERVER+=wazuh-syscheckd
-BUILD_SERVER+=wazuh-monitord
-BUILD_SERVER+=wazuh-reportd
-BUILD_SERVER+=wazuh-authd
-BUILD_SERVER+=wazuh-analysisd
-BUILD_SERVER+=wazuh-logtest-legacy
-BUILD_SERVER+=wazuh-dbd -
-BUILD_SERVER+=wazuh-integratord
-BUILD_SERVER+=wazuh-modulesd
-BUILD_SERVER+=wazuh-db
-BUILD_SERVER+=wazuh-keystore
+BUILD_SERVER+=shieldnet-defend-syscheckd
+BUILD_SERVER+=shieldnet-defend-monitord
+BUILD_SERVER+=shieldnet-defend-reportd
+BUILD_SERVER+=shieldnet-defend-authd
+BUILD_SERVER+=shieldnet-defend-analysisd
+BUILD_SERVER+=shieldnet-defend-logtest-legacy
+BUILD_SERVER+=shieldnet-defend-dbd -
+BUILD_SERVER+=shieldnet-defend-integratord
+BUILD_SERVER+=shieldnet-defend-modulesd
+BUILD_SERVER+=shieldnet-defend-db
+BUILD_SERVER+=shieldnet-defend-keystore
 
-BUILD_AGENT+=wazuh-agentd
+BUILD_AGENT+=shieldnet-defend-agentd
 BUILD_AGENT+=agent-auth
-BUILD_AGENT+=wazuh-logcollector
-BUILD_AGENT+=wazuh-syscheckd
-BUILD_AGENT+=wazuh-execd
+BUILD_AGENT+=shieldnet-defend-logcollector
+BUILD_AGENT+=shieldnet-defend-syscheckd
+BUILD_AGENT+=shieldnet-defend-execd
 BUILD_AGENT+=manage_agents
 BUILD_AGENT+=active-responses
-BUILD_AGENT+=wazuh-modulesd
+BUILD_AGENT+=shieldnet-defend-modulesd
 
 BUILD_CMAKE_PROJECTS+=build_sysinfo
 BUILD_CMAKE_PROJECTS+=build_shared_modules
 ifeq (${TARGET},server)
-BUILD_CMAKE_PROJECTS+=build_wazuh_cmake
+BUILD_CMAKE_PROJECTS+=build_shieldnet_defend_cmake
 endif
 ifeq (,$(filter ${DISABLE_SYSC},YES yes y Y 1))
 ifneq (${uname_S},HP-UX)
@@ -822,13 +822,13 @@ BUILD_CMAKE_PROJECTS+=build_syscollector
 endif
 endif
 
-${WAZUH_LIB_OUTPUT_PATH}${LIBSTDCPP_NAME}: ${libstdc++_path}
+${SHIELDNET_DEFEND_LIB_OUTPUT_PATH}${LIBSTDCPP_NAME}: ${libstdc++_path}
 	cp $< $@
 ifneq (${uname_S},AIX)
 	${STRIP_TOOL} -x $@
 endif
 
-${WAZUH_LIB_OUTPUT_PATH}${LIBGCC_S_NAME}: ${libgcc_s_path}
+${SHIELDNET_DEFEND_LIB_OUTPUT_PATH}${LIBGCC_S_NAME}: ${libgcc_s_path}
 	cp $< $@
 ifneq (${uname_S},AIX)
 	${STRIP_TOOL} -x $@
@@ -878,15 +878,15 @@ $(SELINUX_MODULE): $(SELINUX_ENFORCEMENT)
 	checkmodule -M -m -o $@ $?
 
 WINDOWS_LIBS:=win32/syscollector win32/syscheck
-WINDOWS_BINS:=win32/wazuh-agent.exe win32/wazuh-agent-eventchannel.exe win32/manage_agents.exe win32/setup-windows.exe win32/setup-syscheck.exe win32/setup-iis.exe win32/os_win32ui.exe win32/agent-auth.exe
-WINDOWS_ACTIVE_RESPONSES:=win32/restart-wazuh.exe win32/route-null.exe win32/netsh.exe
+WINDOWS_BINS:=win32/shieldnet-defend-agent.exe win32/shieldnet-defend-agent-eventchannel.exe win32/manage_agents.exe win32/setup-windows.exe win32/setup-syscheck.exe win32/setup-iis.exe win32/os_win32ui.exe win32/agent-auth.exe
+WINDOWS_ACTIVE_RESPONSES:=win32/restart-shieldnet-defend.exe win32/route-null.exe win32/netsh.exe
 
 ifeq (${MAKECMDGOALS},winagent)
 $(error Do not use 'winagent' directly, use 'TARGET=winagent')
 endif
 .PHONY: winagent
-winagent: external win32/libwinpthread-1.dll win32/libwinpthreadpatched.a ${WAZUH_LIB_OUTPUT_PATH}${LIBGCC_S_NAME} ${WAZUH_LIB_OUTPUT_PATH}${LIBSTDCPP_NAME} win32/version-dll.o win32/version-app.o
-	${MAKE} ${WAZUHEXT_LIB} CFLAGS="-DCLIENT -D_POSIX_C_SOURCE -DWIN32 -DPSAPI_VERSION=1" LIBS="-lwsock32 -lws2_32 -lcrypt32"
+winagent: external win32/libwinpthread-1.dll win32/libwinpthreadpatched.a ${SHIELDNET_DEFEND_LIB_OUTPUT_PATH}${LIBGCC_S_NAME} ${SHIELDNET_DEFEND_LIB_OUTPUT_PATH}${LIBSTDCPP_NAME} win32/version-dll.o win32/version-app.o
+	${MAKE} ${SHIELDNETDEFENDEXT_LIB} CFLAGS="-DCLIENT -D_POSIX_C_SOURCE -DWIN32 -DPSAPI_VERSION=1" LIBS="-lwsock32 -lws2_32 -lcrypt32"
 	${MAKE} ${WINDOWS_LIBS} CFLAGS="-DCLIENT -D_POSIX_C_SOURCE -DWIN32 -DPSAPI_VERSION=1"
 	${MAKE} ${WINDOWS_BINS} CFLAGS="-DCLIENT -D_POSIX_C_SOURCE -DWIN32 -DPSAPI_VERSION=1" LIBS="-lwsock32 -lwevtapi -lshlwapi -lcomctl32 -ladvapi32 -lkernel32 -lpsapi -lgdi32 -liphlpapi -lws2_32 -lcrypt32 -lwintrust -lmpr"
 	${MAKE} ${WINDOWS_ACTIVE_RESPONSES} CFLAGS="-DCLIENT -D_POSIX_C_SOURCE -DWIN32 -DPSAPI_VERSION=1" LIBS="-lwsock32 -lwevtapi -lshlwapi -lcomctl32 -ladvapi32 -lkernel32 -lpsapi -lgdi32 -liphlpapi -lws2_32 -lcrypt32 -lwintrust -lmpr"
@@ -896,22 +896,22 @@ winagent: external win32/libwinpthread-1.dll win32/libwinpthreadpatched.a ${WAZU
 	cd win32/ && ./unix2dos.pl ../../etc/local_internal_options-win.conf > default-local_internal_options.conf
 	cd win32/ && ./unix2dos.pl ../../LICENSE > LICENSE.txt
 	cd win32/ && ./unix2dos.pl ../../VERSION.json > VERSION.json
-	cd win32/ && makensis wazuh-installer.nsi
+	cd win32/ && makensis shieldnet-defend-installer.nsi
 
-win32/shared_modules: $(WAZUHEXT_LIB)
+win32/shared_modules: $(SHIELDNETDEFENDEXT_LIB)
 	cd ${DBSYNC} && mkdir -p build && cd build && cmake ${CMAKE_OPTS} ${DBSYNC_TEST} ${SHARED_MODULES_RELEASE_TYPE} ${WIN_RESOURCE_OBJ} .. && ${MAKE}
 	cd ${RSYNC} &&  mkdir -p build && cd build && cmake ${CMAKE_OPTS} ${RSYNC_TEST} ${SHARED_MODULES_RELEASE_TYPE} ${WIN_RESOURCE_OBJ} .. && ${MAKE}
 
 #### Sysinfo ##
 
-win32/sysinfo: $(WAZUHEXT_LIB) win32/version-dll.o
+win32/sysinfo: $(SHIELDNETDEFENDEXT_LIB) win32/version-dll.o
 	cd ${SYSINFO} && mkdir -p build && cd build && cmake ${CMAKE_OPTS} ${SYSINFO_OS} ${SYSINFO_TEST} ${SYSINFO_RELEASE_TYPE} ${WIN_RESOURCE_OBJ} .. && ${MAKE}
 
 #### Syscollector ##
 win32/syscollector: win32/shared_modules win32/sysinfo win32/version-dll.o
 	cd ${SYSCOLLECTOR} && mkdir -p build && cd build && cmake ${CMAKE_OPTS} ${SYSCOLLECTOR_TEST} ${SYSCOLLECTOR_RELEASE_TYPE} ${WIN_RESOURCE_OBJ} .. && ${MAKE}
 
-win32/syscheck: win32/shared_modules $(WAZUHEXT_LIB)
+win32/syscheck: win32/shared_modules $(SHIELDNETDEFENDEXT_LIB)
 	cd ${SYSCHECK} && mkdir -p build && cd build && cmake ${CMAKE_OPTS} ${SYSCHECK_TEST} ${SYSCHECK_RELEASE_TYPE} ${WIN_RESOURCE_OBJ} .. && ${MAKE}
 
 win32/libwinpthread-1.dll: ${WIN_PTHREAD_LIB}
@@ -1581,7 +1581,7 @@ external-precompiled/%.tar.gz:
 endif
 
 # Shared tools
-HTTP_REQUEST_URL := https://github.com/wazuh/wazuh-http-request/tarball/$(HTTP_REQUEST_BRANCH)
+HTTP_REQUEST_URL := https://github.com/shieldnetdefend/shieldnet-defend-http-request/tarball/$(HTTP_REQUEST_BRANCH)
 
 shared_modules/http-request.tar.gz:
 	find $(patsubst %.tar.gz,%,$@) -type f -exec false {} + &&\
@@ -1594,19 +1594,19 @@ shared_modules/http-request.tar.gz:
 #### OSSEC Libs ####
 ####################
 ifeq (${TARGET}, winagent)
-# libwazuhext
-WAZUHEXT_DLL = libwazuhext.$(SHARED)
-WAZUHEXT_LIB = libwazuhext.lib
-WAZUHEXT_LIB_DEF = libwazuhext.def
-# libwazuhshared
-WAZUH_DLL = libwazuhshared.$(SHARED)
-WAZUH_LIB = libwazuhshared.lib
-WAZUH_DEF = libwazuhshared.def
+# libshieldnetdefendext
+SHIELDNETDEFENDEXT_DLL = libshieldnetdefendext.$(SHARED)
+SHIELDNETDEFENDEXT_LIB = libshieldnetdefendext.lib
+SHIELDNETDEFENDEXT_LIB_DEF = libshieldnetdefendext.def
+# libshieldnetdefendshared
+SHIELDNET_DEFEND_DLL = libshieldnetdefendshared.$(SHARED)
+SHIELDNET_DEFEND_LIB = libshieldnetdefendshared.lib
+SHIELDNET_DEFEND_DEF = libshieldnetdefendshared.def
 else
-WAZUHEXT_LIB = libwazuhext.$(SHARED)
-WAZUH_LIB = libwazuhshared.$(SHARED)
+SHIELDNETDEFENDEXT_LIB = libshieldnetdefendext.$(SHARED)
+SHIELDNET_DEFEND_LIB = libshieldnetdefendshared.$(SHARED)
 endif
-BUILD_LIBS = libwazuh.a $(WAZUHEXT_LIB)
+BUILD_LIBS = libshieldnetdefend.a $(SHIELDNETDEFENDEXT_LIB)
 
 $(BUILD_SERVER) $(BUILD_AGENT) $(WINDOWS_BINS) $(WINDOWS_BINS): $(BUILD_LIBS)
 
@@ -1685,55 +1685,55 @@ wrappers_macos_posix_o := $(wrappers_macos_posix_c:.c=.o)
 wrappers_posix_c := $(wildcard unit_tests/wrappers/posix/*.c)
 wrappers_posix_o := $(wrappers_posix_c:.c=.o)
 
-wrappers_wazuh_c := $(wildcard unit_tests/wrappers/wazuh/*.c)
-wrappers_wazuh_o := $(wrappers_wazuh_c:.c=.o)
+wrappers_shieldnet_defend_c := $(wildcard unit_tests/wrappers/shieldnetdefend/*.c)
+wrappers_shieldnet_defend_o := $(wrappers_shieldnet_defend_c:.c=.o)
 
-wrappers_wazuh_os_crypto_c := $(wildcard unit_tests/wrappers/wazuh/os_crypto/*.c)
-wrappers_wazuh_os_crypto_o := $(wrappers_wazuh_os_crypto_c:.c=.o)
+wrappers_shieldnet_defend_os_crypto_c := $(wildcard unit_tests/wrappers/shieldnetdefend/os_crypto/*.c)
+wrappers_shieldnet_defend_os_crypto_o := $(wrappers_shieldnet_defend_os_crypto_c:.c=.o)
 
-wrappers_wazuh_os_execd_c := $(wildcard unit_tests/wrappers/wazuh/os_execd/*.c)
-wrappers_wazuh_os_execd_o := $(wrappers_wazuh_os_execd_c:.c=.o)
+wrappers_shieldnet_defend_os_execd_c := $(wildcard unit_tests/wrappers/shieldnetdefend/os_execd/*.c)
+wrappers_shieldnet_defend_os_execd_o := $(wrappers_shieldnet_defend_os_execd_c:.c=.o)
 
-wrappers_wazuh_os_net_c := $(wildcard unit_tests/wrappers/wazuh/os_net/*.c)
-wrappers_wazuh_os_net_o := $(wrappers_wazuh_os_net_c:.c=.o)
+wrappers_shieldnet_defend_os_net_c := $(wildcard unit_tests/wrappers/shieldnetdefend/os_net/*.c)
+wrappers_shieldnet_defend_os_net_o := $(wrappers_shieldnet_defend_os_net_c:.c=.o)
 
-wrappers_wazuh_os_regex_c := $(wildcard unit_tests/wrappers/wazuh/os_regex/*.c)
-wrappers_wazuh_os_regex_o := $(wrappers_wazuh_os_regex_c:.c=.o)
+wrappers_shieldnet_defend_os_regex_c := $(wildcard unit_tests/wrappers/shieldnetdefend/os_regex/*.c)
+wrappers_shieldnet_defend_os_regex_o := $(wrappers_shieldnet_defend_os_regex_c:.c=.o)
 
-wrappers_wazuh_os_xml_c := $(wildcard unit_tests/wrappers/wazuh/os_xml/*.c)
-wrappers_wazuh_os_xml_o := $(wrappers_wazuh_os_xml_c:.c=.o)
+wrappers_shieldnet_defend_os_xml_c := $(wildcard unit_tests/wrappers/shieldnetdefend/os_xml/*.c)
+wrappers_shieldnet_defend_os_xml_o := $(wrappers_shieldnet_defend_os_xml_c:.c=.o)
 
-wrappers_wazuh_shared_c := $(wildcard unit_tests/wrappers/wazuh/shared/*.c)
-wrappers_wazuh_shared_o := $(wrappers_wazuh_shared_c:.c=.o)
+wrappers_shieldnet_defend_shared_c := $(wildcard unit_tests/wrappers/shieldnetdefend/shared/*.c)
+wrappers_shieldnet_defend_shared_o := $(wrappers_shieldnet_defend_shared_c:.c=.o)
 
-wrappers_wazuh_syscheckd_c := $(wildcard unit_tests/wrappers/wazuh/syscheckd/*.c)
-wrappers_wazuh_syscheckd_o := $(wrappers_wazuh_syscheckd_c:.c=.o)
+wrappers_shieldnet_defend_syscheckd_c := $(wildcard unit_tests/wrappers/shieldnetdefend/syscheckd/*.c)
+wrappers_shieldnet_defend_syscheckd_o := $(wrappers_shieldnet_defend_syscheckd_c:.c=.o)
 
-wrappers_wazuh_wazuh_db_c := $(wildcard unit_tests/wrappers/wazuh/wazuh_db/*.c)
-wrappers_wazuh_wazuh_db_o := $(wrappers_wazuh_wazuh_db_c:.c=.o)
+wrappers_shieldnet_defend_shieldnet_defend_db_c := $(wildcard unit_tests/wrappers/shieldnetdefend/shieldnet_defend_db/*.c)
+wrappers_shieldnet_defend_shieldnet_defend_db_o := $(wrappers_shieldnet_defend_shieldnet_defend_db_c:.c=.o)
 
-wrappers_wazuh_wazuh_modules_c := $(wildcard unit_tests/wrappers/wazuh/wazuh_modules/*.c)
-wrappers_wazuh_wazuh_modules_o := $(wrappers_wazuh_wazuh_modules_c:.c=.o)
+wrappers_shieldnet_defend_shieldnet_defend_modules_c := $(wildcard unit_tests/wrappers/shieldnetdefend/shieldnet_defend_modules/*.c)
+wrappers_shieldnet_defend_shieldnet_defend_modules_o := $(wrappers_shieldnet_defend_shieldnet_defend_modules_c:.c=.o)
 
-wrappers_wazuh_monitord_c := $(wildcard unit_tests/wrappers/wazuh/monitord/*.c)
-wrappers_wazuh_monitord_o := $(wrappers_wazuh_monitord_c:.c=.o)
+wrappers_shieldnet_defend_monitord_c := $(wildcard unit_tests/wrappers/shieldnetdefend/monitord/*.c)
+wrappers_shieldnet_defend_monitord_o := $(wrappers_shieldnet_defend_monitord_c:.c=.o)
 
-wrappers_wazuh_os_auth_c := $(wildcard unit_tests/wrappers/wazuh/os_auth/*.c)
-wrappers_wazuh_os_auth_o := $(wrappers_wazuh_os_auth_c:.c=.o)
+wrappers_shieldnet_defend_os_auth_c := $(wildcard unit_tests/wrappers/shieldnetdefend/os_auth/*.c)
+wrappers_shieldnet_defend_os_auth_o := $(wrappers_shieldnet_defend_os_auth_c:.c=.o)
 
-wrappers_wazuh_addagent_c := $(wildcard unit_tests/wrappers/wazuh/addagent/*.c)
-wrappers_wazuh_addagent_o := $(wrappers_wazuh_addagent_c:.c=.o)
+wrappers_shieldnet_defend_addagent_c := $(wildcard unit_tests/wrappers/shieldnetdefend/addagent/*.c)
+wrappers_shieldnet_defend_addagent_o := $(wrappers_shieldnet_defend_addagent_c:.c=.o)
 
-wrappers_client_agent_c := $(wildcard unit_tests/wrappers/wazuh/client-agent/*.c)
+wrappers_client_agent_c := $(wildcard unit_tests/wrappers/shieldnetdefend/client-agent/*.c)
 wrappers_client_agent_o := $(wrappers_client_agent_c:.c=.o)
 
-wrappers_wazuh_config_c := $(wildcard unit_tests/wrappers/wazuh/config/*.c)
-wrappers_wazuh_config_o := $(wrappers_wazuh_config_c:.c=.o)
+wrappers_shieldnet_defend_config_c := $(wildcard unit_tests/wrappers/shieldnetdefend/config/*.c)
+wrappers_shieldnet_defend_config_o := $(wrappers_shieldnet_defend_config_c:.c=.o)
 
-wrappers_data_provider_c := $(wildcard unit_tests/wrappers/wazuh/data_provider/*.c)
+wrappers_data_provider_c := $(wildcard unit_tests/wrappers/shieldnetdefend/data_provider/*.c)
 wrappers_data_provider_o := $(wrappers_data_provider_c:.c=.o)
 
-wrappers_logcollector_c := $(wildcard unit_tests/wrappers/wazuh/logcollector/*.c)
+wrappers_logcollector_c := $(wildcard unit_tests/wrappers/shieldnetdefend/logcollector/*.c)
 wrappers_logcollector_o := $(wrappers_logcollector_c:.c=.o)
 
 wrappers_windows_c := $(wildcard unit_tests/wrappers/windows/*.c)
@@ -1745,14 +1745,14 @@ wrappers_windows_lib_o := $(wrappers_windows_lib_c:.c=.o)
 wrappers_windows_posix_c := $(wildcard unit_tests/wrappers/windows/posix/*.c)
 wrappers_windows_posix_o := $(wrappers_windows_posix_c:.c=.o)
 
-wrappers_wazuh_remoted_c := $(wildcard unit_tests/wrappers/wazuh/remoted/*.c)
-wrappers_wazuh_remoted_o := $(wrappers_wazuh_remoted_c:.c=.o)
+wrappers_shieldnet_defend_remoted_c := $(wildcard unit_tests/wrappers/shieldnetdefend/remoted/*.c)
+wrappers_shieldnet_defend_remoted_o := $(wrappers_shieldnet_defend_remoted_c:.c=.o)
 
-wrappers_wazuh_analysisd_c := $(wildcard unit_tests/wrappers/wazuh/analysisd/*.c)
-wrappers_wazuh_analysisd_o := $(wrappers_wazuh_analysisd_c:.c=.o)
+wrappers_shieldnet_defend_analysisd_c := $(wildcard unit_tests/wrappers/shieldnetdefend/analysisd/*.c)
+wrappers_shieldnet_defend_analysisd_o := $(wrappers_shieldnet_defend_analysisd_c:.c=.o)
 
-wrappers_wazuh_shared_modules_c := $(wildcard unit_tests/wrappers/wazuh/shared_modules/*.c)
-wrappers_wazuh_shared_modules_o := $(wrappers_wazuh_shared_modules_c:.c=.o)
+wrappers_shieldnet_defend_shared_modules_c := $(wildcard unit_tests/wrappers/shieldnetdefend/shared_modules/*.c)
+wrappers_shieldnet_defend_shared_modules_o := $(wrappers_shieldnet_defend_shared_modules_c:.c=.o)
 
 ifneq (,$(filter ${TEST},YES yes y Y 1))
 	OSSEC_CFLAGS+=${CFLAGS_TEST}
@@ -1770,23 +1770,23 @@ ifneq (,$(filter ${TEST},YES yes y Y 1))
 	UNIT_TEST_WRAPPERS+=${wrappers_externals_pcre2_o}
 	UNIT_TEST_WRAPPERS+=${wrappers_libc_o}
 	UNIT_TEST_WRAPPERS+=${wrappers_posix_o}
-	UNIT_TEST_WRAPPERS+=${wrappers_wazuh_o}
-	UNIT_TEST_WRAPPERS+=${wrappers_wazuh_os_crypto_o}
-	UNIT_TEST_WRAPPERS+=${wrappers_wazuh_os_execd_o}
-	UNIT_TEST_WRAPPERS+=${wrappers_wazuh_os_net_o}
-	UNIT_TEST_WRAPPERS+=${wrappers_wazuh_os_regex_o}
-	UNIT_TEST_WRAPPERS+=${wrappers_wazuh_os_xml_o}
-	UNIT_TEST_WRAPPERS+=${wrappers_wazuh_shared_o}
-	UNIT_TEST_WRAPPERS+=${wrappers_wazuh_syscheckd_o}
-	UNIT_TEST_WRAPPERS+=${wrappers_wazuh_wazuh_db_o}
-	UNIT_TEST_WRAPPERS+=${wrappers_wazuh_wazuh_modules_o}
-	UNIT_TEST_WRAPPERS+=${wrappers_wazuh_monitord_o}
-	UNIT_TEST_WRAPPERS+=${wrappers_wazuh_os_auth_o}
-	UNIT_TEST_WRAPPERS+=${wrappers_wazuh_addagent_o}
-	UNIT_TEST_WRAPPERS+=${wrappers_wazuh_config_o}
+	UNIT_TEST_WRAPPERS+=${wrappers_shieldnet_defend_o}
+	UNIT_TEST_WRAPPERS+=${wrappers_shieldnet_defend_os_crypto_o}
+	UNIT_TEST_WRAPPERS+=${wrappers_shieldnet_defend_os_execd_o}
+	UNIT_TEST_WRAPPERS+=${wrappers_shieldnet_defend_os_net_o}
+	UNIT_TEST_WRAPPERS+=${wrappers_shieldnet_defend_os_regex_o}
+	UNIT_TEST_WRAPPERS+=${wrappers_shieldnet_defend_os_xml_o}
+	UNIT_TEST_WRAPPERS+=${wrappers_shieldnet_defend_shared_o}
+	UNIT_TEST_WRAPPERS+=${wrappers_shieldnet_defend_syscheckd_o}
+	UNIT_TEST_WRAPPERS+=${wrappers_shieldnet_defend_shieldnet_defend_db_o}
+	UNIT_TEST_WRAPPERS+=${wrappers_shieldnet_defend_shieldnet_defend_modules_o}
+	UNIT_TEST_WRAPPERS+=${wrappers_shieldnet_defend_monitord_o}
+	UNIT_TEST_WRAPPERS+=${wrappers_shieldnet_defend_os_auth_o}
+	UNIT_TEST_WRAPPERS+=${wrappers_shieldnet_defend_addagent_o}
+	UNIT_TEST_WRAPPERS+=${wrappers_shieldnet_defend_config_o}
 	UNIT_TEST_WRAPPERS+=${wrappers_client_agent_o}
-	UNIT_TEST_WRAPPERS+=${wrappers_wazuh_remoted_o}
-	UNIT_TEST_WRAPPERS+=${wrappers_wazuh_analysisd_o}
+	UNIT_TEST_WRAPPERS+=${wrappers_shieldnet_defend_remoted_o}
+	UNIT_TEST_WRAPPERS+=${wrappers_shieldnet_defend_analysisd_o}
 	UNIT_TEST_WRAPPERS+=${wrappers_data_provider_o}
 	UNIT_TEST_WRAPPERS+=${wrappers_logcollector_o}
 
@@ -1805,7 +1805,7 @@ ifneq (,$(filter ${TEST},YES yes y Y 1))
 	endif
 
 	ifeq (${TARGET},server)
-		UNIT_TEST_WRAPPERS+=${wrappers_wazuh_shared_modules_o}
+		UNIT_TEST_WRAPPERS+=${wrappers_shieldnet_defend_shared_modules_o}
 	endif
 endif #TEST
 
@@ -1813,10 +1813,10 @@ shared_c := $(wildcard shared/*.c)
 shared_o := $(shared_c:.c=.o)
 
 shared/%.o: shared/%.c
-	${OSSEC_CC} ${OSSEC_CFLAGS} -fPIC -DARGV0=\"wazuh-remoted\" -c $^ -o $@
+	${OSSEC_CC} ${OSSEC_CFLAGS} -fPIC -DARGV0=\"shieldnet-defend-remoted\" -c $^ -o $@
 
 shared/debug_op_proc.o: shared/debug_op.c
-	${OSSEC_CC} ${OSSEC_CFLAGS} -fPIC -DMA -DARGV0=\"wazuh-remoted\" -c $^ -o $@
+	${OSSEC_CC} ${OSSEC_CFLAGS} -fPIC -DMA -DARGV0=\"shieldnet-defend-remoted\" -c $^ -o $@
 
 shared/utf8_op.o: shared/utf8_op.c
 	$(OSSEC_CC) $(OSSEC_CFLAGS) -fPIC -c $< -o $@
@@ -1825,25 +1825,25 @@ shared/utf8_winapi_wrapper.o: shared/utf8_winapi_wrapper.c
 	$(OSSEC_CC) $(OSSEC_CFLAGS) -fPIC -c $< -o $@
 
 shared/file_op_proc.o: shared/file_op.c
-	${OSSEC_CC} ${OSSEC_CFLAGS} -fPIC -DCLIENT -DARGV0=\"wazuh-remoted\" -c $^ -o $@
+	${OSSEC_CC} ${OSSEC_CFLAGS} -fPIC -DCLIENT -DARGV0=\"shieldnet-defend-remoted\" -c $^ -o $@
 
-#### Wazuh DB ####
+#### ShieldnetDefend DB ####
 
-wdb_sql := $(wildcard wazuh_db/*.sql)
-wdblib_c := $(wildcard wazuh_db/wdb*.c)
-wdbhelpers_c := $(wildcard wazuh_db/helpers/*.c)
-wdbshared_c := wazuh_db/wdb_shared.c
+wdb_sql := $(wildcard shieldnet_defend_db/*.sql)
+wdblib_c := $(wildcard shieldnet_defend_db/wdb*.c)
+wdbhelpers_c := $(wildcard shieldnet_defend_db/helpers/*.c)
+wdbshared_c := shieldnet_defend_db/wdb_shared.c
 wdblib_o := $(wdblib_c:.c=.o) $(wdb_sql:.sql=.o)
-wdb_o := wazuh_db/main.o $(wdblib_o:.c=.o) $(wdb_c:.c=.o) $(wdb_sql:.sql=.o) $(wdbshared_c:.c=.o)
+wdb_o := shieldnet_defend_db/main.o $(wdblib_o:.c=.o) $(wdb_c:.c=.o) $(wdb_sql:.sql=.o) $(wdbshared_c:.c=.o)
 
-wazuh_db/schema_%.o: wazuh_db/schema_%.sql
+shieldnet_defend_db/schema_%.o: shieldnet_defend_db/schema_%.sql
 	${QUIET_CC}echo 'const char *'$(word 2, $(subst /, ,$(subst .,_,$<))) '= "'"`cat $< | tr -d \"\n\"`"'";' | ${MING_BASE}${CC} ${OSSEC_CFLAGS} -xc -c -o $@ -
 
-wazuh_db/%.o: wazuh_db/%.c
-	${OSSEC_CC} ${OSSEC_CFLAGS} -DARGV0=\"wazuh-db\" -c $^ -o $@
+shieldnet_defend_db/%.o: shieldnet_defend_db/%.c
+	${OSSEC_CC} ${OSSEC_CFLAGS} -DARGV0=\"shieldnet-defend-db\" -c $^ -o $@
 
-wazuh-db: ${wdb_o}
-	${OSSEC_CCBIN} ${OSSEC_LDFLAGS} ${WAZUH_LDFLAGS} $^ ${OSSEC_LIBS} ${WAZUH_LIBS} -o $@
+shieldnet-defend-db: ${wdb_o}
+	${OSSEC_CCBIN} ${OSSEC_LDFLAGS} ${SHIELDNET_DEFEND_LDFLAGS} $^ ${OSSEC_LIBS} ${SHIELDNET_DEFEND_LIBS} -o $@
 
 #### Config ##########
 
@@ -1853,12 +1853,12 @@ config_o := $(config_c:.c=.o)
 config/%.o: config/%.c
 	${OSSEC_CC} ${OSSEC_CFLAGS} -c $^ -o $@
 
-build_shared_modules: $(WAZUHEXT_LIB)
+build_shared_modules: $(SHIELDNETDEFENDEXT_LIB)
 	cd ${DBSYNC} && mkdir -p build && cd build && cmake ${CMAKE_OPTS} ${DBSYNC_TEST} ${SHARED_MODULES_RELEASE_TYPE} .. && ${MAKE}
 	cd ${RSYNC} && mkdir -p build && cd build && cmake ${CMAKE_OPTS} ${RSYNC_TEST} ${SOLARIS_CMAKE_OPTS} ${SHARED_MODULES_RELEASE_TYPE} .. && ${MAKE}
 
 #### Sysinfo ##
-build_sysinfo: $(WAZUHEXT_LIB)
+build_sysinfo: $(SHIELDNETDEFENDEXT_LIB)
 	cd ${SYSINFO} && mkdir -p build && cd build && cmake ${CMAKE_OPTS} ${SYSINFO_OS} ${SYSINFO_TEST} ${SYSINFO_RELEASE_TYPE} .. && ${MAKE}
 
 #### Syscollector ##
@@ -1867,28 +1867,28 @@ build_syscollector: build_shared_modules build_sysinfo
 	cd ${SYSCOLLECTOR} && mkdir -p build && cd build && cmake -DTARGET=${TARGET} ${CMAKE_OPTS} ${SOLARIS_CMAKE_OPTS} ${SYSCOLLECTOR_TEST} ${SYSCOLLECTOR_RELEASE_TYPE} .. && ${MAKE}
 endif
 
-#### Wazuh cmake ###
-build_wazuh_cmake: $(WAZUHEXT_LIB) $(EXTERNAL_LIBS_NO_WHOLE) build_syscollector
-	mkdir -p build && cd build && cmake .. -DTARGET=${TARGET} ${CMAKE_OPTS} ${WAZUH_RELEASE_TYPE} ${WAZUH_TEST} && ${MAKE}
+#### ShieldnetDefend cmake ###
+build_shieldnet_defend_cmake: $(SHIELDNETDEFENDEXT_LIB) $(EXTERNAL_LIBS_NO_WHOLE) build_syscollector
+	mkdir -p build && cd build && cmake .. -DTARGET=${TARGET} ${CMAKE_OPTS} ${SHIELDNET_DEFEND_RELEASE_TYPE} ${SHIELDNET_DEFEND_TEST} && ${MAKE}
 
-#### Wazuh modules ##
-wmodules_c := $(wildcard wazuh_modules/wm*.c) $(wildcard wazuh_modules/agent_upgrade/*.c)
+#### ShieldnetDefend modules ##
+wmodules_c := $(wildcard shieldnet_defend_modules/wm*.c) $(wildcard shieldnet_defend_modules/agent_upgrade/*.c)
 
 ifeq (${TARGET},agent)
-	wmodules_c := ${wmodules_c} $(wildcard wazuh_modules/agent_upgrade/agent/*.c)
+	wmodules_c := ${wmodules_c} $(wildcard shieldnet_defend_modules/agent_upgrade/agent/*.c)
 else ifeq (${TARGET},winagent)
-	wmodules_c := ${wmodules_c} $(wildcard wazuh_modules/agent_upgrade/agent/*.c)
+	wmodules_c := ${wmodules_c} $(wildcard shieldnet_defend_modules/agent_upgrade/agent/*.c)
 else
-	wmodules_c := ${wmodules_c} $(wildcard wazuh_modules/task_manager/*.c)
-	wmodules_c := ${wmodules_c} $(wildcard wazuh_modules/agent_upgrade/manager/*.c)
+	wmodules_c := ${wmodules_c} $(wildcard shieldnet_defend_modules/task_manager/*.c)
+	wmodules_c := ${wmodules_c} $(wildcard shieldnet_defend_modules/agent_upgrade/manager/*.c)
 endif
 
 wmodules_o := $(wmodules_c:.c=.o)
 
-wazuh_modules/%.o: wazuh_modules/%.c
+shieldnet_defend_modules/%.o: shieldnet_defend_modules/%.c
 	${OSSEC_CC} ${OSSEC_CFLAGS} -c $^ -o $@
 
-wmodules_dep := ${wmodules_o} ${wdbhelpers_c:.c=.o} wazuh_db/wdb_shared.o
+wmodules_dep := ${wmodules_o} ${wdbhelpers_c:.c=.o} shieldnet_defend_db/wdb_shared.o
 
 ifeq (${uname_S},HP-UX)
 	wmodules_dep := ${wmodules_dep} ${config_o}
@@ -1978,26 +1978,26 @@ crypto_o := ${crypto_blowfish_o} \
 					 ${crypto_hmac_o} \
 					 ${crypto_signature_o}
 
-#### libwazuh #########
+#### libshieldnetdefend #########
 
-libwazuh.a: ${config_o} ${wmodules_dep} ${crypto_o} ${shared_o} ${os_net_o} ${os_regex_o} ${os_xml_o} ${os_zlib_o} ${UNIT_TEST_WRAPPERS} os_auth/ssl.o os_auth/check_cert.o addagent/validate.o ${manage_agents} analysisd/logmsg.o
+libshieldnetdefend.a: ${config_o} ${wmodules_dep} ${crypto_o} ${shared_o} ${os_net_o} ${os_regex_o} ${os_xml_o} ${os_zlib_o} ${UNIT_TEST_WRAPPERS} os_auth/ssl.o os_auth/check_cert.o addagent/validate.o ${manage_agents} analysisd/logmsg.o
 	${OSSEC_LINK} $@ $^
 	${OSSEC_RANLIB} $@
 
-### libwazuhext #########
+### libshieldnetdefendext #########
 
 ifeq (${uname_S},Darwin)
-WAZUH_SHFLAGS=-install_name @rpath/libwazuhext.$(SHARED)
+SHIELDNET_DEFEND_SHFLAGS=-install_name @rpath/libshieldnetdefendext.$(SHARED)
 
-$(WAZUHEXT_LIB): $(EXTERNAL_LIBS)
-	$(OSSEC_SHARED) $(OSSEC_CFLAGS) $(WAZUH_SHFLAGS) -o $@ -Wl,-all_load $^ $(OSSEC_LIBS)
+$(SHIELDNETDEFENDEXT_LIB): $(EXTERNAL_LIBS)
+	$(OSSEC_SHARED) $(OSSEC_CFLAGS) $(SHIELDNET_DEFEND_SHFLAGS) -o $@ -Wl,-all_load $^ $(OSSEC_LIBS)
 else
 ifeq (${TARGET}, winagent)
-$(WAZUHEXT_LIB): $(WAZUHEXT_DLL) $(WAZUHEXT_LIB_DEF)
-	$(DLLTOOL) -D $(WAZUHEXT_DLL) --def $(WAZUHEXT_LIB_DEF) --output-delaylib $@
+$(SHIELDNETDEFENDEXT_LIB): $(SHIELDNETDEFENDEXT_DLL) $(SHIELDNETDEFENDEXT_LIB_DEF)
+	$(DLLTOOL) -D $(SHIELDNETDEFENDEXT_DLL) --def $(SHIELDNETDEFENDEXT_LIB_DEF) --output-delaylib $@
 
-$(WAZUHEXT_DLL) $(WAZUHEXT_LIB_DEF): $(EXTERNAL_LIBS) win32/version-dll.o
-	$(OSSEC_SHARED) $(OSSEC_CFLAGS) -o $(WAZUHEXT_DLL) -static-libgcc -Wl,--export-all-symbols -Wl,--add-stdcall-alias -Wl,--whole-archive $^ -Wl,--no-whole-archive -Wl,--output-def,$(WAZUHEXT_LIB_DEF) ${OSSEC_LIBS}
+$(SHIELDNETDEFENDEXT_DLL) $(SHIELDNETDEFENDEXT_LIB_DEF): $(EXTERNAL_LIBS) win32/version-dll.o
+	$(OSSEC_SHARED) $(OSSEC_CFLAGS) -o $(SHIELDNETDEFENDEXT_DLL) -static-libgcc -Wl,--export-all-symbols -Wl,--add-stdcall-alias -Wl,--whole-archive $^ -Wl,--no-whole-archive -Wl,--output-def,$(SHIELDNETDEFENDEXT_LIB_DEF) ${OSSEC_LIBS}
 
 
 else
@@ -2008,34 +2008,34 @@ else
 LIBGCC_FLAGS := -Wl,-rpath,\$$ORIGIN
 endif
 ifeq (${uname_P},sparc)
-$(WAZUHEXT_LIB): $(EXTERNAL_LIBS)
+$(SHIELDNETDEFENDEXT_LIB): $(EXTERNAL_LIBS)
 	$(OSSEC_SHARED) $(OSSEC_CFLAGS) -mimpure-text -o $@ $(LIBGCC_FLAGS) -Wl,--whole-archive $^ -Wl,--no-whole-archive ${OSSEC_LIBS}
 else
-$(WAZUHEXT_LIB): $(EXTERNAL_LIBS)
+$(SHIELDNETDEFENDEXT_LIB): $(EXTERNAL_LIBS)
 	$(OSSEC_SHARED) $(OSSEC_CFLAGS) -o $@ $(LIBGCC_FLAGS) -Wl,--whole-archive $^ -Wl,--no-whole-archive ${OSSEC_LIBS}
 endif
 else
 ifeq (${uname_S},AIX)
-$(WAZUHEXT_LIB): $(EXTERNAL_LIBS)
-	mkdir -p libwazuhext;
-	find external/ -name \*.a -exec cp {} libwazuhext/ \;
+$(SHIELDNETDEFENDEXT_LIB): $(EXTERNAL_LIBS)
+	mkdir -p libshieldnetdefendext;
+	find external/ -name \*.a -exec cp {} libshieldnetdefendext/ \;
 	for lib in libcjson.a libz.a libmsgpack.a libssl.a libcrypto.a libsqlite3.a libyaml.a libpcre2-8.a ; do \
-		ar -x libwazuhext/$$lib; \
-		mv *.o libwazuhext/; \
+		ar -x libshieldnetdefendext/$$lib; \
+		mv *.o libshieldnetdefendext/; \
 	done
-	$(OSSEC_SHARED) $(OSSEC_CFLAGS) libwazuhext/*.o -o $@ -static-libgcc -latomic -lm
+	$(OSSEC_SHARED) $(OSSEC_CFLAGS) libshieldnetdefendext/*.o -o $@ -static-libgcc -latomic -lm
 else
 ifeq (${uname_S},HP-UX)
-$(WAZUHEXT_LIB): $(EXTERNAL_LIBS)
-	mkdir -p libwazuhext;
-	find external/ -name \*.a -exec cp {} libwazuhext/ \;
+$(SHIELDNETDEFENDEXT_LIB): $(EXTERNAL_LIBS)
+	mkdir -p libshieldnetdefendext;
+	find external/ -name \*.a -exec cp {} libshieldnetdefendext/ \;
 	for lib in libcjson.a libz.a libmsgpack.a libssl.a libcrypto.a libsqlite3.a libyaml.a libpcre2-8.a ; do \
-		ar -x libwazuhext/$$lib; \
-		mv *.o libwazuhext/; \
+		ar -x libshieldnetdefendext/$$lib; \
+		mv *.o libshieldnetdefendext/; \
 	done
-	$(OSSEC_SHARED) $(OSSEC_CFLAGS) libwazuhext/*.o -o $@ -static-libgcc
+	$(OSSEC_SHARED) $(OSSEC_CFLAGS) libshieldnetdefendext/*.o -o $@ -static-libgcc
 else
-$(WAZUHEXT_LIB): $(EXTERNAL_LIBS)
+$(SHIELDNETDEFENDEXT_LIB): $(EXTERNAL_LIBS)
 	$(OSSEC_SHARED) $(OSSEC_CFLAGS) -o $@ -Wl,--whole-archive $^ -Wl,--no-whole-archive ${OSSEC_LIBS}
 endif
 endif
@@ -2049,9 +2049,9 @@ os_maild_c := $(wildcard os_maild/*.c)
 os_maild_o := $(os_maild_c:.c=.o)
 
 os_maild/%.o: os_maild/%.c
-	${OSSEC_CC} ${OSSEC_CFLAGS} -DARGV0=\"wazuh-maild\" -c $^ -o $@
+	${OSSEC_CC} ${OSSEC_CFLAGS} -DARGV0=\"shieldnet-defend-maild\" -c $^ -o $@
 
-wazuh-maild: ${os_maild_o}
+shieldnet-defend-maild: ${os_maild_o}
 	${OSSEC_CCBIN} ${OSSEC_LDFLAGS} $^ ${OSSEC_LIBS} -o $@
 
 #### os_dbd ##########
@@ -2060,9 +2060,9 @@ os_dbd_c := $(wildcard os_dbd/*.c)
 os_dbd_o := $(os_dbd_c:.c=.o)
 
 os_dbd/%.o: os_dbd/%.c
-	${OSSEC_CC} ${OSSEC_CFLAGS} ${MI} ${PI} -DARGV0=\"wazuh-dbd\" -c $^ -o $@
+	${OSSEC_CC} ${OSSEC_CFLAGS} ${MI} ${PI} -DARGV0=\"shieldnet-defend-dbd\" -c $^ -o $@
 
-wazuh-dbd: ${os_dbd_o}
+shieldnet-defend-dbd: ${os_dbd_o}
 	${OSSEC_CCBIN} ${OSSEC_LDFLAGS} ${MI} ${PI} $^  ${OSSEC_LIBS} -o $@
 
 
@@ -2072,9 +2072,9 @@ os_csyslogd_c := $(wildcard os_csyslogd/*.c)
 os_csyslogd_o := $(os_csyslogd_c:.c=.o)
 
 os_csyslogd/%.o: os_csyslogd/%.c
-	${OSSEC_CC} ${OSSEC_CFLAGS} -DARGV0=\"wazuh-csyslogd\" -c $^ -o $@
+	${OSSEC_CC} ${OSSEC_CFLAGS} -DARGV0=\"shieldnet-defend-csyslogd\" -c $^ -o $@
 
-wazuh-csyslogd: ${os_csyslogd_o}
+shieldnet-defend-csyslogd: ${os_csyslogd_o}
 	${OSSEC_CCBIN} ${OSSEC_LDFLAGS} $^ ${OSSEC_LIBS} -o $@
 
 
@@ -2084,9 +2084,9 @@ os_agentlessd_c := $(wildcard agentlessd/*.c)
 os_agentlessd_o := $(os_agentlessd_c:.c=.o)
 
 agentlessd/%.o: agentlessd/%.c
-	${OSSEC_CC} ${OSSEC_CFLAGS} -DARGV0=\"wazuh-agentlessd\" -c $^ -o $@
+	${OSSEC_CC} ${OSSEC_CFLAGS} -DARGV0=\"shieldnet-defend-agentlessd\" -c $^ -o $@
 
-wazuh-agentlessd: ${os_agentlessd_o}
+shieldnet-defend-agentlessd: ${os_agentlessd_o}
 	${OSSEC_CCBIN} ${OSSEC_LDFLAGS} $^ ${OSSEC_LIBS} -o $@
 
 #### os_execd #####
@@ -2095,9 +2095,9 @@ os_execd_c := $(wildcard os_execd/*.c)
 os_execd_o := $(os_execd_c:.c=.o)
 
 os_execd/%.o: os_execd/%.c
-	${OSSEC_CC} ${OSSEC_CFLAGS} -DARGV0=\"wazuh-execd\" -c $^ -o $@
+	${OSSEC_CC} ${OSSEC_CFLAGS} -DARGV0=\"shieldnet-defend-execd\" -c $^ -o $@
 
-wazuh-execd: ${os_execd_o} active-response/active_responses.o
+shieldnet-defend-execd: ${os_execd_o} active-response/active_responses.o
 	${OSSEC_CCBIN} ${OSSEC_LDFLAGS} $^ ${OSSEC_LIBS} -o $@
 
 
@@ -2108,12 +2108,12 @@ os_logcollector_o := $(os_logcollector_c:.c=.o)
 os_logcollector_eventchannel_o := $(os_logcollector_c:.c=-event.o)
 
 logcollector/%.o: logcollector/%.c
-	${OSSEC_CC} ${OSSEC_CFLAGS} -DARGV0=\"wazuh-logcollector\" -c $^ -o $@
+	${OSSEC_CC} ${OSSEC_CFLAGS} -DARGV0=\"shieldnet-defend-logcollector\" -c $^ -o $@
 
 logcollector/%-event.o: logcollector/%.c
-	${OSSEC_CC} ${OSSEC_CFLAGS} -DEVENTCHANNEL_SUPPORT -DARGV0=\"wazuh-logcollector\" -c $^ -o $@
+	${OSSEC_CC} ${OSSEC_CFLAGS} -DEVENTCHANNEL_SUPPORT -DARGV0=\"shieldnet-defend-logcollector\" -c $^ -o $@
 
-wazuh-logcollector: ${os_logcollector_o}
+shieldnet-defend-logcollector: ${os_logcollector_o}
 	${OSSEC_CCBIN} ${OSSEC_LDFLAGS} $^ ${OSSEC_LIBS} -o $@
 
 #### remoted #########
@@ -2122,20 +2122,20 @@ remoted_c := $(wildcard remoted/*.c)
 remoted_o := $(remoted_c:.c=.o)
 
 remoted/%.o: remoted/%.c
-	${OSSEC_CC} ${OSSEC_CFLAGS}  -DPORTABLE_UNALIGNED_ACCESS=0 -I./remoted -DARGV0=\"wazuh-remoted\" -c $^ -o $@
+	${OSSEC_CC} ${OSSEC_CFLAGS}  -DPORTABLE_UNALIGNED_ACCESS=0 -I./remoted -DARGV0=\"shieldnet-defend-remoted\" -c $^ -o $@
 
-wazuh-remoted: ${remoted_o}
-	${OSSEC_CCBIN} ${OSSEC_LDFLAGS} ${WAZUH_LDFLAGS} $^ ${OSSEC_LIBS} ${WAZUH_LIBS} -o $@
+shieldnet-defend-remoted: ${remoted_o}
+	${OSSEC_CCBIN} ${OSSEC_LDFLAGS} ${SHIELDNET_DEFEND_LDFLAGS} $^ ${OSSEC_LIBS} ${SHIELDNET_DEFEND_LIBS} -o $@
 
-#### wazuh-agentd ####
+#### shieldnet-defend-agentd ####
 
 client_agent_c := $(wildcard client-agent/*.c)
 client_agent_o := $(client_agent_c:.c=.o)
 
 client-agent/%.o: client-agent/%.c
-	${OSSEC_CC} ${OSSEC_CFLAGS} -I./client-agent -DARGV0=\"wazuh-agentd\" -c $^ -o $@
+	${OSSEC_CC} ${OSSEC_CFLAGS} -I./client-agent -DARGV0=\"shieldnet-defend-agentd\" -c $^ -o $@
 
-wazuh-agentd: ${client_agent_o} monitord/rotate_log.o monitord/compress_log.o
+shieldnet-defend-agentd: ${client_agent_o} monitord/rotate_log.o monitord/compress_log.o
 	${OSSEC_CCBIN} ${OSSEC_LDFLAGS} $^ ${OSSEC_LIBS} -o $@
 
 #### addagent ######
@@ -2152,9 +2152,9 @@ manage_agents: ${addagent_o}
 
 #### Active Response ####
 
-active_response_programs = default-firewall-drop pf npf ipfw firewalld-drop disable-account host-deny ip-customblock restart-wazuh route-null kaspersky wazuh-slack
+active_response_programs = default-firewall-drop pf npf ipfw firewalld-drop disable-account host-deny ip-customblock restart-shieldnet-defend route-null kaspersky shieldnet-defend-slack
 
-$(active_response_programs): ${WAZUH_LIB} ${WAZUHEXT_LIB}
+$(active_response_programs): ${SHIELDNET_DEFEND_LIB} ${SHIELDNETDEFENDEXT_LIB}
 
 # Minimal dependencies for building active responses programs
 AR_PROGRAMS_DEPS = os_regex/os_regex.o os_regex/os_regex_compile.o os_regex/os_match_free_pattern.o os_regex/os_regex_maps.o os_regex/os_regex_execute.o os_regex/os_regex_free_pattern.o os_regex/os_match_execute.o os_regex/os_match_compile.o shared/expression.o shared/randombytes.o shared/validate_op.o shared/regex_op.o shared/string_op.o shared/exec_op.o shared/file_op_proc.o shared/utf8_winapi_wrapper.o shared/utf8_op.o shared/debug_op_proc.o shared/time_op.o shared/privsep_op.o shared/version_op.o shared/binaries_op.o os_xml/os_xml.o os_xml/os_xml_access.o os_regex/os_regex_strbreak.o os_net/os_net.o
@@ -2203,7 +2203,7 @@ host-deny: active-response/host-deny.o active-response/active_responses.o
 ip-customblock: active-response/ip-customblock.o active-response/active_responses.o
 	${OSSEC_CCBIN} ${AR_LDFLAGS} $^ ${OSSEC_LIBS} -o $@
 
-restart-wazuh: active-response/restart-wazuh.o active-response/active_responses.o
+restart-shieldnet-defend: active-response/restart-shieldnet-defend.o active-response/active_responses.o
 	${OSSEC_CCBIN} ${AR_LDFLAGS} $^ ${OSSEC_LIBS} -o $@
 
 route-null: active-response/route-null.o active-response/active_responses.o
@@ -2212,24 +2212,24 @@ route-null: active-response/route-null.o active-response/active_responses.o
 kaspersky: active-response/kaspersky.o active-response/active_responses.o
 	${OSSEC_CCBIN} ${AR_LDFLAGS} $^ ${OSSEC_LIBS} -o $@
 
-wazuh-slack: active-response/wazuh-slack.o active-response/active_responses.o
+shieldnet-defend-slack: active-response/shieldnet-defend-slack.o active-response/active_responses.o
 	${OSSEC_CCBIN} ${AR_LDFLAGS} $^ ${OSSEC_LIBS} -o $@
 
 
-### libwazuhshared.so #########
+### libshieldnetdefendshared.so #########
 
 ifeq (${uname_S},Darwin)
-WAZUH_SHARED_SHFLAGS=-install_name @rpath/libwazuhshared.$(SHARED)
+SHIELDNET_DEFEND_SHARED_SHFLAGS=-install_name @rpath/libshieldnetdefendshared.$(SHARED)
 
-$(WAZUH_LIB): $(WAZUHEXT_LIB) $(AR_PROGRAMS_DEPS)
-	$(OSSEC_SHARED) $(OSSEC_CFLAGS) $(WAZUH_SHARED_SHFLAGS) -o $@ -Wl,-all_load $^ $(OSSEC_LIBS)
+$(SHIELDNET_DEFEND_LIB): $(SHIELDNETDEFENDEXT_LIB) $(AR_PROGRAMS_DEPS)
+	$(OSSEC_SHARED) $(OSSEC_CFLAGS) $(SHIELDNET_DEFEND_SHARED_SHFLAGS) -o $@ -Wl,-all_load $^ $(OSSEC_LIBS)
 else
 ifeq (${TARGET}, winagent)
-$(WAZUH_DLL) $(WAZUH_DEF) : $(WAZUHEXT_DLL) $(AR_PROGRAMS_DEPS) win32/version-dll.o
-	$(OSSEC_SHARED) $(OSSEC_CFLAGS) -UOSSECHIDS -o $(WAZUH_DLL) -static-libgcc -Wl,--export-all-symbols -Wl,--add-stdcall-alias -Wl,--whole-archive $^ -Wl,--no-whole-archive -Wl,--output-def,$(WAZUH_DEF) ${OSSEC_LIBS}
+$(SHIELDNET_DEFEND_DLL) $(SHIELDNET_DEFEND_DEF) : $(SHIELDNETDEFENDEXT_DLL) $(AR_PROGRAMS_DEPS) win32/version-dll.o
+	$(OSSEC_SHARED) $(OSSEC_CFLAGS) -UOSSECHIDS -o $(SHIELDNET_DEFEND_DLL) -static-libgcc -Wl,--export-all-symbols -Wl,--add-stdcall-alias -Wl,--whole-archive $^ -Wl,--no-whole-archive -Wl,--output-def,$(SHIELDNET_DEFEND_DEF) ${OSSEC_LIBS}
 
-$(WAZUH_LIB): $(WAZUH_DLL) $(WAZUH_DEF)
-	$(DLLTOOL)  -D $(WAZUH_DLL) --def $(WAZUH_DEF) --output-delaylib $@
+$(SHIELDNET_DEFEND_LIB): $(SHIELDNET_DEFEND_DLL) $(SHIELDNET_DEFEND_DEF)
+	$(DLLTOOL)  -D $(SHIELDNET_DEFEND_DLL) --def $(SHIELDNET_DEFEND_DEF) --output-delaylib $@
 
 
 else
@@ -2240,18 +2240,18 @@ else
 LIBGCC_FLAGS := -Wl,-rpath,\$$ORIGIN
 endif
 ifeq (${uname_P},sparc)
-$(WAZUH_LIB): $(WAZUHEXT_LIB) $(AR_PROGRAMS_DEPS)
+$(SHIELDNET_DEFEND_LIB): $(SHIELDNETDEFENDEXT_LIB) $(AR_PROGRAMS_DEPS)
 	$(OSSEC_SHARED) $(OSSEC_CFLAGS) -mimpure-text -o $@ $(LIBGCC_FLAGS) -Wl,--whole-archive $^ -Wl,--no-whole-archive ${OSSEC_LIBS}
 else
-$(WAZUH_LIB): $(WAZUHEXT_LIB) $(AR_PROGRAMS_DEPS)
+$(SHIELDNET_DEFEND_LIB): $(SHIELDNETDEFENDEXT_LIB) $(AR_PROGRAMS_DEPS)
 	$(OSSEC_SHARED) $(OSSEC_CFLAGS) -o $@ $(LIBGCC_FLAGS) -Wl,--whole-archive $^ -Wl,--no-whole-archive ${OSSEC_LIBS}
 endif
 else
 ifneq (,$(filter ${uname_S},AIX HP-UX))
-$(WAZUH_LIB): $(WAZUHEXT_LIB) $(AR_PROGRAMS_DEPS)
+$(SHIELDNET_DEFEND_LIB): $(SHIELDNETDEFENDEXT_LIB) $(AR_PROGRAMS_DEPS)
 	$(OSSEC_SHARED) $(OSSEC_CFLAGS) $^ ${OSSEC_LIBS} -o $@ -static-libgcc
 else
-$(WAZUH_LIB): $(WAZUHEXT_LIB) $(AR_PROGRAMS_DEPS)
+$(SHIELDNET_DEFEND_LIB): $(SHIELDNETDEFENDEXT_LIB) $(AR_PROGRAMS_DEPS)
 	$(OSSEC_SHARED) $(OSSEC_CFLAGS) -o $@ -Wl,--whole-archive $^ -Wl,--no-whole-archive ${OSSEC_LIBS}
 endif
 endif
@@ -2261,7 +2261,7 @@ endif
 
 #### Util ##########
 
-util_programs = clear_stats agent_control verify-agent-conf wazuh-regex parallel-regex
+util_programs = clear_stats agent_control verify-agent-conf shieldnet-defend-regex parallel-regex
 
 $(util_programs): $(BUILD_LIBS)
 
@@ -2283,7 +2283,7 @@ verify-agent-conf: util/verify-agent-conf.o
 agent_control: util/agent_control.o addagent/validate.o
 	${OSSEC_CCBIN} ${OSSEC_LDFLAGS} $^ ${OSSEC_LIBS} -o $@
 
-wazuh-regex: util/wazuh-regex.o
+shieldnet-defend-regex: util/shieldnet-defend-regex.o
 	${OSSEC_CCBIN} ${OSSEC_LDFLAGS} $^ ${OSSEC_LIBS} -o $@
 
 parallel-regex: util/parallel-regex.o
@@ -2307,7 +2307,7 @@ librootcheck.a: ${rootcheck_o_lib}
 
 #### FIM ######
 
-wazuh-syscheckd: librootcheck.a libwazuh.a ${WAZUHEXT_LIB} build_shared_modules
+shieldnet-defend-syscheckd: librootcheck.a libshieldnetdefend.a ${SHIELDNETDEFENDEXT_LIB} build_shared_modules
 	cd syscheckd && mkdir -p build && cd build && cmake ${SYSCHECK_OS} ${CMAKE_OPTS} -DCMAKE_C_FLAGS="${DEFINES} -pipe -Wall -Wextra -std=gnu99" ${SYSCHECK_TEST} ${SYSCHECK_RELEASE_TYPE} .. && ${MAKE}
 
 #### Monitor #######
@@ -2316,9 +2316,9 @@ monitor_c := $(wildcard monitord/*.c)
 monitor_o := $(monitor_c:.c=.o)
 
 monitord/%.o: monitord/%.c
-	${OSSEC_CC} ${OSSEC_CFLAGS} -DARGV0=\"wazuh-monitord\" -c $< -o $@
+	${OSSEC_CC} ${OSSEC_CFLAGS} -DARGV0=\"shieldnet-defend-monitord\" -c $< -o $@
 
-wazuh-monitord: ${monitor_o} os_maild/sendcustomemail.o
+shieldnet-defend-monitord: ${monitor_o} os_maild/sendcustomemail.o
 	${OSSEC_CCBIN} ${OSSEC_LDFLAGS} $^ ${OSSEC_LIBS} -o $@
 
 
@@ -2328,9 +2328,9 @@ report_c := reportd/report.c
 report_o := $(report_c:.c=.o)
 
 reportd/%.o: reportd/%.c
-	${OSSEC_CC} ${OSSEC_CFLAGS} -DARGV0=\"wazuh-reportd\" -c $^ -o $@
+	${OSSEC_CC} ${OSSEC_CFLAGS} -DARGV0=\"shieldnet-defend-reportd\" -c $^ -o $@
 
-wazuh-reportd: ${report_o}
+shieldnet-defend-reportd: ${report_o}
 	${OSSEC_CCBIN} ${OSSEC_LDFLAGS} $^ ${OSSEC_LIBS} -o $@
 
 
@@ -2340,12 +2340,12 @@ os_auth_c := ${wildcard os_auth/*.c}
 os_auth_o := $(os_auth_c:.c=.o)
 
 os_auth/%.o: os_auth/%.c
-	${OSSEC_CC} ${OSSEC_CFLAGS} -I./os_auth -DARGV0=\"wazuh-authd\" -c $^ -o $@
+	${OSSEC_CC} ${OSSEC_CFLAGS} -I./os_auth -DARGV0=\"shieldnet-defend-authd\" -c $^ -o $@
 
 agent-auth: addagent/validate.o os_auth/main-client.o os_auth/ssl.o os_auth/check_cert.o
 	${OSSEC_CCBIN} ${OSSEC_LDFLAGS} $^ ${OSSEC_LIBS} -o $@
 
-wazuh-authd: addagent/validate.o os_auth/main-server.o os_auth/local-server.o os_auth/ssl.o os_auth/check_cert.o os_auth/config.o os_auth/authcom.o os_auth/auth.o os_auth/key_request.o os_auth/generate_cert.o
+shieldnet-defend-authd: addagent/validate.o os_auth/main-server.o os_auth/local-server.o os_auth/ssl.o os_auth/check_cert.o os_auth/config.o os_auth/authcom.o os_auth/auth.o os_auth/key_request.o os_auth/generate_cert.o
 	${OSSEC_CCBIN} ${OSSEC_LDFLAGS} $^ ${OSSEC_LIBS} -o $@
 
 #### integratord #####
@@ -2354,9 +2354,9 @@ integrator_c := ${wildcard os_integrator/*.c}
 integrator_o := $(integrator_c:.c=.o)
 
 os_integrator/%.o: os_integrator/%.c
-	${OSSEC_CC} ${OSSEC_CFLAGS}  -I./os_integrator -DARGV0=\"wazuh-integratord\" -c $^ -o $@
+	${OSSEC_CC} ${OSSEC_CFLAGS}  -I./os_integrator -DARGV0=\"shieldnet-defend-integratord\" -c $^ -o $@
 
-wazuh-integratord: ${integrator_o}
+shieldnet-defend-integratord: ${integrator_o}
 	${OSSEC_CCBIN} ${OSSEC_LDFLAGS} $^ ${OSSEC_LIBS} -o $@
 
 #### analysisd #####
@@ -2367,7 +2367,7 @@ all_analysisd_o += ${cdb_o}
 all_analysisd_libs += cdb.a
 
 analysisd/cdb/%.o: analysisd/cdb/%.c
-	${OSSEC_CC} ${OSSEC_CFLAGS} -DARGV0=\"wazuh-analysisd\" -I./analysisd -I./analysisd/cdb -c $^ -o $@
+	${OSSEC_CC} ${OSSEC_CFLAGS} -DARGV0=\"shieldnet-defend-analysisd\" -I./analysisd -I./analysisd/cdb -c $^ -o $@
 
 cdb.a: ${cdb_o}
 	${OSSEC_LINK} $@ $^
@@ -2380,7 +2380,7 @@ all_analysisd_o += ${alerts_o}
 all_analysisd_libs += alerts.a
 
 analysisd/alerts/%.o: analysisd/alerts/%.c
-	${OSSEC_CC} ${OSSEC_CFLAGS} -DARGV0=\"wazuh-analysisd\" -I./analysisd -I./analysisd/alerts -c $^ -o $@
+	${OSSEC_CC} ${OSSEC_CFLAGS} -DARGV0=\"shieldnet-defend-analysisd\" -I./analysisd -I./analysisd/alerts -c $^ -o $@
 
 alerts.a: ${alerts_o}
 	${OSSEC_LINK} $@ $^
@@ -2396,26 +2396,26 @@ all_analysisd_libs += decoders.a decoders-test.a decoders-live.a
 
 
 analysisd/decoders/%-test.o: analysisd/decoders/%.c
-	${OSSEC_CC} ${OSSEC_CFLAGS} -DTESTRULE -DARGV0=\"wazuh-analysisd\" -I./analysisd -I./analysisd/decoders -c $^ -o $@
+	${OSSEC_CC} ${OSSEC_CFLAGS} -DTESTRULE -DARGV0=\"shieldnet-defend-analysisd\" -I./analysisd -I./analysisd/decoders -c $^ -o $@
 
 analysisd/decoders/%-live.o: analysisd/decoders/%.c
-	${OSSEC_CC} ${OSSEC_CFLAGS} -DARGV0=\"wazuh-analysisd\" -I./analysisd -I./analysisd/decoders -c $^ -o $@
+	${OSSEC_CC} ${OSSEC_CFLAGS} -DARGV0=\"shieldnet-defend-analysisd\" -I./analysisd -I./analysisd/decoders -c $^ -o $@
 
 analysisd/decoders/plugins/%-test.o: analysisd/decoders/plugins/%.c
-	${OSSEC_CC} ${OSSEC_CFLAGS} -DTESTRULE -DARGV0=\"wazuh-analysisd\" -I./analysisd -I./analysisd/decoders -c $^ -o $@
+	${OSSEC_CC} ${OSSEC_CFLAGS} -DTESTRULE -DARGV0=\"shieldnet-defend-analysisd\" -I./analysisd -I./analysisd/decoders -c $^ -o $@
 
 
 analysisd/decoders/plugins/%-live.o: analysisd/decoders/plugins/%.c
-	${OSSEC_CC} ${OSSEC_CFLAGS} -DARGV0=\"wazuh-analysisd\" -I./analysisd -I./analysisd/decoders -c $^ -o $@
+	${OSSEC_CC} ${OSSEC_CFLAGS} -DARGV0=\"shieldnet-defend-analysisd\" -I./analysisd -I./analysisd/decoders -c $^ -o $@
 
 analysisd/compiled_rules/compiled_rules.h: analysisd/compiled_rules/.function_list analysisd/compiled_rules/register_rule.sh
 	./analysisd/compiled_rules/register_rule.sh build
 
 analysisd/compiled_rules/%-test.o: analysisd/compiled_rules/%.c
-	${OSSEC_CC} ${OSSEC_CFLAGS} -DTESTRULE -DARGV0=\"wazuh-analysisd\" -I./analysisd -I./analysisd/decoders -c $^ -o $@
+	${OSSEC_CC} ${OSSEC_CFLAGS} -DTESTRULE -DARGV0=\"shieldnet-defend-analysisd\" -I./analysisd -I./analysisd/decoders -c $^ -o $@
 
 analysisd/compiled_rules/%-live.o: analysisd/compiled_rules/%.c
-	${OSSEC_CC} ${OSSEC_CFLAGS} -DARGV0=\"wazuh-analysisd\" -I./analysisd -I./analysisd/decoders -c $^ -o $@
+	${OSSEC_CC} ${OSSEC_CFLAGS} -DARGV0=\"shieldnet-defend-analysisd\" -I./analysisd -I./analysisd/decoders -c $^ -o $@
 
 decoders-live.a: ${decoders_live_o}
 	${OSSEC_LINK} $@ $^
@@ -2428,14 +2428,14 @@ format_o := ${format_c:.c=.o}
 all_analysisd_o += ${format_o}
 
 analysisd/format/%.o: analysisd/format/%.c
-	${OSSEC_CC} ${OSSEC_CFLAGS} -DARGV0=\"wazuh-analysisd\" -I./analysisd -I./analysisd/decoders -c $^ -o $@
+	${OSSEC_CC} ${OSSEC_CFLAGS} -DARGV0=\"shieldnet-defend-analysisd\" -I./analysisd -I./analysisd/decoders -c $^ -o $@
 
 output_c := ${wildcard analysisd/output/*c}
 output_o := ${output_c:.c=.o}
 all_analysisd_o += ${output_o}
 
 analysisd/output/%.o: analysisd/output/%.c
-	${OSSEC_CC} ${OSSEC_CFLAGS} -DARGV0=\"wazuh-analysisd\" -I./analysisd -I./analysisd/decoders -c $^ -o $@
+	${OSSEC_CC} ${OSSEC_CFLAGS} -DARGV0=\"shieldnet-defend-analysisd\" -I./analysisd -I./analysisd/decoders -c $^ -o $@
 
 analysisd_c := ${filter-out analysisd/logmsg.c, ${filter-out analysisd/analysisd.c, ${filter-out analysisd/testrule.c, ${filter-out analysisd/makelists.c, ${wildcard analysisd/*.c}}}}}
 analysisd_o := ${analysisd_c:.c=.o}
@@ -2446,20 +2446,20 @@ analysisd_live_o := $(analysisd_o:.o=-live.o)
 all_analysisd_o += ${analysisd_test_o} ${analysisd_live_o} analysisd/testrule-test.o analysisd/analysisd-live.o analysisd/analysisd-test.o analysisd/makelists-live.o
 
 analysisd/%-live.o: analysisd/%.c analysisd/compiled_rules/compiled_rules.h
-	${OSSEC_CC} ${OSSEC_CFLAGS} -DARGV0=\"wazuh-analysisd\" -I./analysisd -c $< -o $@
+	${OSSEC_CC} ${OSSEC_CFLAGS} -DARGV0=\"shieldnet-defend-analysisd\" -I./analysisd -c $< -o $@
 
 analysisd/%-test.o: analysisd/%.c analysisd/compiled_rules/compiled_rules.h
-	${OSSEC_CC} ${OSSEC_CFLAGS} -DTESTRULE -DARGV0=\"wazuh-analysisd\" -I./analysisd -c $< -o $@
+	${OSSEC_CC} ${OSSEC_CFLAGS} -DTESTRULE -DARGV0=\"shieldnet-defend-analysisd\" -I./analysisd -c $< -o $@
 
-wazuh-logtest-legacy: ${analysisd_test_o} ${output_o} ${format_o} analysisd/testrule-test.o analysisd/analysisd-test.o alerts.a cdb.a decoders-test.a
+shieldnet-defend-logtest-legacy: ${analysisd_test_o} ${output_o} ${format_o} analysisd/testrule-test.o analysisd/analysisd-test.o alerts.a cdb.a decoders-test.a
 	${OSSEC_CCBIN} ${OSSEC_LDFLAGS} $^ ${OSSEC_LIBS} -o $@
 
-wazuh-analysisd: ${analysisd_live_o} analysisd/analysisd-live.o ${output_o} ${format_o} alerts.a cdb.a decoders-live.a analysisd/logmsg.o
+shieldnet-defend-analysisd: ${analysisd_live_o} analysisd/analysisd-live.o ${output_o} ${format_o} alerts.a cdb.a decoders-live.a analysisd/logmsg.o
 	${OSSEC_CCBIN} ${OSSEC_LDFLAGS} $^ ${OSSEC_LIBS} -o $@
 
-### wazuh-modulesd ##
+### shieldnet-defend-modulesd ##
 
-wmodulesd_c := wazuh_modules/main.c
+wmodulesd_c := shieldnet_defend_modules/main.c
 wmodulesd_o := $(wmodulesd_c:.c=.o)
 
 ifeq (${TARGET},server)
@@ -2468,20 +2468,20 @@ ifeq (,$(filter ${DISABLE_JEMALLOC},YES yes y Y 1))
 endif
 endif
 
-wazuh-modulesd: ${wmodulesd_o}
+shieldnet-defend-modulesd: ${wmodulesd_o}
 	${OSSEC_CCBIN} ${OSSEC_LDFLAGS} $^ ${OSSEC_LIBS} ${MODULESD_LDFLAGS} -o $@
 
-### wazuh-gtest-gmock ###
+### shieldnet-defend-gtest-gmock ###
 
 build_gtest:
 	cd $(EXTERNAL_GOOGLE_TEST) && mkdir -p build && cd build && cmake .. ${CMAKE_OPTS} ${GTEST_RELEASE_TYPE}  -DBUILD_GMOCK=ON -DBUILD_SHARED_LIBS=0 && ${MAKE} && cp -r lib ..
 
-### wazuh-google-benchmark ###
+### shieldnet-defend-google-benchmark ###
 
 build_benchmark:
 	cd $(EXTERNAL_GOOGLE_BENCHMARK) && mkdir -p build && cd build && cmake .. -DBENCHMARK_ENABLE_TESTING=0 ${CMAKE_OPTS} && ${MAKE}
 
-### wazuh-python ###
+### shieldnet-defend-python ###
 
 WPYTHON_DIR := ${INSTALLDIR}/framework/python
 OPTIMIZE_CPYTHON?=no
@@ -2500,14 +2500,14 @@ ifeq (,${INSTALLDIR})
 endif
 
 ifeq (,$(wildcard ${EXTERNAL_CPYTHON}/python))
-	export WPATH_LIB="'\$$\$$ORIGIN/../../../lib'" && export SOURCE_PATH=${ROUTE_PATH} && export WAZUH_FFI_PATH=${EXTERNAL_LIBFFI} && export LD_LIBRARY_PATH=${ROUTE_PATH} && cd ${EXTERNAL_CPYTHON} && ./configure --prefix="${WPYTHON_DIR}" --libdir="${WPYTHON_DIR}/lib" --enable-shared --with-openssl="${ROUTE_PATH}/${EXTERNAL_OPENSSL}" LDFLAGS="${ARCH_FLAGS} -L${ROUTE_PATH} -lwazuhext -Wl,-rpath,'\$$\$$ORIGIN/../../../lib',--disable-new-dtags" CPPFLAGS="-I${ROUTE_PATH}/${EXTERNAL_OPENSSL}" $(CPYTHON_FLAGS) && ${MAKE}
+	export WPATH_LIB="'\$$\$$ORIGIN/../../../lib'" && export SOURCE_PATH=${ROUTE_PATH} && export SHIELDNET_DEFEND_FFI_PATH=${EXTERNAL_LIBFFI} && export LD_LIBRARY_PATH=${ROUTE_PATH} && cd ${EXTERNAL_CPYTHON} && ./configure --prefix="${WPYTHON_DIR}" --libdir="${WPYTHON_DIR}/lib" --enable-shared --with-openssl="${ROUTE_PATH}/${EXTERNAL_OPENSSL}" LDFLAGS="${ARCH_FLAGS} -L${ROUTE_PATH} -lshieldnetdefendext -Wl,-rpath,'\$$\$$ORIGIN/../../../lib',--disable-new-dtags" CPPFLAGS="-I${ROUTE_PATH}/${EXTERNAL_OPENSSL}" $(CPYTHON_FLAGS) && ${MAKE}
 endif
 
-build_python: $(WAZUHEXT_LIB)
+build_python: $(SHIELDNETDEFENDEXT_LIB)
 
 install_python:
 ifneq (,$(wildcard ${EXTERNAL_CPYTHON}))
-	cd ${EXTERNAL_CPYTHON} && export WPATH_LIB=${INSTALLDIR}/lib && export SOURCE_PATH=${ROUTE_PATH} && export WAZUH_FFI_PATH=${EXTERNAL_LIBFFI} && ${MAKE} install
+	cd ${EXTERNAL_CPYTHON} && export WPATH_LIB=${INSTALLDIR}/lib && export SOURCE_PATH=${ROUTE_PATH} && export SHIELDNET_DEFEND_FFI_PATH=${EXTERNAL_LIBFFI} && ${MAKE} install
 else
 	mkdir -p ${WPYTHON_DIR}
 	cp external/${WPYTHON_TAR} ${WPYTHON_DIR}/${WPYTHON_TAR} && ${TAR} ${WPYTHON_DIR}/${WPYTHON_TAR} -C ${WPYTHON_DIR} && rm -rf ${WPYTHON_DIR}/${WPYTHON_TAR}
@@ -2524,7 +2524,7 @@ endif
 
 install_framework: install_python
 	cd ../framework && ${WPYTHON_DIR}/bin/python3 -m pip install . --use-pep517 --prefix=${WPYTHON_DIR} && rm -rf build/
-	chown -R root:${WAZUH_GROUP} ${WPYTHON_DIR}
+	chown -R root:${SHIELDNET_DEFEND_GROUP} ${WPYTHON_DIR}
 	chmod -R o=- ${WPYTHON_DIR}
 
 install_api: install_python
@@ -2536,7 +2536,7 @@ install_mitre: install_python
 ####################
 #### test ##########
 ####################
-CFLAGS_TEST=-g -O0 --coverage -DWAZUH_UNIT_TESTING
+CFLAGS_TEST=-g -O0 --coverage -DSHIELDNET_DEFEND_UNIT_TESTING
 # Use sanitizers only on linux
 ifneq (${TARGET},winagent)
 ifeq (${uname_S},Linux)
@@ -2585,43 +2585,43 @@ unit_tests/wrappers/macos/libc/%.o: unit_tests/wrappers/macos/libc/%.c
 unit_tests/wrappers/posix/%.o: unit_tests/wrappers/posix/%.c
 	${OSSEC_CC} ${OSSEC_CFLAGS} ${DEFINES_EVENTCHANNEL} -c $^ -o $@
 
-unit_tests/wrappers/wazuh/%.o: unit_tests/wrappers/wazuh/%.c
+unit_tests/wrappers/shieldnetdefend/%.o: unit_tests/wrappers/shieldnetdefend/%.c
 	${OSSEC_CC} ${OSSEC_CFLAGS} ${DEFINES_EVENTCHANNEL} -c $^ -o $@
 
-unit_tests/wrappers/wazuh/os_crypto/%.o: unit_tests/wrappers/wazuh/os_crypto/%.c
+unit_tests/wrappers/shieldnetdefend/os_crypto/%.o: unit_tests/wrappers/shieldnetdefend/os_crypto/%.c
 	${OSSEC_CC} ${OSSEC_CFLAGS} ${DEFINES_EVENTCHANNEL} -c $^ -o $@
 
-unit_tests/wrappers/wazuh/os_execd/%.o: unit_tests/wrappers/wazuh/os_execd/%.c
+unit_tests/wrappers/shieldnetdefend/os_execd/%.o: unit_tests/wrappers/shieldnetdefend/os_execd/%.c
 	${OSSEC_CC} ${OSSEC_CFLAGS} ${DEFINES_EVENTCHANNEL} -c $^ -o $@
 
-unit_tests/wrappers/wazuh/os_net/%.o: unit_tests/wrappers/wazuh/os_net/%.c
+unit_tests/wrappers/shieldnetdefend/os_net/%.o: unit_tests/wrappers/shieldnetdefend/os_net/%.c
 	${OSSEC_CC} ${OSSEC_CFLAGS} ${DEFINES_EVENTCHANNEL} -c $^ -o $@
 
-unit_tests/wrappers/wazuh/os_regex/%.o: unit_tests/wrappers/wazuh/os_regex/%.c
+unit_tests/wrappers/shieldnetdefend/os_regex/%.o: unit_tests/wrappers/shieldnetdefend/os_regex/%.c
 	${OSSEC_CC} ${OSSEC_CFLAGS} ${DEFINES_EVENTCHANNEL} -c $^ -o $@
 
-unit_tests/wrappers/wazuh/shared/%.o: unit_tests/wrappers/wazuh/shared/%.c
+unit_tests/wrappers/shieldnetdefend/shared/%.o: unit_tests/wrappers/shieldnetdefend/shared/%.c
 	${OSSEC_CC} ${OSSEC_CFLAGS} ${DEFINES_EVENTCHANNEL} -c $^ -o $@
 
-unit_tests/wrappers/wazuh/syscheckd/%.o: unit_tests/wrappers/wazuh/syscheckd/%.c
+unit_tests/wrappers/shieldnetdefend/syscheckd/%.o: unit_tests/wrappers/shieldnetdefend/syscheckd/%.c
 	${OSSEC_CC} ${OSSEC_CFLAGS} ${DEFINES_EVENTCHANNEL} -c $^ -o $@
 
-unit_tests/wrappers/wazuh/wazuh_db/%.o: unit_tests/wrappers/wazuh/wazuh_db/%.c
+unit_tests/wrappers/shieldnetdefend/shieldnet_defend_db/%.o: unit_tests/wrappers/shieldnetdefend/shieldnet_defend_db/%.c
 	${OSSEC_CC} ${OSSEC_CFLAGS} ${DEFINES_EVENTCHANNEL} -c $^ -o $@
 
-unit_tests/wrappers/wazuh/wazuh_modules/%.o: unit_tests/wrappers/wazuh/wazuh_modules/%.c
+unit_tests/wrappers/shieldnetdefend/shieldnet_defend_modules/%.o: unit_tests/wrappers/shieldnetdefend/shieldnet_defend_modules/%.c
 	${OSSEC_CC} ${OSSEC_CFLAGS} ${DEFINES_EVENTCHANNEL} -c $^ -o $@
 
-unit_tests/wrappers/wazuh/monitord/%.o: unit_tests/wrappers/wazuh/monitord/%.c
+unit_tests/wrappers/shieldnetdefend/monitord/%.o: unit_tests/wrappers/shieldnetdefend/monitord/%.c
 	${OSSEC_CC} ${OSSEC_CFLAGS} ${DEFINES_EVENTCHANNEL} -c $^ -o $@
 
-unit_tests/wrappers/wazuh/os_auth/%.o: unit_tests/wrappers/wazuh/os_auth/%.c
+unit_tests/wrappers/shieldnetdefend/os_auth/%.o: unit_tests/wrappers/shieldnetdefend/os_auth/%.c
 	${OSSEC_CC} ${OSSEC_CFLAGS} ${DEFINES_EVENTCHANNEL} -c $^ -o $@
 
-unit_tests/wrappers/wazuh/addagent/%.o: unit_tests/wrappers/wazuh/addagent/%.c
+unit_tests/wrappers/shieldnetdefend/addagent/%.o: unit_tests/wrappers/shieldnetdefend/addagent/%.c
 	${OSSEC_CC} ${OSSEC_CFLAGS} ${DEFINES_EVENTCHANNEL} -c $^ -o $@
 
-unit_tests/wrappers/wazuh/config/%.o: unit_tests/wrappers/wazuh/config/%.c
+unit_tests/wrappers/shieldnetdefend/config/%.o: unit_tests/wrappers/shieldnetdefend/config/%.c
 	${OSSEC_CC} ${OSSEC_CFLAGS} ${DEFINES_EVENTCHANNEL} -c $^ -o $@
 
 unit_tests/wrappers/windows/%.o: unit_tests/wrappers/windows/%.c
@@ -2630,10 +2630,10 @@ unit_tests/wrappers/windows/%.o: unit_tests/wrappers/windows/%.c
 unit_tests/wrappers/windows/libc/%.o: unit_tests/wrappers/windows/libc/%.c
 	${OSSEC_CC} ${OSSEC_CFLAGS} ${DEFINES_EVENTCHANNEL} -c $^ -o $@
 
-unit_tests/wrappers/wazuh/remoted/%.o: unit_tests/wrappers/wazuh/remoted/%.c
+unit_tests/wrappers/shieldnetdefend/remoted/%.o: unit_tests/wrappers/shieldnetdefend/remoted/%.c
 	${OSSEC_CC} ${OSSEC_CFLAGS} ${DEFINES_EVENTCHANNEL} -c $^ -o $@
 
-unit_tests/wrappers/wazuh/analysisd/%.o: unit_tests/wrappers/wazuh/analysisd/%.c
+unit_tests/wrappers/shieldnetdefend/analysisd/%.o: unit_tests/wrappers/shieldnetdefend/analysisd/%.c
 	${OSSEC_CC} ${OSSEC_CFLAGS} ${DEFINES_EVENTCHANNEL} -c $^ -o $@
 
 .PHONY: test
@@ -2664,13 +2664,13 @@ win32/ui_resource.o: win32/ui/win32ui.rc
 win32/auth_resource.o: win32/agent-auth.rc
 	${OSSEC_WINDRES} -i $< -o $@
 
-win32/wazuh_agent_resource.o: win32/wazuh-agent.rc
+win32/shieldnet_defend_agent_resource.o: win32/shieldnet-defend-agent.rc
 	${OSSEC_WINDRES} -i $< -o $@
 
 win32/manage_agents_resource.o: win32/manage_agents.rc
 	${OSSEC_WINDRES} -i $< -o $@
 
-win32/restart_wazuh_resource.o: win32/restart-wazuh.rc
+win32/restart_shieldnet_defend_resource.o: win32/restart-shieldnet-defend.rc
 	${OSSEC_WINDRES} -i $< -o $@
 
 win32/route_null_resource.o: win32/route-null.rc
@@ -2679,7 +2679,7 @@ win32/route_null_resource.o: win32/route-null.rc
 win32/netsh_resource.o: win32/netsh.rc
 	${OSSEC_WINDRES} -i $< -o $@
 
-win32/wazuh_agent_eventchannel_resource.o: win32/wazuh-agent-eventchannel.rc
+win32/shieldnet_defend_agent_eventchannel_resource.o: win32/shieldnet-defend-agent-eventchannel.rc
 	${OSSEC_WINDRES} -i $< -o $@
 
 win32/icon.o: win32/icofile.rc
@@ -2689,22 +2689,22 @@ win32_c := $(wildcard win32/*.c)
 win32_o := $(win32_c:.c=.o)
 
 win32/%.o: win32/%.c
-	${OSSEC_CC} ${OSSEC_CFLAGS} -DARGV0=\"wazuh-agent\" -c $^ -o $@
+	${OSSEC_CC} ${OSSEC_CFLAGS} -DARGV0=\"shieldnet-defend-agent\" -c $^ -o $@
 
 win32/%_rk.o: win32/%.c
-	${OSSEC_CC} ${OSSEC_CFLAGS} -UOSSECHIDS -DARGV0=\"wazuh-agent\" -c $^ -o $@
+	${OSSEC_CC} ${OSSEC_CFLAGS} -UOSSECHIDS -DARGV0=\"shieldnet-defend-agent\" -c $^ -o $@
 
 win32_ui_c := $(wildcard win32/ui/*.c)
 win32_ui_o := $(win32_ui_c:.c=.o)
 
 win32/ui/%.o: win32/ui/%.c
-	${OSSEC_CC} ${OSSEC_CFLAGS} -UOSSECHIDS -DARGV0=\"wazuh-win32ui\" -c $^ -o $@
+	${OSSEC_CC} ${OSSEC_CFLAGS} -UOSSECHIDS -DARGV0=\"shieldnet-defend-win32ui\" -c $^ -o $@
 
-win32/wazuh-agent.exe: win32/wazuh_agent_resource.o win32/version-app.o win32/icon.o win32/win_agent.o win32/win_service.o win32/win_utils.o os_crypto/md5_sha1_sha256/md5_sha1_sha256_op.o ${rootcheck_o} $(filter-out wazuh_modules/main.o, ${wmodulesd_o}) $(filter-out client-agent/main.o, $(filter-out client-agent/agentd.o, $(filter-out client-agent/event-forward.o, ${client_agent_o}))) $(filter-out logcollector/main.o, ${os_logcollector_o}) $(filter-out os_execd/main.o, ${os_execd_o}) active-response/active_responses.o monitord/rotate_log.o monitord/compress_log.o
-	${OSSEC_CCBIN} -DARGV0=\"wazuh-agent\" -DOSSECHIDS ${OSSEC_LDFLAGS} $^ ${OSSEC_LIBS} ${DBSYNC_LIB} ${RSYNC_LIB} -lwazuh-syscheckd -l:libfimdb.lib libwazuh.a -o $@
+win32/shieldnet-defend-agent.exe: win32/shieldnet_defend_agent_resource.o win32/version-app.o win32/icon.o win32/win_agent.o win32/win_service.o win32/win_utils.o os_crypto/md5_sha1_sha256/md5_sha1_sha256_op.o ${rootcheck_o} $(filter-out shieldnet_defend_modules/main.o, ${wmodulesd_o}) $(filter-out client-agent/main.o, $(filter-out client-agent/agentd.o, $(filter-out client-agent/event-forward.o, ${client_agent_o}))) $(filter-out logcollector/main.o, ${os_logcollector_o}) $(filter-out os_execd/main.o, ${os_execd_o}) active-response/active_responses.o monitord/rotate_log.o monitord/compress_log.o
+	${OSSEC_CCBIN} -DARGV0=\"shieldnet-defend-agent\" -DOSSECHIDS ${OSSEC_LDFLAGS} $^ ${OSSEC_LIBS} ${DBSYNC_LIB} ${RSYNC_LIB} -lshieldnet-defend-syscheckd -l:libfimdb.lib libshieldnetdefend.a -o $@
 
-win32/wazuh-agent-eventchannel.exe: win32/wazuh_agent_eventchannel_resource.o win32/version-app.o win32/icon.o win32/win_agent.o win32/win_service.o win32/win_utils.o os_crypto/md5_sha1_sha256/md5_sha1_sha256_op.o ${rootcheck_o} $(filter-out wazuh_modules/main.o, ${wmodulesd_o}) $(filter-out client-agent/main.o, $(filter-out client-agent/agentd.o, $(filter-out client-agent/event-forward.o, ${client_agent_o}))) $(filter-out logcollector/main-event.o, ${os_logcollector_eventchannel_o}) $(filter-out os_execd/main.o, ${os_execd_o}) active-response/active_responses.o monitord/rotate_log.o monitord/compress_log.o
-	${OSSEC_CCBIN} -DARGV0=\"wazuh-agent\" -DOSSECHIDS -DEVENTCHANNEL_SUPPORT ${OSSEC_LDFLAGS} $^ ${OSSEC_LIBS} ${DBSYNC_LIB} ${RSYNC_LIB} -lwazuh-syscheckd-event -l:libfimdb.lib libwazuh.a -lwevtapi -o $@
+win32/shieldnet-defend-agent-eventchannel.exe: win32/shieldnet_defend_agent_eventchannel_resource.o win32/version-app.o win32/icon.o win32/win_agent.o win32/win_service.o win32/win_utils.o os_crypto/md5_sha1_sha256/md5_sha1_sha256_op.o ${rootcheck_o} $(filter-out shieldnet_defend_modules/main.o, ${wmodulesd_o}) $(filter-out client-agent/main.o, $(filter-out client-agent/agentd.o, $(filter-out client-agent/event-forward.o, ${client_agent_o}))) $(filter-out logcollector/main-event.o, ${os_logcollector_eventchannel_o}) $(filter-out os_execd/main.o, ${os_execd_o}) active-response/active_responses.o monitord/rotate_log.o monitord/compress_log.o
+	${OSSEC_CCBIN} -DARGV0=\"shieldnet-defend-agent\" -DOSSECHIDS -DEVENTCHANNEL_SUPPORT ${OSSEC_LDFLAGS} $^ ${OSSEC_LIBS} ${DBSYNC_LIB} ${RSYNC_LIB} -lshieldnet-defend-syscheckd-event -l:libfimdb.lib libshieldnetdefend.a -lwevtapi -o $@
 
 win32/manage_agents.exe: win32/manage_agents_resource.o win32/version-app.o win32/win_service_rk.o ${addagent_o}
 	${OSSEC_CCBIN} -DARGV0=\"manage-agents\" -DMA ${OSSEC_LDFLAGS} $^ ${OSSEC_LIBS} -o $@
@@ -2725,18 +2725,18 @@ win32/auth_resource.o: win32/agent-auth.rc
 	${OSSEC_WINDRES} -i $< -o $@
 
 win32/os_win32ui.exe: win32/ui_resource.o win32/version-app.o win32/win_service_rk.o ${win32_ui_o}
-	${OSSEC_CCBIN} -DARGV0=\"wazuh-win32ui\" ${OSSEC_LDFLAGS} $^ ${OSSEC_LIBS} -I./syscheckd/include -mwindows -o $@
+	${OSSEC_CCBIN} -DARGV0=\"shieldnet-defend-win32ui\" ${OSSEC_LDFLAGS} $^ ${OSSEC_LIBS} -I./syscheckd/include -mwindows -o $@
 
 win32/agent-auth.exe: win32/auth_resource.o win32/version-app.o win32/win_service_rk.o os_auth/main-client.o os_auth/ssl.o os_auth/check_cert.o addagent/validate.o
 	${OSSEC_CCBIN} -DARGV0=\"agent-auth\" -DOSSECHIDS ${OSSEC_LDFLAGS} $^ ${OSSEC_LIBS} -lshlwapi -lwsock32 -lsecur32 -lws2_32 -flto -o $@
 
-win32/restart-wazuh.exe: win32/restart_wazuh_resource.o win32/version-app.o active-response/active_responses.o active-response/restart-wazuh.o shared/cryptography.o shared/dll_load_notify.o shared/debug_op_proc.o shared/time_op.o shared/file_op_proc.o shared/utf8_winapi_wrapper.o shared/utf8_op.o ${WAZUH_LIB} ${WAZUHEXT_LIB}
-	${OSSEC_CCBIN} -DARGV0=\"restart-wazuh\" ${AR_LDFLAGS} $^ -lwintrust -lpsapi -lcrypt32 -lshlwapi -lmpr -o $@
+win32/restart-shieldnet-defend.exe: win32/restart_shieldnet_defend_resource.o win32/version-app.o active-response/active_responses.o active-response/restart-shieldnet-defend.o shared/cryptography.o shared/dll_load_notify.o shared/debug_op_proc.o shared/time_op.o shared/file_op_proc.o shared/utf8_winapi_wrapper.o shared/utf8_op.o ${SHIELDNET_DEFEND_LIB} ${SHIELDNETDEFENDEXT_LIB}
+	${OSSEC_CCBIN} -DARGV0=\"restart-shieldnet-defend\" ${AR_LDFLAGS} $^ -lwintrust -lpsapi -lcrypt32 -lshlwapi -lmpr -o $@
 
-win32/route-null.exe: win32/route_null_resource.o win32/version-app.o active-response/active_responses.o active-response/route-null.o shared/cryptography.o shared/dll_load_notify.o shared/debug_op_proc.o shared/time_op.o shared/file_op_proc.o shared/utf8_winapi_wrapper.o shared/utf8_op.o ${WAZUH_LIB} ${WAZUHEXT_LIB}
+win32/route-null.exe: win32/route_null_resource.o win32/version-app.o active-response/active_responses.o active-response/route-null.o shared/cryptography.o shared/dll_load_notify.o shared/debug_op_proc.o shared/time_op.o shared/file_op_proc.o shared/utf8_winapi_wrapper.o shared/utf8_op.o ${SHIELDNET_DEFEND_LIB} ${SHIELDNETDEFENDEXT_LIB}
 	${OSSEC_CCBIN} -DARGV0=\"route-null\" ${AR_LDFLAGS} $^ -lwintrust -lpsapi -lcrypt32 -lshlwapi -lmpr -o $@
 
-win32/netsh.exe: win32/netsh_resource.o win32/version-app.o active-response/active_responses.o active-response/netsh.o shared/cryptography.o shared/dll_load_notify.o shared/debug_op_proc.o shared/time_op.o shared/file_op_proc.o shared/utf8_winapi_wrapper.o shared/utf8_op.o ${WAZUH_LIB} ${WAZUHEXT_LIB}
+win32/netsh.exe: win32/netsh_resource.o win32/version-app.o active-response/active_responses.o active-response/netsh.o shared/cryptography.o shared/dll_load_notify.o shared/debug_op_proc.o shared/time_op.o shared/file_op_proc.o shared/utf8_winapi_wrapper.o shared/utf8_op.o ${SHIELDNET_DEFEND_LIB} ${SHIELDNETDEFENDEXT_LIB}
 	${OSSEC_CCBIN} -DARGV0=\"netsh\" ${AR_LDFLAGS} $^ -lwintrust -lpsapi -lcrypt32 -lshlwapi -lmpr -o $@
 
 
@@ -2834,13 +2834,13 @@ clean-internals: clean-unit-tests
 	rm -f ${os_auth_o}
 	rm -f ${all_analysisd_o} ${all_analysisd_libs} analysisd/compiled_rules/compiled_rules.h analysisd/logmsg.o
 	rm -f ${integrator_o}
-	rm -f ${wmodulesd_o} ${wmodules_o} $(wildcard wazuh_modules/agent_upgrade/agent/*.o)
+	rm -f ${wmodulesd_o} ${wmodules_o} $(wildcard shieldnet_defend_modules/agent_upgrade/agent/*.o)
 	rm -f ${wdb_o}
-	rm -f wazuh_db/*.o
-	rm -f wazuh_db/helpers/*.o
+	rm -f shieldnet_defend_db/*.o
+	rm -f shieldnet_defend_db/helpers/*.o
 	rm -f ${SELINUX_MODULE}
 	rm -f ${SELINUX_POLICY}
-	rm -f $(WAZUH_LIB)
+	rm -f $(SHIELDNET_DEFEND_LIB)
 	rm -rf $(DBSYNC)build
 	rm -rf $(RSYNC)build
 	rm -rf $(SYSCOLLECTOR)build
@@ -2850,10 +2850,10 @@ clean-internals: clean-unit-tests
 	rm -rf $(SYSCHECK)build
 	rm -rf ${SHARED_MODULES}http-request/build
 	rm -rf build
-	rm -rf libwazuhext
+	rm -rf libshieldnetdefendext
 	rm -rf libstdc++.so.6
 	rm -rf libgcc_s.so.1
-	rm -f libwazuh.a
+	rm -f libshieldnetdefend.a
 	rm -f shared/*.o
 
 
@@ -2876,26 +2876,26 @@ clean-unit-tests:
 	rm -f ${wrappers_macos_libc_o}
 	rm -f ${wrappers_macos_posix_o}
 	rm -f ${wrappers_posix_o}
-	rm -f ${wrappers_wazuh_o}
-	rm -f ${wrappers_wazuh_os_crypto_o}
-	rm -f ${wrappers_wazuh_os_execd_o}
-	rm -f ${wrappers_wazuh_os_net_o}
-	rm -f ${wrappers_wazuh_os_regex_o}
-	rm -f ${wrappers_wazuh_os_xml_o}
-	rm -f ${wrappers_wazuh_shared_o}
-	rm -f ${wrappers_wazuh_syscheckd_o}
-	rm -f ${wrappers_wazuh_wazuh_db_o}
-	rm -f ${wrappers_wazuh_wazuh_modules_o}
-	rm -f ${wrappers_wazuh_monitord_o}
-	rm -f ${wrappers_wazuh_os_auth_o}
-	rm -f ${wrappers_wazuh_addagent_o}
-	rm -f ${wrappers_wazuh_config_o}
+	rm -f ${wrappers_shieldnet_defend_o}
+	rm -f ${wrappers_shieldnet_defend_os_crypto_o}
+	rm -f ${wrappers_shieldnet_defend_os_execd_o}
+	rm -f ${wrappers_shieldnet_defend_os_net_o}
+	rm -f ${wrappers_shieldnet_defend_os_regex_o}
+	rm -f ${wrappers_shieldnet_defend_os_xml_o}
+	rm -f ${wrappers_shieldnet_defend_shared_o}
+	rm -f ${wrappers_shieldnet_defend_syscheckd_o}
+	rm -f ${wrappers_shieldnet_defend_shieldnet_defend_db_o}
+	rm -f ${wrappers_shieldnet_defend_shieldnet_defend_modules_o}
+	rm -f ${wrappers_shieldnet_defend_monitord_o}
+	rm -f ${wrappers_shieldnet_defend_os_auth_o}
+	rm -f ${wrappers_shieldnet_defend_addagent_o}
+	rm -f ${wrappers_shieldnet_defend_config_o}
 	rm -f ${wrappers_windows_o}
 	rm -f ${wrappers_windows_lib_o}
 	rm -f ${wrappers_windows_posix_o}
 	rm -f ${wrappers_client_agent_o}
-	rm -f ${wrappers_wazuh_remoted_o}
-	rm -f ${wrappers_wazuh_analysisd_o}
+	rm -f ${wrappers_shieldnet_defend_remoted_o}
+	rm -f ${wrappers_shieldnet_defend_analysisd_o}
 	rm -f ${wrappers_logcollector_o}
 	rm -f ${wrappers_macos_o}
 	rm -f ${wrappers_data_provider_o}
@@ -2904,10 +2904,10 @@ clean-framework:
 	${MAKE} -C ../framework clean
 
 clean-windows:
-	rm -f libwazuh.a
-	rm -f libwazuhshared.*
-	rm -f libwazuhext.*
-	rm -f wazuh_modules/syscollector/*.o wazuh_modules/syscollector/*.obj
+	rm -f libshieldnetdefend.a
+	rm -f libshieldnetdefendshared.*
+	rm -f libshieldnetdefendext.*
+	rm -f shieldnet_defend_modules/syscollector/*.o shieldnet_defend_modules/syscollector/*.obj
 	rm -f win32/LICENSE.txt
 	rm -f win32/help_win.txt
 	rm -f win32/internal_options.conf
@@ -2919,13 +2919,13 @@ clean-windows:
 	rm -f win32/netsh.cmd
 	rm -f win32/netsh-win-2016.cmd
 	rm -f win32/default-ossec-pre6.conf
-	rm -f win32/restart-wazuh.exe
+	rm -f win32/restart-shieldnet-defend.exe
 	rm -f win32/route-null.exe
 	rm -f win32/netsh.exe
 	rm -f ${win32_o} ${win32_ui_o} win32/win_service_rk.o
 	rm -f win32/icon.o win32/resource.o
 	rm -f ${WINDOWS_BINS}
-	rm -f win32/wazuh-agent-*.exe
+	rm -f win32/shieldnet-defend-agent-*.exe
 	rm -f win32/libwinpthread-1.dll
 	rm -f win32/*.o
 	rm -f win32/version-*.o

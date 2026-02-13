@@ -1,11 +1,11 @@
-FROM public.ecr.aws/o5x5t0j3/amd64/api_development:integration_test_wazuh-generic
+FROM public.ecr.aws/o5x5t0j3/amd64/api_development:integration_test_shieldnet-defend-generic
 
-ARG WAZUH_BRANCH
+ARG SHIELDNET_DEFEND_BRANCH
 
-## install Wazuh
-RUN mkdir wazuh && curl -sL https://github.com/wazuh/wazuh/tarball/${WAZUH_BRANCH} | tar zx --strip-components=1 -C wazuh
-ADD base/agent/preloaded-vars.conf /wazuh/etc/preloaded-vars.conf
-RUN /wazuh/install.sh
+## install ShieldnetDefend
+RUN mkdir shieldnetdefend && curl -sL https://github.com/shieldnetdefend/shieldnetdefend/tarball/${SHIELDNET_DEFEND_BRANCH} | tar zx --strip-components=1 -C shieldnetdefend
+ADD base/agent/preloaded-vars.conf /shieldnetdefend/etc/preloaded-vars.conf
+RUN /shieldnetdefend/install.sh
 
 COPY base/agent/entrypoint.sh /scripts/entrypoint.sh
 

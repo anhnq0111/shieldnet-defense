@@ -2,34 +2,34 @@
 #
 # name: ossec
 # purpose: Init script for ossec-hids
-# Copyright (C) 2015, Wazuh Inc.
+# Copyright (C) 2015, ShieldnetDefend Inc.
 # Aug. 07 2008 Chris Cuevas
 #
 
-WAZUH_HOME=WAZUH_HOME_TMP
-WAZUH_CONTROL="$WAZUH_HOME/bin/wazuh-control"
+SHIELDNET_DEFEND_HOME=SHIELDNET_DEFEND_HOME_TMP
+SHIELDNET_DEFEND_CONTROL="$SHIELDNET_DEFEND_HOME/bin/shieldnet-defend-control"
 
 case "$1" in
 start)
-    if [ -f "$WAZUH_CONTROL" ]; then
-        echo "Starting Wazuh"
-        ${WAZUH_CONTROL} start
+    if [ -f "$SHIELDNET_DEFEND_CONTROL" ]; then
+        echo "Starting ShieldnetDefend"
+        ${SHIELDNET_DEFEND_CONTROL} start
     fi
     ;;
 stop)
-    if [ -f "$WAZUH_CONTROL" ]; then
-        echo "Stopping Wazuh"
-        ${WAZUH_CONTROL} stop
+    if [ -f "$SHIELDNET_DEFEND_CONTROL" ]; then
+        echo "Stopping ShieldnetDefend"
+        ${SHIELDNET_DEFEND_CONTROL} stop
     fi
     ;;
 status)
-    if [ -f "$WAZUH_CONTROL" ]; then
-        ${WAZUH_CONTROL} status
+    if [ -f "$SHIELDNET_DEFEND_CONTROL" ]; then
+        ${SHIELDNET_DEFEND_CONTROL} status
     fi
     ;;
 restart)
-    if [ -f "$WAZUH_CONTROL" ]; then
-        ${WAZUH_CONTROL} restart
+    if [ -f "$SHIELDNET_DEFEND_CONTROL" ]; then
+        ${SHIELDNET_DEFEND_CONTROL} restart
     fi
     ;;
 *)

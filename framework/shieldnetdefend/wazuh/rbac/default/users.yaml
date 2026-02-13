@@ -1,0 +1,12 @@
+# SHIELDNETDEFEND SYSTEM FILE, PLEASE DO NOT MODIFY
+
+default_users:
+  shieldnetdefend:
+    description: Superuser of ShieldnetDefend.
+    password: shieldnetdefend
+    allow_run_as: True
+
+  shieldnet-defend-wui:
+    description: Superuser of ShieldnetDefend UI
+    password: shieldnet-defend-wui
+    allow_run_as: True

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015, Wazuh Inc.
+ * Copyright (C) 2015, ShieldnetDefend Inc.
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General Public
@@ -15,7 +15,7 @@
 
 #include "../../headers/shared.h"
 #include "../../analysisd/logtest.h"
-#include "../wrappers/wazuh/shared/debug_op_wrappers.h"
+#include "../wrappers/shieldnetdefend/shared/debug_op_wrappers.h"
 
 int Read_Logtest(XML_NODE node);
 cJSON *getRuleTestConfig();

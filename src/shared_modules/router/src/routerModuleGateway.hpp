@@ -1,6 +1,6 @@
 /*
- * Wazuh router
- * Copyright (C) 2015, Wazuh Inc.
+ * ShieldnetDefend router
+ * Copyright (C) 2015, ShieldnetDefend Inc.
  * May 30, 2025.
  *
  * This program is free software; you can redistribute it
@@ -13,7 +13,7 @@
 #define _ROUTER_MODULE_GATEWAY_HPP
 
 #include "external/cpp-httplib/httplib.h"
-#include "wazuh-db/gateway.hpp"
+#include "shieldnet-defend-db/gateway.hpp"
 #include <string_view>
 
 /**
@@ -27,7 +27,7 @@ public:
     /**
      * @brief Redirects the request to the appropriate module.
      *
-     * @param module The module to be used. E.g. "wazuh-db"
+     * @param module The module to be used. E.g. "shieldnet-defend-db"
      * @param callbackPre The pre callback function, this function is called before the endpoint
      * @param callbackPost The post callback function, this function is called after the endpoint
      * @param endpoint The endpoint to be used. E.g. "/v1/agents"
@@ -43,7 +43,7 @@ public:
                          const httplib::Request& req,
                          httplib::Response& res)
     {
-        if (module.compare("wazuh-db") == 0)
+        if (module.compare("shieldnet-defend-db") == 0)
         {
             WDB::redirect(callbackPre, callbackPost, endpoint, method, req, res);
         }

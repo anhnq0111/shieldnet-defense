@@ -3,4 +3,4 @@ authors = ["Dwordcito"]
 language = "en"
 multilingual = false
 src = "."
-title = "Wazuh technical documentation"
+title = "ShieldnetDefend technical documentation"

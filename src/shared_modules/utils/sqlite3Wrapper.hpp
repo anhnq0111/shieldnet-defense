@@ -1,6 +1,6 @@
 /*
- * Wazuh SQLITE3 wrapper
- * Copyright (C) 2015, Wazuh Inc.
+ * ShieldnetDefend SQLITE3 wrapper
+ * Copyright (C) 2015, ShieldnetDefend Inc.
  * May 1, 2025.
  *
  * This program is free software; you can redistribute it

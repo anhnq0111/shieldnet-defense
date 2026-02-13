@@ -23,11 +23,11 @@ jobs:
           cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local
           make -j$(sysctl -n hw.ncpu)
           sudo make install
-      - name: Build wazuh agent for macOS 13 with tests flags
+      - name: Build shieldnetdefend agent for macOS 13 with tests flags
         run: |
           make deps -C src TARGET=agent -j4
           LIBRARY_PATH=/usr/local/lib make -C src TARGET=agent -j4 DEBUG=1 TEST=1
-      - name: Run wazuh unit tests for macOS 13
+      - name: Run shieldnetdefend unit tests for macOS 13
         run: |
           cd src/data_provider/build
           ctest -V
@@ -35,7 +35,7 @@ jobs:
           ctest -V
           cd ../../rsync/build
           ctest -V
-          cd ../../../wazuh_modules/syscollector/build
+          cd ../../../shieldnet_defend_modules/syscollector/build
           ctest -V
   build-sonoma:
     runs-on: macos-14
@@ -52,11 +52,11 @@ jobs:
           cmake .. -DCMAKE_INSTALL_PREFIX=/usr/local
           make -j$(sysctl -n hw.ncpu)
           sudo make install
-      - name: Build wazuh agent for macOS 14 with tests flags
+      - name: Build shieldnetdefend agent for macOS 14 with tests flags
         run: |
           make deps -C src TARGET=agent -j3
           C_INCLUDE_PATH=$C_INCLUDE_PATH:/opt/homebrew/include LIBRARY_PATH=/usr/local/lib:/opt/homebrew/lib make -C src TARGET=agent -j3 DEBUG=1 TEST=1
-      - name: Run wazuh unit tests for macOS 14
+      - name: Run shieldnetdefend unit tests for macOS 14
         run: |
           cd src/data_provider/build
           ctest -V
@@ -64,5 +64,5 @@ jobs:
           ctest -V
           cd ../../rsync/build
           ctest -V
-          cd ../../../wazuh_modules/syscollector/build
+          cd ../../../shieldnet_defend_modules/syscollector/build
           ctest -V

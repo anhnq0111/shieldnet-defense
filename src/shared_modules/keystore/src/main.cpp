@@ -1,6 +1,6 @@
 /*
- * Wazuh keystore
- * Copyright (C) 2015, Wazuh Inc.
+ * ShieldnetDefend keystore
+ * Copyright (C) 2015, ShieldnetDefend Inc.
  * January 25, 2024.
  *
  * This program is free software; you can redistribute it

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015, Wazuh Inc.
+ * Copyright (C) 2015, ShieldnetDefend Inc.
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General Public
@@ -13,10 +13,10 @@
 #include <cmocka.h>
 #include <stdio.h>
 
-#include "../wrappers/wazuh/shared/debug_op_wrappers.h"
-#include "../wrappers/wazuh/wazuh_db/wdb_wrappers.h"
+#include "../wrappers/shieldnetdefend/shared/debug_op_wrappers.h"
+#include "../wrappers/shieldnetdefend/shieldnet_defend_db/wdb_wrappers.h"
 
-#include "../headers/wazuhdb_op.h"
+#include "../headers/shieldnetdefenddb_op.h"
 #include "../headers/syscheck_op.h"
 
 /* Auxiliar structs */
