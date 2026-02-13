@@ -1,11 +1,11 @@
 """
-Copyright (C) 2015-2024, Wazuh Inc.
-Created by Wazuh, Inc. <info@wazuh.com>.
+Copyright (C) 2015-2024, ShieldnetDefend Inc.
+Created by ShieldnetDefend, Inc. <info@shieldnetdefend.com>.
 This program is free software; you can redistribute it and/or modify it under the terms of GPLv2
 """
 import pytest
 
-from wazuh_testing.tools.certificate_controller import CertificateController
+from shieldnet_defend_testing.tools.certificate_controller import CertificateController
 
 
 @pytest.fixture()

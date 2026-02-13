@@ -1,6 +1,6 @@
 /*
- * Wazuh router - SchemaAdapter tests
- * Copyright (C) 2015, Wazuh Inc.
+ * ShieldnetDefend router - SchemaAdapter tests
+ * Copyright (C) 2015, ShieldnetDefend Inc.
  * July 24, 2025.
  *
  * This program is free software; you can redistribute it
@@ -42,7 +42,7 @@ TEST_F(SchemaAdapterTest, TestSchemaAdapterMT_SYNC_INTEGRITY_CHECK_GLOBAL)
     auto parserSync = flatbuffers::Parser();
     parserSync.opts.skip_unexpected_fields_in_json = true;
     parserSync.opts.zero_on_float_to_int =
-        true; // Avoids issues with float to int conversion, custom option made for Wazuh.
+        true; // Avoids issues with float to int conversion, custom option made for ShieldnetDefend.
 
     if (!parserSync.Parse(rsync_SCHEMA))
     {
@@ -69,7 +69,7 @@ TEST_F(SchemaAdapterTest, TestSchemaAdapterMT_SYNC_STATE_FIM_REGISTRY_VALUE)
     auto parserSync = flatbuffers::Parser();
     parserSync.opts.skip_unexpected_fields_in_json = true;
     parserSync.opts.zero_on_float_to_int =
-        true; // Avoids issues with float to int conversion, custom option made for Wazuh.
+        true; // Avoids issues with float to int conversion, custom option made for ShieldnetDefend.
 
     if (!parserSync.Parse(rsync_SCHEMA))
     {
@@ -96,7 +96,7 @@ TEST_F(SchemaAdapterTest, TestSchemaAdapterMT_SYNC_STATE_SYSCOLLECTOR_PACKAGES)
     auto parserSync = flatbuffers::Parser();
     parserSync.opts.skip_unexpected_fields_in_json = true;
     parserSync.opts.zero_on_float_to_int =
-        true; // Avoids issues with float to int conversion, custom option made for Wazuh.
+        true; // Avoids issues with float to int conversion, custom option made for ShieldnetDefend.
 
     if (!parserSync.Parse(rsync_SCHEMA))
     {
@@ -123,7 +123,7 @@ TEST_F(SchemaAdapterTest, TestSchemaAdapterMT_SYNC_INTEGRITY_CLEAR_SYSCOLLECTOR_
     auto parserSync = flatbuffers::Parser();
     parserSync.opts.skip_unexpected_fields_in_json = true;
     parserSync.opts.zero_on_float_to_int =
-        true; // Avoids issues with float to int conversion, custom option made for Wazuh.
+        true; // Avoids issues with float to int conversion, custom option made for ShieldnetDefend.
 
     if (!parserSync.Parse(rsync_SCHEMA))
     {
@@ -150,7 +150,7 @@ TEST_F(SchemaAdapterTest, TestSchemaAdapterMT_SYNC_DELTAS_DBSYNC_PROCESSES)
     auto parserSync = flatbuffers::Parser();
     parserSync.opts.skip_unexpected_fields_in_json = true;
     parserSync.opts.zero_on_float_to_int =
-        true; // Avoids issues with float to int conversion, custom option made for Wazuh.
+        true; // Avoids issues with float to int conversion, custom option made for ShieldnetDefend.
 
     if (!parserSync.Parse(syscollector_deltas_SCHEMA))
     {
@@ -209,7 +209,7 @@ TEST_F(SchemaAdapterTest, TestSchemaAdapterMT_SYNC_INTEGRITY_CHECK_GLOBAL_OLD)
     auto parserSync = flatbuffers::Parser();
     parserSync.opts.skip_unexpected_fields_in_json = true;
     parserSync.opts.zero_on_float_to_int =
-        true; // Avoids issues with float to int conversion, custom option made for Wazuh.
+        true; // Avoids issues with float to int conversion, custom option made for ShieldnetDefend.
 
     if (!parserSync.Parse(rsync_SCHEMA))
     {
@@ -265,7 +265,7 @@ TEST_F(SchemaAdapterTest, TestSchemaAdapterMT_SYNC_INTEGRITY_CLEAR_SYSCOLLECTOR_
     auto parserSync = flatbuffers::Parser();
     parserSync.opts.skip_unexpected_fields_in_json = true;
     parserSync.opts.zero_on_float_to_int =
-        true; // Avoids issues with float to int conversion, custom option made for Wazuh.
+        true; // Avoids issues with float to int conversion, custom option made for ShieldnetDefend.
 
     if (!parserSync.Parse(rsync_SCHEMA))
     {
@@ -292,7 +292,7 @@ TEST_F(SchemaAdapterTest, TestSchemaAdapterMT_SYNC_INTEGRITY_CLEAR_SYSCOLLECTOR_
     auto parserSync = flatbuffers::Parser();
     parserSync.opts.skip_unexpected_fields_in_json = true;
     parserSync.opts.zero_on_float_to_int =
-        true; // Avoids issues with float to int conversion, custom option made for Wazuh.
+        true; // Avoids issues with float to int conversion, custom option made for ShieldnetDefend.
 
     if (!parserSync.Parse(rsync_SCHEMA))
     {
@@ -319,7 +319,7 @@ TEST_F(SchemaAdapterTest, TestSchemaAdapterMT_SYNC_INTEGRITY_CLEAR_SYSCOLLECTOR_
     auto parserSync = flatbuffers::Parser();
     parserSync.opts.skip_unexpected_fields_in_json = true;
     parserSync.opts.zero_on_float_to_int =
-        true; // Avoids issues with float to int conversion, custom option made for Wazuh.
+        true; // Avoids issues with float to int conversion, custom option made for ShieldnetDefend.
 
     if (!parserSync.Parse(rsync_SCHEMA))
     {
@@ -346,7 +346,7 @@ TEST_F(SchemaAdapterTest, TestSchemaAdapterMT_SYNC_INTEGRITY_CLEAR_SYSCOLLECTOR_
     auto parserSync = flatbuffers::Parser();
     parserSync.opts.skip_unexpected_fields_in_json = true;
     parserSync.opts.zero_on_float_to_int =
-        true; // Avoids issues with float to int conversion, custom option made for Wazuh.
+        true; // Avoids issues with float to int conversion, custom option made for ShieldnetDefend.
 
     if (!parserSync.Parse(rsync_SCHEMA))
     {
@@ -373,7 +373,7 @@ TEST_F(SchemaAdapterTest, TestSchemaAdapterMT_SYS_DELTAS_DBSYNC_PACKAGES)
     auto parserSync = flatbuffers::Parser();
     parserSync.opts.skip_unexpected_fields_in_json = true;
     parserSync.opts.zero_on_float_to_int =
-        true; // Avoids issues with float to int conversion, custom option made for Wazuh.
+        true; // Avoids issues with float to int conversion, custom option made for ShieldnetDefend.
 
     if (!parserSync.Parse(syscollector_deltas_SCHEMA))
     {
@@ -400,7 +400,7 @@ TEST_F(SchemaAdapterTest, TestSchemaAdapterMT_SYS_DELTAS_DBSYNC_NETWORK_IFACE)
     auto parserSync = flatbuffers::Parser();
     parserSync.opts.skip_unexpected_fields_in_json = true;
     parserSync.opts.zero_on_float_to_int =
-        true; // Avoids issues with float to int conversion, custom option made for Wazuh.
+        true; // Avoids issues with float to int conversion, custom option made for ShieldnetDefend.
 
     if (!parserSync.Parse(syscollector_deltas_SCHEMA))
     {
@@ -427,7 +427,7 @@ TEST_F(SchemaAdapterTest, TestSchemaAdapterMT_SYS_DELTAS_DBSYNC_NETWORK_PROTOCOL
     auto parserSync = flatbuffers::Parser();
     parserSync.opts.skip_unexpected_fields_in_json = true;
     parserSync.opts.zero_on_float_to_int =
-        true; // Avoids issues with float to int conversion, custom option made for Wazuh.
+        true; // Avoids issues with float to int conversion, custom option made for ShieldnetDefend.
 
     if (!parserSync.Parse(syscollector_deltas_SCHEMA))
     {
@@ -454,7 +454,7 @@ TEST_F(SchemaAdapterTest, TestSchemaAdapterMT_SYS_DELTAS_DBSYNC_NETWORK_ADDRESS)
     auto parserSync = flatbuffers::Parser();
     parserSync.opts.skip_unexpected_fields_in_json = true;
     parserSync.opts.zero_on_float_to_int =
-        true; // Avoids issues with float to int conversion, custom option made for Wazuh.
+        true; // Avoids issues with float to int conversion, custom option made for ShieldnetDefend.
 
     if (!parserSync.Parse(syscollector_deltas_SCHEMA))
     {
@@ -481,7 +481,7 @@ TEST_F(SchemaAdapterTest, TestSchemaAdapterMT_SYS_DELTAS_DBSYNC_HWINFO)
     auto parserSync = flatbuffers::Parser();
     parserSync.opts.skip_unexpected_fields_in_json = true;
     parserSync.opts.zero_on_float_to_int =
-        true; // Avoids issues with float to int conversion, custom option made for Wazuh.
+        true; // Avoids issues with float to int conversion, custom option made for ShieldnetDefend.
 
     if (!parserSync.Parse(syscollector_deltas_SCHEMA))
     {
@@ -508,7 +508,7 @@ TEST_F(SchemaAdapterTest, TestSchemaAdapterMT_SYS_DELTAS_DBSYNC_PORTS)
     auto parserSync = flatbuffers::Parser();
     parserSync.opts.skip_unexpected_fields_in_json = true;
     parserSync.opts.zero_on_float_to_int =
-        true; // Avoids issues with float to int conversion, custom option made for Wazuh.
+        true; // Avoids issues with float to int conversion, custom option made for ShieldnetDefend.
 
     if (!parserSync.Parse(syscollector_deltas_SCHEMA))
     {
@@ -535,7 +535,7 @@ TEST_F(SchemaAdapterTest, TestSchemaAdapterMT_SYS_DELTAS_DBSYNC_HOTFIXES)
     auto parserSync = flatbuffers::Parser();
     parserSync.opts.skip_unexpected_fields_in_json = true;
     parserSync.opts.zero_on_float_to_int =
-        true; // Avoids issues with float to int conversion, custom option made for Wazuh.
+        true; // Avoids issues with float to int conversion, custom option made for ShieldnetDefend.
 
     if (!parserSync.Parse(syscollector_deltas_SCHEMA))
     {
@@ -604,7 +604,7 @@ TEST_F(SchemaAdapterTest, TestSchemaAdapterMT_SYS_DELTAS_DBSYNC_PACKAGES_HUGE_SI
     auto parserSync = flatbuffers::Parser();
     parserSync.opts.skip_unexpected_fields_in_json = true;
     parserSync.opts.zero_on_float_to_int =
-        true; // Avoids issues with float to int conversion, custom option made for Wazuh.
+        true; // Avoids issues with float to int conversion, custom option made for ShieldnetDefend.
 
     if (!parserSync.Parse(syscollector_deltas_SCHEMA))
     {
@@ -631,7 +631,7 @@ TEST_F(SchemaAdapterTest, TestSchemaAdapterMT_SYNC_STATE_SYSCOLLECTOR_PACKAGES_N
     auto parserSync = flatbuffers::Parser();
     parserSync.opts.skip_unexpected_fields_in_json = true;
     parserSync.opts.zero_on_float_to_int =
-        true; // Avoids issues with float to int conversion, custom option made for Wazuh.
+        true; // Avoids issues with float to int conversion, custom option made for ShieldnetDefend.
 
     if (!parserSync.Parse(rsync_SCHEMA))
     {

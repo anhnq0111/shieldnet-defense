@@ -1,6 +1,6 @@
 #! /bin/bash
 # By Spransy, Derek" <DSPRANS () emory ! edu> and Charlie Scott
-# Modified by Wazuh, Inc. <info@wazuh.com>.
+# Modified by ShieldnetDefend, Inc. <info@shieldnetdefend.com>.
 # This program is a free software; you can redistribute it and/or modify it under the terms of GPLv2
 
 #####
@@ -39,21 +39,21 @@ function check_arch
 check_arch
 
 if [ -d "${DIR}" ]; then
-    echo "A Wazuh agent installation was found in ${DIR}. Will perform an upgrade."
+    echo "A ShieldnetDefend agent installation was found in ${DIR}. Will perform an upgrade."
     upgrade="true"
-    touch "${DIR}/WAZUH_PKG_UPGRADE"
+    touch "${DIR}/SHIELDNET_DEFEND_PKG_UPGRADE"
 
-    if [ -f "${DIR}/WAZUH_RESTART" ]; then
-        rm -f "${DIR}/WAZUH_RESTART"
+    if [ -f "${DIR}/SHIELDNET_DEFEND_RESTART" ]; then
+        rm -f "${DIR}/SHIELDNET_DEFEND_RESTART"
     fi
 
     # Stops the agent before upgrading it
-    if ${DIR}/bin/wazuh-control status | grep "is running" > /dev/null 2>&1; then
-        touch "${DIR}/WAZUH_RESTART"
-        ${DIR}/bin/wazuh-control stop
+    if ${DIR}/bin/shieldnet-defend-control status | grep "is running" > /dev/null 2>&1; then
+        touch "${DIR}/SHIELDNET_DEFEND_RESTART"
+        ${DIR}/bin/shieldnet-defend-control stop
         restart="true"
     elif ${DIR}/bin/ossec-control status | grep "is running" > /dev/null 2>&1; then
-        touch "${DIR}/WAZUH_RESTART"
+        touch "${DIR}/SHIELDNET_DEFEND_RESTART"
         ${DIR}/bin/ossec-control stop
         restart="true"
     fi
@@ -63,8 +63,8 @@ if [ -d "${DIR}" ]; then
     cp -r ${DIR}/etc/{ossec.conf,client.keys,local_internal_options.conf,shared} ${DIR}/config_files/
 
     if [ -d ${DIR}/logs/ossec ]; then
-        echo "Renaming ${DIR}/logs/ossec to ${DIR}/logs/wazuh"
-        mv ${DIR}/logs/ossec ${DIR}/logs/wazuh
+        echo "Renaming ${DIR}/logs/ossec to ${DIR}/logs/shieldnetdefend"
+        mv ${DIR}/logs/ossec ${DIR}/logs/shieldnetdefend
     fi
 
     if [ -d ${DIR}/queue/ossec ]; then
@@ -72,9 +72,9 @@ if [ -d "${DIR}" ]; then
         mv ${DIR}/queue/ossec ${DIR}/queue/sockets
     fi
 
-    if pkgutil --pkgs | grep -i wazuh-agent-etc > /dev/null 2>&1 ; then
-        echo "Removing previous package receipt for wazuh-agent-etc"
-        pkgutil --forget com.wazuh.pkg.wazuh-agent-etc
+    if pkgutil --pkgs | grep -i shieldnet-defend-agent-etc > /dev/null 2>&1 ; then
+        echo "Removing previous package receipt for shieldnet-defend-agent-etc"
+        pkgutil --forget com.shieldnetdefend.pkg.shieldnet-defend-agent-etc
     fi
 fi
 
@@ -101,7 +101,7 @@ while [[ $idvar -eq 0 ]]; do
    fi
 done
 
-echo "UID available for wazuh user is:";
+echo "UID available for shieldnetdefend user is:";
 echo ${new_uid}
 
 # Verify that the uid and gid exist and match
@@ -118,37 +118,37 @@ fi
 
 # Creating the group
 echo "Checking group..."
-if [[ $(dscl . -read /Groups/wazuh) ]]
+if [[ $(dscl . -read /Groups/shieldnetdefend) ]]
     then
-    echo "wazuh group already exists.";
+    echo "shieldnetdefend group already exists.";
 else
-    sudo ${DSCL} localhost -create /Local/Default/Groups/wazuh
-    check_errm "Error creating group wazuh" "67"
-    sudo ${DSCL} localhost -createprop /Local/Default/Groups/wazuh PrimaryGroupID ${new_gid}
-    sudo ${DSCL} localhost -createprop /Local/Default/Groups/wazuh RealName wazuh
-    sudo ${DSCL} localhost -createprop /Local/Default/Groups/wazuh RecordName wazuh
-    sudo ${DSCL} localhost -createprop /Local/Default/Groups/wazuh RecordType: dsRecTypeStandard:Groups
-    sudo ${DSCL} localhost -createprop /Local/Default/Groups/wazuh Password "*"
+    sudo ${DSCL} localhost -create /Local/Default/Groups/shieldnetdefend
+    check_errm "Error creating group shieldnetdefend" "67"
+    sudo ${DSCL} localhost -createprop /Local/Default/Groups/shieldnetdefend PrimaryGroupID ${new_gid}
+    sudo ${DSCL} localhost -createprop /Local/Default/Groups/shieldnetdefend RealName shieldnetdefend
+    sudo ${DSCL} localhost -createprop /Local/Default/Groups/shieldnetdefend RecordName shieldnetdefend
+    sudo ${DSCL} localhost -createprop /Local/Default/Groups/shieldnetdefend RecordType: dsRecTypeStandard:Groups
+    sudo ${DSCL} localhost -createprop /Local/Default/Groups/shieldnetdefend Password "*"
 fi
 
 # Creating the user
 echo "Checking user..."
-if [[ $(dscl . -read /Users/wazuh) ]]
+if [[ $(dscl . -read /Users/shieldnetdefend) ]]
     then
-    echo "wazuh user already exists.";
+    echo "shieldnetdefend user already exists.";
 else
-    sudo ${DSCL} localhost -create /Local/Default/Users/wazuh
-    check_errm "Error creating user wazuh" "77"
-    sudo ${DSCL} localhost -createprop /Local/Default/Users/wazuh RecordName wazuh
-    sudo ${DSCL} localhost -createprop /Local/Default/Users/wazuh RealName wazuh
-    sudo ${DSCL} localhost -createprop /Local/Default/Users/wazuh UserShell /usr/bin/false
-    sudo ${DSCL} localhost -createprop /Local/Default/Users/wazuh NFSHomeDirectory /var/wazuh
-    sudo ${DSCL} localhost -createprop /Local/Default/Users/wazuh UniqueID ${new_uid}
-    sudo ${DSCL} localhost -createprop /Local/Default/Users/wazuh PrimaryGroupID ${new_gid}
-    sudo ${DSCL} localhost -append /Local/Default/Groups/wazuh GroupMembership wazuh
-    sudo ${DSCL} localhost -createprop /Local/Default/Users/wazuh Password "*"
+    sudo ${DSCL} localhost -create /Local/Default/Users/shieldnetdefend
+    check_errm "Error creating user shieldnetdefend" "77"
+    sudo ${DSCL} localhost -createprop /Local/Default/Users/shieldnetdefend RecordName shieldnetdefend
+    sudo ${DSCL} localhost -createprop /Local/Default/Users/shieldnetdefend RealName shieldnetdefend
+    sudo ${DSCL} localhost -createprop /Local/Default/Users/shieldnetdefend UserShell /usr/bin/false
+    sudo ${DSCL} localhost -createprop /Local/Default/Users/shieldnetdefend NFSHomeDirectory /var/shieldnetdefend
+    sudo ${DSCL} localhost -createprop /Local/Default/Users/shieldnetdefend UniqueID ${new_uid}
+    sudo ${DSCL} localhost -createprop /Local/Default/Users/shieldnetdefend PrimaryGroupID ${new_gid}
+    sudo ${DSCL} localhost -append /Local/Default/Groups/shieldnetdefend GroupMembership shieldnetdefend
+    sudo ${DSCL} localhost -createprop /Local/Default/Users/shieldnetdefend Password "*"
 fi
 
 #Hide the fixed users
-echo "Hiding the fixed wazuh user"
-dscl . create /Users/wazuh IsHidden 1
+echo "Hiding the fixed shieldnetdefend user"
+dscl . create /Users/shieldnetdefend IsHidden 1

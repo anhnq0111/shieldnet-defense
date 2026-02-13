@@ -1,65 +1,65 @@
 services:
-    wazuh-base:
+    shieldnet-defend-base:
         build:
-            context: ./wazuh-base
+            context: ./shieldnet-defend-base
             args:
-                WAZUH_BRANCH: ${WAZUH_BRANCH}
-        image: dev-wazuh-base
+                SHIELDNET_DEFEND_BRANCH: ${SHIELDNET_DEFEND_BRANCH}
+        image: dev-shieldnet-defend-base
 
-    wazuh-master:
+    shieldnet-defend-master:
         build:
-            context: ./wazuh-manager
+            context: ./shieldnet-defend-manager
             target: server
-        image: dev-wazuh-manager
-        hostname: wazuh-master
+        image: dev-shieldnet-defend-manager
+        hostname: shieldnet-defend-master
         volumes:
-            - ${WAZUH_LOCAL_PATH}/framework/scripts:/var/ossec/framework/scripts
-            - ${WAZUH_LOCAL_PATH}/api/scripts:/var/ossec/api/scripts
-            - ${WAZUH_LOCAL_PATH}/framework/wazuh:/var/ossec/framework/python/lib/python${WAZUH_PYTHON_VERSION}/site-packages/wazuh
-            - ${WAZUH_LOCAL_PATH}/api/api:/var/ossec/framework/python/lib/python${WAZUH_PYTHON_VERSION}/site-packages/api
+            - ${SHIELDNET_DEFEND_LOCAL_PATH}/framework/scripts:/var/ossec/framework/scripts
+            - ${SHIELDNET_DEFEND_LOCAL_PATH}/api/scripts:/var/ossec/api/scripts
+            - ${SHIELDNET_DEFEND_LOCAL_PATH}/framework/shieldnetdefend:/var/ossec/framework/python/lib/python${SHIELDNET_DEFEND_PYTHON_VERSION}/site-packages/shieldnetdefend
+            - ${SHIELDNET_DEFEND_LOCAL_PATH}/api/api:/var/ossec/framework/python/lib/python${SHIELDNET_DEFEND_PYTHON_VERSION}/site-packages/api
         ports:
             - "55050:55000"
         entrypoint:
             - /scripts/entrypoint.sh
-            - wazuh-master
+            - shieldnet-defend-master
             - master-node
             - master
         depends_on:
-            - wazuh-base
+            - shieldnet-defend-base
 
-    wazuh-worker1:
-        image: dev-wazuh-manager
-        hostname: wazuh-worker1
+    shieldnet-defend-worker1:
+        image: dev-shieldnet-defend-manager
+        hostname: shieldnet-defend-worker1
         volumes:
-            - ${WAZUH_LOCAL_PATH}/framework/scripts:/var/ossec/framework/scripts
-            - ${WAZUH_LOCAL_PATH}/api/scripts:/var/ossec/api/scripts
-            - ${WAZUH_LOCAL_PATH}/framework/wazuh:/var/ossec/framework/python/lib/python${WAZUH_PYTHON_VERSION}/site-packages/wazuh
-            - ${WAZUH_LOCAL_PATH}/api/api:/var/ossec/framework/python/lib/python${WAZUH_PYTHON_VERSION}/site-packages/api
+            - ${SHIELDNET_DEFEND_LOCAL_PATH}/framework/scripts:/var/ossec/framework/scripts
+            - ${SHIELDNET_DEFEND_LOCAL_PATH}/api/scripts:/var/ossec/api/scripts
+            - ${SHIELDNET_DEFEND_LOCAL_PATH}/framework/shieldnetdefend:/var/ossec/framework/python/lib/python${SHIELDNET_DEFEND_PYTHON_VERSION}/site-packages/shieldnetdefend
+            - ${SHIELDNET_DEFEND_LOCAL_PATH}/api/api:/var/ossec/framework/python/lib/python${SHIELDNET_DEFEND_PYTHON_VERSION}/site-packages/api
         depends_on:
-            - wazuh-master
+            - shieldnet-defend-master
         ports:
             - "55051:55000"
         entrypoint:
             - /scripts/entrypoint.sh
-            - wazuh-master
+            - shieldnet-defend-master
             - worker1
             - worker
 
-    wazuh-worker2:
-        image: dev-wazuh-manager
-        hostname: wazuh-worker2
+    shieldnet-defend-worker2:
+        image: dev-shieldnet-defend-manager
+        hostname: shieldnet-defend-worker2
         volumes:
-            - ${WAZUH_LOCAL_PATH}/framework/scripts:/var/ossec/framework/scripts
-            - ${WAZUH_LOCAL_PATH}/api/scripts:/var/ossec/api/scripts
-            - ${WAZUH_LOCAL_PATH}/framework/wazuh:/var/ossec/framework/python/lib/python${WAZUH_PYTHON_VERSION}/site-packages/wazuh
-            - ${WAZUH_LOCAL_PATH}/api/api:/var/ossec/framework/python/lib/python${WAZUH_PYTHON_VERSION}/site-packages/api
+            - ${SHIELDNET_DEFEND_LOCAL_PATH}/framework/scripts:/var/ossec/framework/scripts
+            - ${SHIELDNET_DEFEND_LOCAL_PATH}/api/scripts:/var/ossec/api/scripts
+            - ${SHIELDNET_DEFEND_LOCAL_PATH}/framework/shieldnetdefend:/var/ossec/framework/python/lib/python${SHIELDNET_DEFEND_PYTHON_VERSION}/site-packages/shieldnetdefend
+            - ${SHIELDNET_DEFEND_LOCAL_PATH}/api/api:/var/ossec/framework/python/lib/python${SHIELDNET_DEFEND_PYTHON_VERSION}/site-packages/api
         depends_on:
-            - wazuh-master
+            - shieldnet-defend-master
         ports:
             - "55052:55000"
         entrypoint:
             - /scripts/entrypoint.sh
-            - wazuh-master
+            - shieldnet-defend-master
             - worker2
             - worker
 
@@ -71,20 +71,20 @@ services:
         entrypoint:
             - /scripts/entrypoint.sh
         depends_on:
-            - wazuh-master
-            - wazuh-worker1
-            - wazuh-worker2
+            - shieldnet-defend-master
+            - shieldnet-defend-worker1
+            - shieldnet-defend-worker2
 
-    wazuh-agent:
+    shieldnet-defend-agent:
         build:
-            context: ./wazuh-agent
-        image: dev-wazuh-agent
+            context: ./shieldnet-defend-agent
+        image: dev-shieldnet-defend-agent
         entrypoint:
             - /scripts/entrypoint.sh
             - nginx-lb
-            - ${WAZUH_VERSION}
+            - ${SHIELDNET_DEFEND_VERSION}
         depends_on:
-            - wazuh-master
-            - wazuh-worker1
-            - wazuh-worker2
+            - shieldnet-defend-master
+            - shieldnet-defend-worker1
+            - shieldnet-defend-worker2
             - nginx-lb

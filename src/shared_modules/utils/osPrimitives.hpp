@@ -1,6 +1,6 @@
 /*
- * Wazuh - OS primitives
- * Copyright (C) 2015, Wazuh Inc.
+ * ShieldnetDefend - OS primitives
+ * Copyright (C) 2015, ShieldnetDefend Inc.
  * May 1, 2023.
  *
  * This program is free software; you can redistribute it

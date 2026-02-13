@@ -24,7 +24,7 @@ The following sections present representative examples of the supported modules 
       "version": "10.0.17763.7136"
     }
   },
-  "wazuh": {
+  "shieldnetdefend": {
     "schema": {
       "version": "1.0"
     }
@@ -54,7 +54,7 @@ The following sections present representative examples of the supported modules 
       "version": "9"
     }
   },
-  "wazuh": {
+  "shieldnetdefend": {
     "schema": {
       "version": "1.0"
     }
@@ -82,7 +82,7 @@ The following sections present representative examples of the supported modules 
     "vendor": "Microsoft Corporation",
     "version": "16.0.4849.1000"
   },
-  "wazuh": {
+  "shieldnetdefend": {
     "schema": {
       "version": "1.0"
     }
@@ -109,7 +109,7 @@ The following sections present representative examples of the supported modules 
     "vendor": "CentOS",
     "version": "1.7.3-10.el9"
   },
-  "wazuh": {
+  "shieldnetdefend": {
     "schema": {
       "version": "1.0"
     }
@@ -129,15 +129,15 @@ The following sections present representative examples of the supported modules 
   },
   "process": {
     "args_count": 0,
-    "command_line": "C:/Program Files (x86)/ossec-agent/wazuh-agent.exe",
-    "name": "wazuh-agent.exe",
+    "command_line": "C:/Program Files (x86)/ossec-agent/shieldnet-defend-agent.exe",
+    "name": "shieldnet-defend-agent.exe",
     "parent": {
       "pid": 656
     },
     "pid": 7360,
     "start": "2025-04-15T16:01:12.000Z"
   },
-  "wazuh": {
+  "shieldnetdefend": {
     "schema": {
       "version": "1.0"
     }
@@ -155,15 +155,15 @@ The following sections present representative examples of the supported modules 
   },
   "process": {
     "args_count": 0,
-    "command_line": "/var/ossec/bin/wazuh-modulesd",
-    "name": "wazuh-modulesd",
+    "command_line": "/var/ossec/bin/shieldnet-defend-modulesd",
+    "name": "shieldnet-defend-modulesd",
     "parent": {
       "pid": 1
     },
     "pid": 6310,
     "start": "2025-04-15T16:01:02.000Z"
   },
-  "wazuh": {
+  "shieldnetdefend": {
     "schema": {
       "version": "1.0"
     }
@@ -212,7 +212,7 @@ The following sections present representative examples of the supported modules 
     "ip": "::",
     "port": 49667
   },
-  "wazuh": {
+  "shieldnetdefend": {
     "schema": {
       "version": "1.0"
     }
@@ -256,7 +256,7 @@ The following sections present representative examples of the supported modules 
     "ip": "10.0.2.15",
     "port": 68
   },
-  "wazuh": {
+  "shieldnetdefend": {
     "schema": {
       "version": "1.0"
     }
@@ -289,7 +289,7 @@ The following sections present representative examples of the supported modules 
   "observer": {
     "serial_number": "0"
   },
-  "wazuh": {
+  "shieldnetdefend": {
     "schema": {
       "version": "1.0"
     }
@@ -320,7 +320,7 @@ The following sections present representative examples of the supported modules 
   "observer": {
     "serial_number": "0"
   },
-  "wazuh": {
+  "shieldnetdefend": {
     "schema": {
       "version": "1.0"
     }
@@ -343,7 +343,7 @@ The following sections present representative examples of the supported modules 
       "name": "KB5055519"
     }
   },
-  "wazuh": {
+  "shieldnetdefend": {
     "schema": {
       "version": "1.0"
     }
@@ -402,7 +402,7 @@ The following sections present representative examples of the supported modules 
       }
     }
   },
-  "wazuh": {
+  "shieldnetdefend": {
     "schema": {
       "version": "1.0"
     }
@@ -427,7 +427,7 @@ The following sections present representative examples of the supported modules 
     "netmask": "255.255.255.0",
     "protocol": "IPv4"
   },
-  "wazuh": {
+  "shieldnetdefend": {
     "schema": {
       "version": "1.0"
     }
@@ -450,7 +450,7 @@ The following sections present representative examples of the supported modules 
     "netmask": "255.255.255.0",
     "protocol": "IPv4"
   },
-  "wazuh": {
+  "shieldnetdefend": {
     "schema": {
       "version": "1.0"
     }
@@ -496,7 +496,7 @@ The following sections present representative examples of the supported modules 
       }
     }
   },
-  "wazuh": {
+  "shieldnetdefend": {
     "schema": {
       "version": "1.0"
     }
@@ -539,7 +539,7 @@ The following sections present representative examples of the supported modules 
       }
     }
   },
-  "wazuh": {
+  "shieldnetdefend": {
     "schema": {
       "version": "1.0"
     }

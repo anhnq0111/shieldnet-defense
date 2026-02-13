@@ -1,6 +1,6 @@
 /*
- * Wazuh Syscheck
- * Copyright (C) 2015, Wazuh Inc.
+ * ShieldnetDefend Syscheck
+ * Copyright (C) 2015, ShieldnetDefend Inc.
  * September 6, 2021.
  *
  * This program is free software; you can redistribute it

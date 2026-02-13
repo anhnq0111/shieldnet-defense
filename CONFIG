@@ -1,13 +1,13 @@
-WAZUH
-Copyright (C) 2015, Wazuh Inc.
+SHIELDNETDEFEND
+Copyright (C) 2015, ShieldnetDefend Inc.
 
 Based on OSSEC
 Copyright (C) 2014 Trend Micro Inc.
 
 
-= Information about Wazuh =
+= Information about ShieldnetDefend =
 
-Visit https://www.wazuh.com
+Visit https://www.shieldnetdefend.com
 
 
 = Recommended Installation =
@@ -15,8 +15,8 @@ Visit https://www.wazuh.com
 See INSTALL
 
 
-== Configuring Wazuh ==
+== Configuring ShieldnetDefend ==
 
 Just follow the steps from the install.sh script.
 More information at
-https://documentation.wazuh.com
+https://documentation.shieldnetdefend.com

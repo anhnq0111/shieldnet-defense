@@ -1,6 +1,6 @@
 /*
- * Wazuh - Content Merge Tool
- * Copyright (C) 2015, Wazuh Inc.
+ * ShieldnetDefend - Content Merge Tool
+ * Copyright (C) 2015, ShieldnetDefend Inc.
  * January 10, 2023.
  *
  */

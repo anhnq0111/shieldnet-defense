@@ -1,6 +1,6 @@
 /*
- * Wazuh router - RemoteSubscriptionManager tests
- * Copyright (C) 2015, Wazuh Inc.
+ * ShieldnetDefend router - RemoteSubscriptionManager tests
+ * Copyright (C) 2015, ShieldnetDefend Inc.
  * December 19, 2023.
  *
  * This program is free software; you can redistribute it

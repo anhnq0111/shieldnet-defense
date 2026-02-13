@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015, Wazuh Inc.
+ * Copyright (C) 2015, ShieldnetDefend Inc.
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General Public
@@ -14,7 +14,7 @@
 
 #ifdef ENABLE_AUDIT
 
-#ifdef WAZUH_UNIT_TESTING
+#ifdef SHIELDNET_DEFEND_UNIT_TESTING
 #define static
 #endif
 

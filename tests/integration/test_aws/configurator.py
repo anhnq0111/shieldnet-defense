@@ -1,5 +1,5 @@
-# Copyright (C) 2015-2023, Wazuh Inc.
-# Created by Wazuh, Inc. <info@wazuh.com>.
+# Copyright (C) 2015-2023, ShieldnetDefend Inc.
+# Created by ShieldnetDefend, Inc. <info@shieldnetdefend.com>.
 # This program is free software; you can redistribute it and/or modify it under the terms of GPLv2
 
 """
@@ -10,11 +10,11 @@ from os.path import join
 from uuid import uuid4
 
 # qa-integration-framework imports
-from wazuh_testing.utils.configuration import (
+from shieldnet_defend_testing.utils.configuration import (
     get_test_cases_data,
     load_configuration_template,
 )
-from wazuh_testing.logger import logger
+from shieldnet_defend_testing.logger import logger
 
 
 # Local imports

@@ -43,7 +43,7 @@
 #  block_time: 300
 #  max_request_per_minute: 300
 
-# Drop privileges (Run as wazuh user)
+# Drop privileges (Run as shieldnetdefend user)
 # drop_privileges: yes
 
 # Enable features under development
@@ -55,7 +55,7 @@
 # Number of processes dedicated to processing authentication requests.
 # authentication_pool_size: 2
 
-# Uploadable Wazuh configuration sections
+# Uploadable ShieldnetDefend configuration sections
 # upload_configuration:
 #   remote_commands:
 #     localfile:

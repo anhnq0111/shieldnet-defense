@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.12.4)
 
-project(Wazuh)
+project(ShieldnetDefend)
 
 enable_testing()
 
@@ -98,8 +98,8 @@ if("${VERSION_FILE}" STREQUAL "")
 endif("${VERSION_FILE}" STREQUAL "")
 
 message("==============================================")
-message("Wazuh version: ${VERSION_FILE}")
-message("Wazuh revision: ${REVISION_FILE}")
+message("ShieldnetDefend version: ${VERSION_FILE}")
+message("ShieldnetDefend revision: ${REVISION_FILE}")
 message("==============================================")
 
 set(BENCHMARK_ENABLE_TESTING "OFF")
@@ -136,9 +136,9 @@ add_subdirectory(shared_modules/utils)
 add_subdirectory(shared_modules/router)
 add_subdirectory(shared_modules/content_manager)
 
-set(CURL_DEP wazuhext)
+set(CURL_DEP shieldnetdefendext)
 add_subdirectory(shared_modules/http-request)
 add_subdirectory(shared_modules/indexer_connector)
-add_subdirectory(wazuh_modules/vulnerability_scanner)
+add_subdirectory(shieldnet_defend_modules/vulnerability_scanner)
 add_subdirectory(shared_modules/keystore)
-add_subdirectory(wazuh_modules/inventory_harvester)
+add_subdirectory(shieldnet_defend_modules/inventory_harvester)

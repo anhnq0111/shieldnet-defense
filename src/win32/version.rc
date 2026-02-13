@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015, Wazuh Inc.
+ * Copyright (C) 2015, ShieldnetDefend Inc.
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General Public
@@ -43,13 +43,13 @@ BEGIN
 	BEGIN
 		BLOCK "040904b0"
         BEGIN
-		VALUE "CompanyName",        "Wazuh Inc."
-		VALUE "FileDescription",    "Wazuh Agent"
+		VALUE "CompanyName",        "ShieldnetDefend Inc."
+		VALUE "FileDescription",    "ShieldnetDefend Agent"
 		VALUE "FileVersion",        QUOTE(VER_PRODUCTVERSION_STR)
-		VALUE "LegalCopyright",     "Copyright (C) Wazuh, Inc."
-		VALUE "ProductName",        "Wazuh Windows Agent"
+		VALUE "LegalCopyright",     "Copyright (C) ShieldnetDefend, Inc."
+		VALUE "ProductName",        "ShieldnetDefend Windows Agent"
 		VALUE "ProductVersion",     QUOTE(VER_PRODUCTVERSION_STR)
-         VALUE "Info",               "https://www.wazuh.com"
+         VALUE "Info",               "https://www.shieldnetdefend.com"
          VALUE "License",            "GPLv2"
         END
 	END

@@ -2,9 +2,9 @@
 
 The **Inventory Harvester** does not provide any dedicated configuration options to change its behavior, although the way it operates relies on the settings from the indexer connector and the modules from which it processes events.
 
-## Connection to Wazuh Indexer
+## Connection to ShieldnetDefend Indexer
 
-As mentioned above, the Inventory Harvester module needs to connect to the Wazuh Indexer through the Indexer Connector module.
+As mentioned above, the Inventory Harvester module needs to connect to the ShieldnetDefend Indexer through the Indexer Connector module.
 
 - Default Indexer Connector configuration block
 ```xml
@@ -23,12 +23,12 @@ As mentioned above, the Inventory Harvester module needs to connect to the Wazuh
   </indexer>
 ```
 
-It is important to verify the status of the Wazuh Indexer **GET /_cluster/health**
+It is important to verify the status of the ShieldnetDefend Indexer **GET /_cluster/health**
 
 - e.g. Response
 ```json
 {
-  "cluster_name": "wazuh-cluster",
+  "cluster_name": "shieldnet-defend-cluster",
   "status": "green",
   "timed_out": false,
   "number_of_nodes": 1,

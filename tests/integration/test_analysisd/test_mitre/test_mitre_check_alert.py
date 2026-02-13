@@ -1,15 +1,15 @@
 '''
-copyright: Copyright (C) 2015-2024, Wazuh Inc.
+copyright: Copyright (C) 2015-2024, ShieldnetDefend Inc.
 
-           Created by Wazuh, Inc. <info@wazuh.com>.
+           Created by ShieldnetDefend, Inc. <info@shieldnetdefend.com>.
 
            This program is free software; you can redistribute it and/or modify it under the terms of GPLv2
 
 type: integration
 
-brief: The 'wazuh-analysisd' daemon receives the log messages and compares them to the rules.
+brief: The 'shieldnet-defend-analysisd' daemon receives the log messages and compares them to the rules.
        It then creates an alert when a log message matches an applicable rule.
-       Specifically, these tests will check if the 'wazuh-analysisd' daemon generates alerts
+       Specifically, these tests will check if the 'shieldnet-defend-analysisd' daemon generates alerts
        using custom rules that contains the 'mitre' field to enrich those alerts with
        MITREs IDs, techniques and tactics.
 
@@ -22,8 +22,8 @@ targets:
     - manager
 
 daemons:
-    - wazuh-analysisd
-    - wazuh-db
+    - shieldnet-defend-analysisd
+    - shieldnet-defend-db
 
 os_platform:
     - linux
@@ -40,7 +40,7 @@ os_version:
     - Ubuntu Bionic
 
 references:
-    - https://documentation.wazuh.com/current/user-manual/reference/daemons/wazuh-analysisd.html
+    - https://documentation.shieldnetdefend.com/current/user-manual/reference/daemons/shieldnet-defend-analysisd.html
     - https://attack.mitre.org/
 
 tags:
@@ -52,10 +52,10 @@ import json
 import jsonschema
 import pytest
 
-from wazuh_testing.constants.paths.logs import ALERTS_JSON_PATH
-from wazuh_testing.modules.analysisd import patterns, utils
-from wazuh_testing.tools.monitors import file_monitor
-from wazuh_testing.utils import callbacks
+from shieldnet_defend_testing.constants.paths.logs import ALERTS_JSON_PATH
+from shieldnet_defend_testing.modules.analysisd import patterns, utils
+from shieldnet_defend_testing.tools.monitors import file_monitor
+from shieldnet_defend_testing.utils import callbacks
 
 from . import RULES_SAMPLE_PATH
 
@@ -84,7 +84,7 @@ def test_mitre_check_alert(test_configuration, truncate_monitored_files, configu
                  so that the alerts generated include this information which
                  will be finally validated.
 
-    wazuh_min_version: 4.2.0
+    shieldnet_defend_min_version: 4.2.0
 
     tier: 0
 
@@ -100,7 +100,7 @@ def test_mitre_check_alert(test_configuration, truncate_monitored_files, configu
             brief: Configure a custom rule in 'local_rules.xml' for testing.
         - daemons_handler:
             type: fixture
-            brief: Handler of Wazuh daemons.
+            brief: Handler of ShieldnetDefend daemons.
 
     assertions:
         - Verify that the MITRE alerts are generated and are correct.
@@ -117,13 +117,13 @@ def test_mitre_check_alert(test_configuration, truncate_monitored_files, configu
         - man_in_the_middle
         - wdb_socket
     '''
-    wazuh_alert_monitor = file_monitor.FileMonitor(ALERTS_JSON_PATH)
+    shieldnet_defend_alert_monitor = file_monitor.FileMonitor(ALERTS_JSON_PATH)
 
     # Wait until Mitre's event is detected
     if test_configuration not in invalid_configurations:
-        wazuh_alert_monitor.start(timeout=30, callback=callbacks.generate_callback(patterns.ANALYSISD_ALERT_STARTED))
-        utils.validate_mitre_event(json.loads(wazuh_alert_monitor.callback_result))
+        shieldnet_defend_alert_monitor.start(timeout=30, callback=callbacks.generate_callback(patterns.ANALYSISD_ALERT_STARTED))
+        utils.validate_mitre_event(json.loads(shieldnet_defend_alert_monitor.callback_result))
     else:
         with pytest.raises(jsonschema.exceptions.ValidationError):
-            wazuh_alert_monitor.start(timeout=30, callback=callbacks.generate_callback(patterns.ANALYSISD_ALERT_STARTED))
-            utils.validate_mitre_event(json.loads(wazuh_alert_monitor.callback_result))
+            shieldnet_defend_alert_monitor.start(timeout=30, callback=callbacks.generate_callback(patterns.ANALYSISD_ALERT_STARTED))
+            utils.validate_mitre_event(json.loads(shieldnet_defend_alert_monitor.callback_result))

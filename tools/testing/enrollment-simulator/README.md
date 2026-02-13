@@ -1,15 +1,15 @@
 # Enrollment Simulator
 
-A performance testing tool for the Wazuh authentication daemon (`wazuh-authd`). This simulator generates concurrent SSL connections to test agent enrollment scenarios under various load conditions.
+A performance testing tool for the ShieldnetDefend authentication daemon (`shieldnet-defend-authd`). This simulator generates concurrent SSL connections to test agent enrollment scenarios under various load conditions.
 
 ## Overview
 
-The enrollment simulator creates multiple threads that simultaneously attempt to register agents with the Wazuh authentication daemon. It supports various agent configurations and provides detailed performance statistics including response times, success rates, and throughput metrics.
+The enrollment simulator creates multiple threads that simultaneously attempt to register agents with the ShieldnetDefend authentication daemon. It supports various agent configurations and provides detailed performance statistics including response times, success rates, and throughput metrics.
 
 ## Features
 
 - **Multi-threaded simulation** with configurable thread count
-- **SSL/TLS connections** to wazuh-authd
+- **SSL/TLS connections** to shieldnet-defend-authd
 - **Configurable agent scenarios**:
   - New vs. repeated agent registrations
   - Correct vs. incorrect passwords
@@ -54,8 +54,8 @@ The executable `enrollment-simulator` will be created in the `build/` directory.
 
 | Option | Description | Default |
 |--------|-------------|---------|
-| `--host HOST` | Target Wazuh server hostname or IP | localhost |
-| `--port PORT` | Target port for wazuh-authd | 1515 |
+| `--host HOST` | Target ShieldnetDefend server hostname or IP | localhost |
+| `--port PORT` | Target port for shieldnet-defend-authd | 1515 |
 | `--password PASS` | Correct authentication password | topsecret |
 | `--threads N` | Number of concurrent threads | 4 |
 | `--total N` | Total number of registrations to perform | 10000 |
@@ -165,12 +165,12 @@ When using `--csv-file`, detailed metrics are exported including:
 ## Troubleshooting
 
 ### SSL Connection Issues
-- Ensure wazuh-authd is running and accepting SSL connections
+- Ensure shieldnet-defend-authd is running and accepting SSL connections
 - Check firewall settings for the target port
 - Verify SSL certificate configuration (simulator uses `SSL_VERIFY_NONE` for testing)
 
 ### High Error Rates
-- Check wazuh-authd logs for error details
+- Check shieldnet-defend-authd logs for error details
 - Verify the correct password is configured
 - Ensure sufficient system resources on both client and server
 
@@ -181,4 +181,4 @@ When using `--csv-file`, detailed metrics are exported including:
 
 ## License
 
-This tool is part of the Wazuh project and follows the same licensing terms.
+This tool is part of the ShieldnetDefend project and follows the same licensing terms.

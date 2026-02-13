@@ -1,15 +1,15 @@
 '''
-copyright: Copyright (C) 2015-2024, Wazuh Inc.
+copyright: Copyright (C) 2015-2024, ShieldnetDefend Inc.
 
-           Created by Wazuh, Inc. <info@wazuh.com>.
+           Created by ShieldnetDefend, Inc. <info@shieldnetdefend.com>.
 
            This program is free software; you can redistribute it and/or modify it under the terms of GPLv2
 
 type: integration
 
-brief: These tests will check if the 'wazuh-authd' daemon correctly handles the enrollment requests
-       from agents with pre-existing IP addresses or names. The 'wazuh-authd' daemon can automatically
-       add a Wazuh agent to a Wazuh manager and provide the key to the agent. It is used along with
+brief: These tests will check if the 'shieldnet-defend-authd' daemon correctly handles the enrollment requests
+       from agents with pre-existing IP addresses or names. The 'shieldnet-defend-authd' daemon can automatically
+       add a ShieldnetDefend agent to a ShieldnetDefend manager and provide the key to the agent. It is used along with
        the 'agent-auth' application.
 
 components:
@@ -19,9 +19,9 @@ targets:
     - manager
 
 daemons:
-    - wazuh-authd
-    - wazuh-db
-    - wazuh-modulesd
+    - shieldnet-defend-authd
+    - shieldnet-defend-db
+    - shieldnet-defend-modulesd
 
 os_platform:
     - linux
@@ -38,8 +38,8 @@ os_version:
     - Ubuntu Bionic
 
 references:
-    - https://documentation.wazuh.com/current/user-manual/reference/daemons/wazuh-authd.html
-    - https://documentation.wazuh.com/current/user-manual/reference/tools/agent_groups.html
+    - https://documentation.shieldnetdefend.com/current/user-manual/reference/daemons/shieldnet-defend-authd.html
+    - https://documentation.shieldnetdefend.com/current/user-manual/reference/tools/agent_groups.html
 
 tags:
     - enrollment
@@ -48,14 +48,14 @@ from pathlib import Path
 
 import pytest
 import time
-from wazuh_testing.constants.paths.sockets import AUTHD_SOCKET_PATH
-from wazuh_testing.constants.ports import DEFAULT_SSL_REMOTE_ENROLLMENT_PORT
-from wazuh_testing.utils.agent_groups import check_agent_groups
-from wazuh_testing.utils.db_queries.global_db import delete_agent
-from wazuh_testing.utils.client_keys import check_client_keys
+from shieldnet_defend_testing.constants.paths.sockets import AUTHD_SOCKET_PATH
+from shieldnet_defend_testing.constants.ports import DEFAULT_SSL_REMOTE_ENROLLMENT_PORT
+from shieldnet_defend_testing.utils.agent_groups import check_agent_groups
+from shieldnet_defend_testing.utils.db_queries.global_db import delete_agent
+from shieldnet_defend_testing.utils.client_keys import check_client_keys
 
 from . import CONFIGURATIONS_FOLDER_PATH, TEST_CASES_FOLDER_PATH, utils
-from wazuh_testing.utils.configuration import get_test_cases_data, load_configuration_template
+from shieldnet_defend_testing.utils.configuration import get_test_cases_data, load_configuration_template
 
 # Marks
 pytestmark = [pytest.mark.server, pytest.mark.tier(level=0)]
@@ -123,16 +123,16 @@ def register_agent_local_server(receiver_sockets, Name, Group=None, IP=None):
 
 # Tests
 @pytest.mark.parametrize('test_configuration,test_metadata', zip(test_configuration, test_metadata), ids=test_cases_ids)
-def test_ossec_authd_agents_ctx(test_configuration, test_metadata, set_wazuh_configuration, truncate_monitored_files,
+def test_ossec_authd_agents_ctx(test_configuration, test_metadata, set_shieldnet_defend_configuration, truncate_monitored_files,
                                 clean_agents_ctx, daemons_handler, wait_for_authd_startup, connect_to_sockets, set_up_groups):
     '''
     description:
-        Check if when the 'wazuh-authd' daemon receives an enrollment request from an agent
+        Check if when the 'shieldnet-defend-authd' daemon receives an enrollment request from an agent
         that has an IP address or name that is already registered, 'authd' creates a record
         for the new agent and deletes the old one. In this case, the enrollment requests
         are sent to an IP v4 network socket.
 
-    wazuh_min_version:
+    shieldnet_defend_min_version:
         4.2.0
 
     tier: 0
@@ -144,9 +144,9 @@ def test_ossec_authd_agents_ctx(test_configuration, test_metadata, set_wazuh_con
         - test_metadata:
             type: dict
             brief: Test case metadata.
-        - set_wazuh_configuration:
+        - set_shieldnet_defend_configuration:
             type: fixture
-            brief: Load basic wazuh configuration.
+            brief: Load basic shieldnetdefend configuration.
         - truncate_monitored_files:
             type: fixture
             brief: Truncate all the log files and json alerts files before and after the test execution.
@@ -155,7 +155,7 @@ def test_ossec_authd_agents_ctx(test_configuration, test_metadata, set_wazuh_con
             brief: Clean agents files.
         - daemons_handler:
             type: fixture
-            brief: Handler of Wazuh daemons.
+            brief: Handler of ShieldnetDefend daemons.
         - connect_to_sockets:
             type: fixture
             brief: Module scope version of 'connect_to_sockets' fixture.
@@ -171,11 +171,11 @@ def test_ossec_authd_agents_ctx(test_configuration, test_metadata, set_wazuh_con
         - Verify that agents using an already registered name can successfully enroll.
 
     input_description:
-        Different test cases are contained in an external YAML file (wazuh_conf.yaml)
-        which includes configuration settings for the 'wazuh-authd' daemon.
+        Different test cases are contained in an external YAML file (shieldnet_defend_conf.yaml)
+        which includes configuration settings for the 'shieldnet-defend-authd' daemon.
 
     expected_output:
-        - r'Accepting connections on port 1515' (When the 'wazuh-authd' daemon is ready to accept enrollments)
+        - r'Accepting connections on port 1515' (When the 'shieldnet-defend-authd' daemon is ready to accept enrollments)
         - r'OSSEC K:' (When the agent has enrolled in the manager)
     tags:
         - keys

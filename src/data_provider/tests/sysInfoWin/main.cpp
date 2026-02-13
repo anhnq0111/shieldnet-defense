@@ -1,6 +1,6 @@
 /*
- * Wazuh SysInfo
- * Copyright (C) 2015, Wazuh Inc.
+ * ShieldnetDefend SysInfo
+ * Copyright (C) 2015, ShieldnetDefend Inc.
  * February 25, 2021.
  *
  * This program is free software; you can redistribute it

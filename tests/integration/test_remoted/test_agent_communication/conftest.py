@@ -1,23 +1,23 @@
 """
- Copyright (C) 2015-2043, Wazuh Inc.
- Created by Wazuh, Inc. <info@wazuh.com>.
+ Copyright (C) 2015-2043, ShieldnetDefend Inc.
+ Created by ShieldnetDefend, Inc. <info@shieldnetdefend.com>.
  This program is free software; you can redistribute it and/or modify it under the terms of GPLv2
 """
 
 import pytest
 import time
-from wazuh_testing.tools.thread_executor import ThreadExecutor
+from shieldnet_defend_testing.tools.thread_executor import ThreadExecutor
 
-from wazuh_testing.constants.paths.logs import WAZUH_LOG_PATH
-from wazuh_testing.modules.analysisd.patterns import ANALYSISD_STARTED
-from wazuh_testing.utils import callbacks
-from wazuh_testing.tools.monitors import file_monitor
-from wazuh_testing.tools.simulators.agent_simulator import connect
+from shieldnet_defend_testing.constants.paths.logs import SHIELDNET_DEFEND_LOG_PATH
+from shieldnet_defend_testing.modules.analysisd.patterns import ANALYSISD_STARTED
+from shieldnet_defend_testing.utils import callbacks
+from shieldnet_defend_testing.tools.monitors import file_monitor
+from shieldnet_defend_testing.tools.simulators.agent_simulator import connect
 
 @pytest.fixture(scope='module')
 def waiting_for_analysisd_startup(request):
     """Wait until analysisd has begun and alerts.json is created."""
-    log_monitor = file_monitor.FileMonitor(WAZUH_LOG_PATH)
+    log_monitor = file_monitor.FileMonitor(SHIELDNET_DEFEND_LOG_PATH)
     log_monitor.start(callback=callbacks.generate_callback(ANALYSISD_STARTED))
 
 

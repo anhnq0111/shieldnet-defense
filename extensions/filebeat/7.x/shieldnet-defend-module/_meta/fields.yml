@@ -1,0 +1,9 @@
+- key: shieldnetdefend
+  title: "shieldnetdefend"
+  description: >
+    shieldnetdefend Module
+  fields:
+    - name: shieldnetdefend
+      type: group
+      description: >
+      fields:

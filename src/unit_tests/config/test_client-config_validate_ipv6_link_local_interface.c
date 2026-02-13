@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015, Wazuh Inc.
+ * Copyright (C) 2015, ShieldnetDefend Inc.
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General Public
@@ -14,8 +14,8 @@
 #include <stdio.h>
 
 #include "../../config/client-config.h"
-#include "../wrappers/wazuh/shared/debug_op_wrappers.h"
-#include "../wrappers/wazuh/os_net/os_net_wrappers.h"
+#include "../wrappers/shieldnetdefend/shared/debug_op_wrappers.h"
+#include "../wrappers/shieldnetdefend/os_net/os_net_wrappers.h"
 
 /* tests */
 

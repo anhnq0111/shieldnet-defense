@@ -1,6 +1,6 @@
 /*
- * Wazuh content manager.
- * Copyright (C) 2015, Wazuh Inc.
+ * ShieldnetDefend content manager.
+ * Copyright (C) 2015, ShieldnetDefend Inc.
  * May 1, 2023.
  *
  * This program is free software; you can redistribute it

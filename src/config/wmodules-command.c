@@ -1,6 +1,6 @@
 /*
- * Wazuh Module Configuration
- * Copyright (C) 2015, Wazuh Inc.
+ * ShieldnetDefend Module Configuration
+ * Copyright (C) 2015, ShieldnetDefend Inc.
  * October 26, 2017.
  *
  * This program is free software; you can redistribute it
@@ -9,7 +9,7 @@
  * Foundation.
  */
 
-#include "wazuh_modules/wmodules.h"
+#include "shieldnet_defend_modules/wmodules.h"
 
 static const char *XML_DISABLED = "disabled";
 static const char *XML_TAG = "tag";

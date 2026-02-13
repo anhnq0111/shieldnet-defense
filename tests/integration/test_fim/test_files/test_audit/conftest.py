@@ -1,12 +1,12 @@
-# Copyright (C) 2015-2024, Wazuh Inc.
-# Created by Wazuh, Inc. <info@wazuh.com>.
+# Copyright (C) 2015-2024, ShieldnetDefend Inc.
+# Created by ShieldnetDefend, Inc. <info@shieldnetdefend.com>.
 # This program is free software; you can redistribute it and/or modify it under the terms of GPLv2
 import distro
 import re
 import pytest
 import subprocess
 
-from wazuh_testing.constants.platforms import CENTOS, UBUNTU, DEBIAN
+from shieldnet_defend_testing.constants.platforms import CENTOS, UBUNTU, DEBIAN
 
 @pytest.fixture(scope='module')
 def uninstall_audit():

@@ -1,6 +1,6 @@
 /*
- * Wazuh router
- * Copyright (C) 2015, Wazuh Inc.
+ * ShieldnetDefend router
+ * Copyright (C) 2015, ShieldnetDefend Inc.
  * July 24, 2025.
  *
  * This program is free software; you can redistribute it

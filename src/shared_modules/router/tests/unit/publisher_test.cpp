@@ -1,6 +1,6 @@
 /*
- * Wazuh router - Publisher tests
- * Copyright (C) 2015, Wazuh Inc.
+ * ShieldnetDefend router - Publisher tests
+ * Copyright (C) 2015, ShieldnetDefend Inc.
  * July 17, 2023.
  *
  * This program is free software; you can redistribute it
