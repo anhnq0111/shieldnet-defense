@@ -18,9 +18,9 @@ jobs:
       - id: build-shieldnet
         run: |
           cd packages/macos
-          ./generate_shieldnet_packages.sh -i
-          sudo ./generate_shieldnet_packages.sh -a arm64 -s ~/shieldnet-packages-arm64
-          sudo ./generate_shieldnet_packages.sh -a intel64 -s ~/shieldnet-packages-x86_64
+          ./generate_shieldnet_defend_packages.sh -i
+          sudo ./generate_shieldnet_defend_packages.sh -a arm64 -s ~/shieldnet-packages-arm64
+          sudo ./generate_shieldnet_defend_packages.sh -a intel64 -s ~/shieldnet-packages-x86_64
 
       - name: Upload MacOs packages
         uses: actions/upload-artifact@v4

@@ -69,14 +69,14 @@ jobs:
       - name: Copy MSI generator script
         run: |
           ls ${{ steps.download-compressed-agent.outputs.download-path }}
-          Copy-Item -Path ${{ steps.download-compressed-agent.outputs.download-path }}\shieldnet-local-src\packages\windows\generate_shieldnet_msi.ps1 -Destination ${{ steps.download-compressed-agent.outputs.download-path }}\shieldnet-local-src\src\win32\
+          Copy-Item -Path ${{ steps.download-compressed-agent.outputs.download-path }}\shieldnet-defend-local-src\packages\windows\generate_shieldnet_msi.ps1 -Destination ${{ steps.download-compressed-agent.outputs.download-path }}\shieldnet-local-src\src\win32\
         shell: powershell
 
       - name: Build MSI
         run: |
-          cd ${{ steps.download-compressed-agent.outputs.download-path }}\shieldnet-local-src\src\win32\
-          .\generate_shieldnet_msi.ps1 `
-            -MSI_NAME shieldnet-package.msi `
+          cd ${{ steps.download-compressed-agent.outputs.download-path }}\shieldnet-defend-local-src\src\win32\
+          .\generate_shieldnet_defend_msi.ps1 `
+            -MSI_NAME shieldnet-defend-package.msi `
             -SIGN no `
             -WIX_TOOLS_PATH "C:\Program Files (x86)\WiX Toolset v3.14\bin"
         shell: powershell
@@ -84,5 +84,5 @@ jobs:
       - name: Upload MSI
         uses: actions/upload-artifact@v4
         with:
-          name: shieldnet-package.msi
-          path: ${{ steps.download-compressed-agent.outputs.download-path }}\shieldnet-local-src\src\win32\shieldnet-package.msi
+          name: shieldnet-defend-package.msi
+          path: ${{ steps.download-compressed-agent.outputs.download-path }}\shieldnet-defend-local-src\src\win32\shieldnet-defend-package.msi
