@@ -69,7 +69,7 @@ jobs:
       - name: Copy MSI generator script
         run: |
           ls ${{ steps.download-compressed-agent.outputs.download-path }}
-          Copy-Item -Path ${{ steps.download-compressed-agent.outputs.download-path }}\shieldnet-defend-local-src\packages\windows\generate_shieldnet_defend_msi.ps1 -Destination ${{ steps.download-compressed-agent.outputs.download-path }}\shieldnet-local-src\src\win32\
+          Copy-Item -Path ${{ steps.download-compressed-agent.outputs.download-path }}\shieldnet-defend-local-src\packages\windows\generate_shieldnet_defend_msi.ps1 -Destination ${{ steps.download-compressed-agent.outputs.download-path }}\shieldnet-defend-local-src\src\win32\
         shell: powershell
 
       - name: Build MSI
