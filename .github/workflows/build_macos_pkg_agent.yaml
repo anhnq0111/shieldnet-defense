@@ -1,0 +1,32 @@
+name: ShieldNet MacOs Package Builder
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    tags:
+      - macos-pkg-v*
+
+jobs:
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - id: build-shieldnet
+        run: |
+          echo "White-labeling the package..."
+          ./white-lable.sh
+          echo "Building the package..."
+          cd packages/macos
+          ./generate_shieldnet_packages.sh -i
+          sudo ./generate_shieldnet_packages.sh -a arm64 -s ~/shieldnet-packages-arm64
+          sudo ./generate_shieldnet_packages.sh -a intel64 -s ~/shieldnet-packages-x86_64
+
+      - name: Upload MacOs packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: ShieldNet Packages
+          path: ~/shieldnet-packages*
