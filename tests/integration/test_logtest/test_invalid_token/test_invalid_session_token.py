@@ -1,16 +1,16 @@
 '''
-copyright: Copyright (C) 2015-2024, Wazuh Inc.
+copyright: Copyright (C) 2015-2024, ShieldnetDefend Inc.
 
-           Created by Wazuh, Inc. <info@wazuh.com>.
+           Created by ShieldnetDefend, Inc. <info@shieldnetdefend.com>.
 
            This program is free software; you can redistribute it and/or modify it under the terms of GPLv2
 
 type: integration
 
-brief: The 'wazuh-logtest' tool allows the testing and verification of rules and decoders against provided log examples
-       remotely inside a sandbox in 'wazuh-analysisd'. This functionality is provided by the manager, whose work
+brief: The 'shieldnet-defend-logtest' tool allows the testing and verification of rules and decoders against provided log examples
+       remotely inside a sandbox in 'shieldnet-defend-analysisd'. This functionality is provided by the manager, whose work
        parameters are configured in the ossec.conf file in the XML rule_test section. Test logs can be evaluated through
-       the 'wazuh-logtest' tool or by making requests via RESTful API. These tests will check if the logtest
+       the 'shieldnet-defend-logtest' tool or by making requests via RESTful API. These tests will check if the logtest
        configuration is valid. Also checks rules, decoders, decoders, alerts matching logs correctly.
 
 components:
@@ -22,7 +22,7 @@ targets:
     - manager
 
 daemons:
-    - wazuh-analysisd
+    - shieldnet-defend-analysisd
 
 os_platform:
     - linux
@@ -39,9 +39,9 @@ os_version:
     - Ubuntu Bionic
 
 references:
-    - https://documentation.wazuh.com/current/user-manual/reference/tools/wazuh-logtest.html
-    - https://documentation.wazuh.com/current/user-manual/capabilities/wazuh-logtest/index.html
-    - https://documentation.wazuh.com/current/user-manual/reference/daemons/wazuh-analysisd.html
+    - https://documentation.shieldnetdefend.com/current/user-manual/reference/tools/shieldnet-defend-logtest.html
+    - https://documentation.shieldnetdefend.com/current/user-manual/capabilities/shieldnet-defend-logtest/index.html
+    - https://documentation.shieldnetdefend.com/current/user-manual/reference/daemons/shieldnet-defend-analysisd.html
 
 tags:
     - logtest_configuration
@@ -50,12 +50,12 @@ import json
 from pathlib import Path
 import pytest
 
-from wazuh_testing.constants.paths.sockets import LOGTEST_SOCKET_PATH
-from wazuh_testing.constants.daemons import ANALYSISD_DAEMON, WAZUH_DB_DAEMON
-from wazuh_testing.tools.socket_controller import SocketController
-from wazuh_testing.utils import configuration
-from wazuh_testing.utils.callbacks import generate_callback
-from wazuh_testing.modules.analysisd import patterns
+from shieldnet_defend_testing.constants.paths.sockets import LOGTEST_SOCKET_PATH
+from shieldnet_defend_testing.constants.daemons import ANALYSISD_DAEMON, SHIELDNET_DEFEND_DB_DAEMON
+from shieldnet_defend_testing.tools.socket_controller import SocketController
+from shieldnet_defend_testing.utils import configuration
+from shieldnet_defend_testing.utils.callbacks import generate_callback
+from shieldnet_defend_testing.modules.analysisd import patterns
 
 from . import TEST_CASES_FOLDER_PATH
 
@@ -68,25 +68,25 @@ t_cases_path = Path(TEST_CASES_FOLDER_PATH, 'cases_invalid_session_token.yaml')
 t_config_parameters, t_config_metadata, t_case_ids = configuration.get_test_cases_data(t_cases_path)
 
 # Test daemons to restart.
-daemons_handler_configuration = {'daemons': [ANALYSISD_DAEMON, WAZUH_DB_DAEMON]}
+daemons_handler_configuration = {'daemons': [ANALYSISD_DAEMON, SHIELDNET_DEFEND_DB_DAEMON]}
 
 
 # Tests
 @pytest.mark.parametrize('test_metadata', t_config_metadata, ids=t_case_ids)
 def test_invalid_session_token(test_metadata, daemons_handler_module, wait_for_logtest_startup):
     '''
-    description: Check if `wazuh-logtest` correctly detects and handles errors when using a session token.
+    description: Check if `shieldnet-defend-logtest` correctly detects and handles errors when using a session token.
                  To do this, it sends the inputs through a socket, receives and decodes the message. Then, it checks
                  if any invalid token or session token is not caught.
 
-    wazuh_min_version: 4.2.0
+    shieldnet_defend_min_version: 4.2.0
 
     tier: 0
 
     parameters:
         - daemons_handler_module:
             type: fixture
-            brief: Wazuh logtests daemons handler.
+            brief: ShieldnetDefend logtests daemons handler.
         - wait_for_logtest_startup:
             type: fixture
             brief: Wait until logtest has begun.

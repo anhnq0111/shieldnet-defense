@@ -1,13 +1,13 @@
 '''
-copyright: Copyright (C) 2015-2024, Wazuh Inc.
+copyright: Copyright (C) 2015-2024, ShieldnetDefend Inc.
 
-           Created by Wazuh, Inc. <info@wazuh.com>.
+           Created by ShieldnetDefend, Inc. <info@shieldnetdefend.com>.
 
            This program is free software; you can redistribute it and/or modify it under the terms of GPLv2
 
 type: integration
 
-brief: The 'wazuh-agentd' program is the client-side daemon that communicates with the server.
+brief: The 'shieldnet-defend-agentd' program is the client-side daemon that communicates with the server.
        This tests will check if the server address specified in the configuration is a valid
        address or not.
 
@@ -20,7 +20,7 @@ components:
     - agent
 
 daemons:
-    - wazuh-agentd
+    - shieldnet-defend-agentd
 
 os_platform:
     - linux
@@ -54,7 +54,7 @@ os_version:
     - Windows XP
 
 references:
-    - https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/client.html#address
+    - https://documentation.shieldnetdefend.com/current/user-manual/reference/ossec-conf/client.html#address
 
 tags:
     - agentd
@@ -65,15 +65,15 @@ import pytest
 
 from pathlib import Path
 
-from wazuh_testing.constants.paths.logs import WAZUH_LOG_PATH
-from wazuh_testing.constants.platforms import WINDOWS
-from wazuh_testing.constants.ports import DEFAULT_SSL_REMOTE_ENROLLMENT_PORT
-from wazuh_testing.modules.agentd.configuration import AGENTD_DEBUG, AGENTD_WINDOWS_DEBUG
-from wazuh_testing.modules.agentd.patterns import ENROLLMENT_INVALID_SERVER, ENROLLMENT_RESOLVE_ERROR, ENROLLMENT_CONNECTED
-from wazuh_testing.utils.configuration import get_test_cases_data, load_configuration_template
-from wazuh_testing.tools.monitors.file_monitor import FileMonitor
-from wazuh_testing.utils.callbacks import generate_callback
-from wazuh_testing.utils.network import format_ipv6_long
+from shieldnet_defend_testing.constants.paths.logs import SHIELDNET_DEFEND_LOG_PATH
+from shieldnet_defend_testing.constants.platforms import WINDOWS
+from shieldnet_defend_testing.constants.ports import DEFAULT_SSL_REMOTE_ENROLLMENT_PORT
+from shieldnet_defend_testing.modules.agentd.configuration import AGENTD_DEBUG, AGENTD_WINDOWS_DEBUG
+from shieldnet_defend_testing.modules.agentd.patterns import ENROLLMENT_INVALID_SERVER, ENROLLMENT_RESOLVE_ERROR, ENROLLMENT_CONNECTED
+from shieldnet_defend_testing.utils.configuration import get_test_cases_data, load_configuration_template
+from shieldnet_defend_testing.tools.monitors.file_monitor import FileMonitor
+from shieldnet_defend_testing.utils.callbacks import generate_callback
+from shieldnet_defend_testing.utils.network import format_ipv6_long
 
 from . import CONFIGS_PATH, TEST_CASES_PATH
 
@@ -100,7 +100,7 @@ daemons_handler_configuration = {'all_daemons': True}
 
 # Test function.
 @pytest.mark.parametrize('test_configuration, test_metadata',  zip(test_configuration, test_metadata), ids=cases_ids)
-def test_agentd_server_address_configuration(test_configuration, test_metadata, set_wazuh_configuration, configure_local_internal_options,
+def test_agentd_server_address_configuration(test_configuration, test_metadata, set_shieldnet_defend_configuration, configure_local_internal_options,
                                              truncate_monitored_files, daemons_handler_module, shutdown_agentd,
                                              configure_socket_listener, restart_agentd):
 
@@ -108,7 +108,7 @@ def test_agentd_server_address_configuration(test_configuration, test_metadata, 
     description: Check the messages produced by the agent when introducing
                  a valid and invalid server address, with IPv4 and IPv6
 
-    wazuh_min_version: 4.4.0
+    shieldnet_defend_min_version: 4.4.0
 
     parameters:
         - test_configuration:
@@ -150,7 +150,7 @@ def test_agentd_server_address_configuration(test_configuration, test_metadata, 
     if 'ipv6' in test_metadata:
         final_manager_address = format_ipv6_long(final_manager_address)
 
-    log_monitor = FileMonitor(WAZUH_LOG_PATH)
+    log_monitor = FileMonitor(SHIELDNET_DEFEND_LOG_PATH)
 
     if manager_address == 'MANAGER_IP':
         callback=generate_callback(ENROLLMENT_INVALID_SERVER, {'server_ip': str(test_metadata['server_address'])})

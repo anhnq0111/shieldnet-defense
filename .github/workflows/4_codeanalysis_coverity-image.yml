@@ -8,7 +8,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: wazuh/coverity-scan
+  IMAGE_NAME: shieldnetdefend/coverity-scan
 
 jobs:
   build-and-push-image:
@@ -19,7 +19,7 @@ jobs:
       packages: write
 
     env:
-      PROJECT: wazuh/wazuh
+      PROJECT: shieldnetdefend/shieldnetdefend
 
     steps:
       - uses: actions/checkout@v4
@@ -27,7 +27,7 @@ jobs:
       - name: Download Coverity tarball
         run: |
           wget -q https://scan.coverity.com/download/linux64 \
-            --post-data "token=${{ secrets.COVERITY_SCAN_WAZUH_TOKEN }}&project=${PROJECT//\//%2F}" \
+            --post-data "token=${{ secrets.COVERITY_SCAN_SHIELDNET_DEFEND_TOKEN }}&project=${PROJECT//\//%2F}" \
             -O tools/testing/coverity/coverity_tool.tgz
 
       - name: Log in to the Container registry

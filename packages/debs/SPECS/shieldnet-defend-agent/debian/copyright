@@ -1,0 +1,38 @@
+This work was packaged for Debian by:
+
+    ShieldnetDefend, Inc <info@shieldnetdefend.com> on Wed, 24 Sep 2025 00:00:00 +0000
+
+It was downloaded from:
+
+    https://www.shieldnetdefend.com
+
+Upstream Authors:
+
+    dcid@dcid.me
+    Jia-BingJB_Cheng@trendmicro.com
+    vichargrave@gmail.com
+    ossec@michaelstarks.com
+    ddpbsd@gmail.com
+    scott@atomicorp.com
+    brad.lhotsky@gmail.com
+    jeremy@jeremyrossy.com
+    santiago.bassett@gmail.com
+    pedro@shieldnetdefend.com
+    alberto.rodriguez@shieldnetdefend.com
+    braulio@shieldnetdefend.com
+    jose.fernandez@shieldnetdefend.com
+
+Copyright:
+
+    GNU General Public License version 2.
+
+License:
+
+    GNU General Public License version 2.
+
+The Debian packaging is:
+
+    Copyright (C) 2015 ShieldnetDefend, Inc <info@shieldnetdefend.com>
+
+and is licensed under the GPL version 2,
+see "/usr/share/common-licenses/GPL-2".

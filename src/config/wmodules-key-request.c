@@ -1,4 +1,4 @@
-/* Copyright (C) 2015, Wazuh Inc.
+/* Copyright (C) 2015, ShieldnetDefend Inc.
  * All right reserved.
  *
  * This program is free software; you can redistribute it
@@ -7,7 +7,7 @@
  * Foundation
 */
 
-#include "wazuh_modules/wmodules.h"
+#include "shieldnet_defend_modules/wmodules.h"
 #include <stdio.h>
 
 // Reading function

@@ -15,14 +15,14 @@ inputs:
     default: "/tmp/current.csv"
   installation_directory:
     required: false
-    description: "Path to the wazuh Installation directory"
+    description: "Path to the shieldnetdefend Installation directory"
     default: "/var/ossec"
-  wazuh_uid:
+  shieldnet_defend_uid:
     required: true
-    description: "Wazuh user ID"
-  wazuh_gid:
+    description: "ShieldnetDefend user ID"
+  shieldnet_defend_gid:
     required: true
-    description: "Wazuh group ID"
+    description: "ShieldnetDefend group ID"
   size_check:
     required: false
     description: "Check the size of the files"
@@ -60,7 +60,7 @@ runs:
       ignore=""
       if [ -n "${{ inputs.ignore }}" ]; then ignore="--ignore ${{ inputs.ignore }}"; fi
 
-      sudo venv/bin/python3 check_files.py -b '${{ inputs.current_status }}' --wazuh_gid ${{ inputs.wazuh_gid }} --wazuh_uid ${{ inputs.wazuh_uid }} --directory '${{ inputs.installation_directory }}' ${size_check} ${ignore}
+      sudo venv/bin/python3 check_files.py -b '${{ inputs.current_status }}' --shieldnet_defend_gid ${{ inputs.shieldnet_defend_gid }} --shieldnet_defend_uid ${{ inputs.shieldnet_defend_uid }} --directory '${{ inputs.installation_directory }}' ${size_check} ${ignore}
 
   - name: Upload current stats
     if: success()
@@ -80,7 +80,7 @@ runs:
       ignore=""
       if [ -n "${{ inputs.ignore }}" ]; then ignore="--ignore ${{ inputs.ignore }}"; fi
 
-      sudo venv/bin/python3 check_files.py --report '${{ inputs.report_file }}' --file_csv_path '${{ inputs.expected_files }}' --wazuh_uid ${{ inputs.wazuh_uid }} --wazuh_gid ${{ inputs.wazuh_gid }} --directory '${{ inputs.installation_directory }}' ${size_check} ${ignore}
+      sudo venv/bin/python3 check_files.py --report '${{ inputs.report_file }}' --file_csv_path '${{ inputs.expected_files }}' --shieldnet_defend_uid ${{ inputs.shieldnet_defend_uid }} --shieldnet_defend_gid ${{ inputs.shieldnet_defend_gid }} --directory '${{ inputs.installation_directory }}' ${size_check} ${ignore}
 
   - name: Upload validation results
     if: always()

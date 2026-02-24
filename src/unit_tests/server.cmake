@@ -1,9 +1,9 @@
-# Find the wazuh shared library
-find_library(WAZUHEXT NAMES libwazuhext.so HINTS "${SRC_FOLDER}")
+# Find the shieldnetdefend shared library
+find_library(SHIELDNETDEFENDEXT NAMES libshieldnetdefendext.so HINTS "${SRC_FOLDER}")
 set(uname "Linux")
 
-if(NOT WAZUHEXT)
-    message(FATAL_ERROR "libwazuhext not found! Aborting...")
+if(NOT SHIELDNETDEFENDEXT)
+    message(FATAL_ERROR "libshieldnetdefendext not found! Aborting...")
 endif()
 
 # Add compiling flags
@@ -11,14 +11,14 @@ add_compile_options(-ggdb -O0 -g -coverage -DTEST_SERVER -DENABLE_AUDIT -DINOTIF
 link_libraries(-fsanitize=address -fsanitize=undefined)
 # Set tests dependencies
 link_directories("${SRC_FOLDER}/syscheckd/build/lib/")
-set(TEST_DEPS ${WAZUHLIB} ${WAZUHEXT} -lpthread -ldl -lfimebpf -lcmocka -fprofile-arcs -ftest-coverage)
+set(TEST_DEPS ${SHIELDNETDEFENDLIB} ${SHIELDNETDEFENDEXT} -lpthread -ldl -lfimebpf -lcmocka -fprofile-arcs -ftest-coverage)
 
 add_subdirectory(analysisd)
 add_subdirectory(remoted)
-add_subdirectory(wazuh_db)
+add_subdirectory(shieldnet_defend_db)
 add_subdirectory(os_auth)
 add_subdirectory(os_crypto)
-add_subdirectory(wazuh_modules)
+add_subdirectory(shieldnet_defend_modules)
 add_subdirectory(monitord)
 add_subdirectory(logcollector)
 add_subdirectory(os_execd)

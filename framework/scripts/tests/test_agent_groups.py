@@ -1,21 +1,21 @@
-# Copyright (C) 2015, Wazuh Inc.
-# Created by Wazuh, Inc. <info@wazuh.com>.
+# Copyright (C) 2015, ShieldnetDefend Inc.
+# Created by ShieldnetDefend, Inc. <info@shieldnetdefend.com>.
 # This program is free software; you can redistribute it and/or modify it under the terms of GPLv2
 
 import pytest
 import sys
 from unittest.mock import call, patch, MagicMock
 
-with patch('wazuh.core.common.wazuh_uid'):
-    with patch('wazuh.core.common.wazuh_gid'):
-        sys.modules['wazuh.rbac.orm'] = MagicMock()
-        import wazuh.rbac.decorators
-        from wazuh.tests.util import RBAC_bypasser
+with patch('shieldnetdefend.core.common.shieldnet_defend_uid'):
+    with patch('shieldnetdefend.core.common.shieldnet_defend_gid'):
+        sys.modules['shieldnetdefend.rbac.orm'] = MagicMock()
+        import shieldnetdefend.rbac.decorators
+        from shieldnetdefend.tests.util import RBAC_bypasser
 
-        del sys.modules['wazuh.rbac.orm']
-        wazuh.rbac.decorators.expose_resources = RBAC_bypasser
+        del sys.modules['shieldnetdefend.rbac.orm']
+        shieldnetdefend.rbac.decorators.expose_resources = RBAC_bypasser
         from scripts import agent_groups
-        from wazuh import agent
+        from shieldnetdefend import agent
 
 
 @patch('scripts.agent_groups.exit')

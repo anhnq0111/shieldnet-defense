@@ -11,9 +11,9 @@ build/
 
 # Objects
 libsqlite3.so*
-wazuh-clusterd-internal
+shieldnet-defend-clusterd-internal
 
 # Projects
 .idea
 
-wazuh/wazuh.json
+shieldnetdefend/shieldnetdefend.json

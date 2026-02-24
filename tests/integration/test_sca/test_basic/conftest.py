@@ -1,6 +1,6 @@
 """
- Copyright (C) 2015-2024, Wazuh Inc.
- Created by Wazuh, Inc. <info@wazuh.com>.
+ Copyright (C) 2015-2024, ShieldnetDefend Inc.
+ Created by ShieldnetDefend, Inc. <info@shieldnetdefend.com>.
  This program is free software; you can redistribute it and/or modify it under the terms of GPLv2
 """
 import os
@@ -9,10 +9,10 @@ import sys
 import subprocess
 from pathlib import Path
 
-from wazuh_testing.constants.paths.ruleset import CIS_RULESET_PATH
-from wazuh_testing.utils.file import copy, remove_file, copy_files_in_folder, delete_path_recursively
-from wazuh_testing.constants.paths import TEMP_FILE_PATH
-from wazuh_testing.constants.platforms import WINDOWS
+from shieldnet_defend_testing.constants.paths.ruleset import CIS_RULESET_PATH
+from shieldnet_defend_testing.utils.file import copy, remove_file, copy_files_in_folder, delete_path_recursively
+from shieldnet_defend_testing.constants.paths import TEMP_FILE_PATH
+from shieldnet_defend_testing.constants.platforms import WINDOWS
 
 from . import TEST_DATA_PATH
 

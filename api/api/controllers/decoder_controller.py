@@ -1,5 +1,5 @@
-# Copyright (C) 2015, Wazuh Inc.
-# Created by Wazuh, Inc. <info@wazuh.com>.
+# Copyright (C) 2015, ShieldnetDefend Inc.
+# Created by ShieldnetDefend, Inc. <info@shieldnetdefend.com>.
 # This program is a free software; you can redistribute it and/or modify it under the terms of GPLv2
 
 import logging
@@ -10,11 +10,11 @@ from connexion.lifecycle import ConnexionResponse
 from api.controllers.util import json_response, XML_CONTENT_TYPE
 from api.models.base_model_ import Body
 from api.util import remove_nones_to_dict, parse_api_param, raise_if_exc
-from wazuh import decoder as decoder_framework
-from wazuh.core.cluster.dapi.dapi import DistributedAPI
-from wazuh.core.results import AffectedItemsWazuhResult
+from shieldnetdefend import decoder as decoder_framework
+from shieldnetdefend.core.cluster.dapi.dapi import DistributedAPI
+from shieldnetdefend.core.results import AffectedItemsShieldnetDefendResult
 
-logger = logging.getLogger('wazuh-api')
+logger = logging.getLogger('shieldnet-defend-api')
 
 
 async def get_decoders(decoder_names: list = None, pretty: bool = False, wait_for_complete: bool = False,
@@ -94,7 +94,7 @@ async def get_decoders_files(pretty: bool = False, wait_for_complete: bool = Fal
                              select: str = None, distinct: bool = False) -> ConnexionResponse:
     """Get all decoders' files.
 
-    Returns information about all decoders' files used in Wazuh.
+    Returns information about all decoders' files used in ShieldnetDefend.
     This information includes the decoders' file, decoders' routes, decoders' statuses, etc.
 
     Parameters
@@ -247,7 +247,7 @@ async def get_file(pretty: bool = False, wait_for_complete: bool = False,
                           rbac_permissions=request.context['token_info']['rbac_policies']
                           )
     data = raise_if_exc(await dapi.distribute_function())
-    if isinstance(data, AffectedItemsWazuhResult):
+    if isinstance(data, AffectedItemsShieldnetDefendResult):
         response = json_response(data, pretty=pretty)
     else:
         response = ConnexionResponse(body=data["message"],

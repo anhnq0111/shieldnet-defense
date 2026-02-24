@@ -35,11 +35,11 @@ set_target_properties(
     LINKER_LANGUAGE C
 )
 
-target_link_libraries(MONITOR_O ${WAZUHLIB} ${WAZUHEXT} -lpthread)
-target_link_libraries(MAILD_O ${WAZUHLIB} ${WAZUHEXT} -lpthread)
+target_link_libraries(MONITOR_O ${SHIELDNETDEFENDLIB} ${SHIELDNETDEFENDEXT} -lpthread)
+target_link_libraries(MAILD_O ${SHIELDNETDEFENDLIB} ${SHIELDNETDEFENDEXT} -lpthread)
 
 #include wrappers
-include(${SRC_FOLDER}/unit_tests/wrappers/wazuh/shared/shared.cmake)
+include(${SRC_FOLDER}/unit_tests/wrappers/shieldnetdefend/shared/shared.cmake)
 
 list(APPEND monitord_tests_names "test_monitord")
 list(APPEND monitord_tests_flags "-Wl,--wrap,time\
@@ -66,8 +66,8 @@ foreach(counter RANGE ${count})
 
     target_link_libraries(
         ${test_name}
-        ${WAZUHLIB}
-        ${WAZUHEXT}
+        ${SHIELDNETDEFENDLIB}
+        ${SHIELDNETDEFENDEXT}
         MONITOR_O
         MAILD_O
         ${TEST_DEPS}

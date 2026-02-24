@@ -183,11 +183,11 @@ update_file_sources() {
         fi
     fi
 
-    # Update wazuh-*.sh scripts
+    # Update shieldnet-defend-*.sh scripts
     for script in \
-        "$DIR_SRC/init/wazuh-server.sh" \
-        "$DIR_SRC/init/wazuh-client.sh" \
-        "$DIR_SRC/init/wazuh-local.sh"
+        "$DIR_SRC/init/shieldnet-defend-server.sh" \
+        "$DIR_SRC/init/shieldnet-defend-client.sh" \
+        "$DIR_SRC/init/shieldnet-defend-local.sh"
     do
         if [[ -n "$new_version" ]]; then
             local current_script_version
@@ -216,8 +216,8 @@ update_file_sources() {
         fi
     done
 
-    # Update wazuh-installer.nsi
-    local nsi_file="$DIR_SRC/win32/wazuh-installer.nsi"
+    # Update shieldnet-defend-installer.nsi
+    local nsi_file="$DIR_SRC/win32/shieldnet-defend-installer.nsi"
     if [[ -n "$new_version" ]]; then
         local current_nsi_version
         current_nsi_version=$(grep -E '^!define VERSION' "$nsi_file" \
@@ -240,15 +240,15 @@ update_file_sources() {
         fi
     fi
 
-    # Update wazuh-installer.wxs
+    # Update shieldnet-defend-installer.wxs
     if [[ -n "$new_version" ]]; then
-        local wxs_file="$DIR_SRC/win32/wazuh-installer.wxs"
+        local wxs_file="$DIR_SRC/win32/shieldnet-defend-installer.wxs"
         local current_wxs_version
         current_wxs_version=$(grep -E '<Product ' "$wxs_file" \
             | sed -E 's/.*Version="([^"]+)".*/\1/')
 
         if [[ "$current_wxs_version" != "$new_version" ]]; then
-            sed -i -E "s|(<Product Id=\"\*\" Name=\"Wazuh Agent\" Language=\"1033\" Version=\")[^\"]+(\" Manufacturer=)|\1${new_version}\2|" "$wxs_file"
+            sed -i -E "s|(<Product Id=\"\*\" Name=\"ShieldnetDefend Agent\" Language=\"1033\" Version=\")[^\"]+(\" Manufacturer=)|\1${new_version}\2|" "$wxs_file"
             log_action "Modified $wxs_file with new version: $new_version"
         fi
     fi
@@ -306,8 +306,8 @@ update_file_framework() {
 
     [[ -z "$new_version" && -z "$new_stage" ]] && return
 
-    local init_file="$DIR_FRAMEWORK/wazuh/__init__.py"
-    local cluster_file="$DIR_FRAMEWORK/wazuh/core/cluster/__init__.py"
+    local init_file="$DIR_FRAMEWORK/shieldnetdefend/__init__.py"
+    local cluster_file="$DIR_FRAMEWORK/shieldnetdefend/core/cluster/__init__.py"
 
     if [[ -n "$new_version" ]]; then
         local current_version_init
@@ -417,12 +417,12 @@ update_file_packages() {
 
         if [[ -n "$existing_line" ]]; then
             sed -i -E \
-                "s|^\* .+ - ${final_version}$|* ${spec_date} support <info@wazuh.com> - ${final_version}|" \
+                "s|^\* .+ - ${final_version}$|* ${spec_date} support <info@shieldnetdefend.com> - ${final_version}|" \
                 "$spec_file"
             log_action "Updated changelog date for version ${final_version} in: $spec_file"
         else
             sed -i -E \
-                "/^%changelog\s*$/a * ${spec_date} support <info@wazuh.com> - ${final_version}\n- More info: https://documentation.wazuh.com/current/release-notes/release-${final_version//./-}.html" \
+                "/^%changelog\s*$/a * ${spec_date} support <info@shieldnetdefend.com> - ${final_version}\n- More info: https://documentation.shieldnetdefend.com/current/release-notes/release-${final_version//./-}.html" \
                 "$spec_file"
             log_action "Prepended changelog entry for version ${final_version} in: $spec_file"
         fi
@@ -437,9 +437,9 @@ update_file_packages() {
 cat <<EOF
 ${INSTALL_TYPE} (${final_version}-RELEASE) stable; urgency=low
 
-  * More info: https://documentation.wazuh.com/current/release-notes/release-${final_version//./-}.html
+  * More info: https://documentation.shieldnetdefend.com/current/release-notes/release-${final_version//./-}.html
 
- -- Wazuh, Inc <info@wazuh.com>  ${formatted_date}
+ -- ShieldnetDefend, Inc <info@shieldnetdefend.com>  ${formatted_date}
 
 EOF
 )"
@@ -457,8 +457,8 @@ EOF
                     print
                     next
                 }
-                if (inside_match && $0 ~ /^ -- Wazuh, Inc <info@wazuh.com>  /) {
-                    print " -- Wazuh, Inc <info@wazuh.com>  " new_date
+                if (inside_match && $0 ~ /^ -- ShieldnetDefend, Inc <info@shieldnetdefend.com>  /) {
+                    print " -- ShieldnetDefend, Inc <info@shieldnetdefend.com>  " new_date
                     inside_match = 0
                     next
                 }
@@ -481,7 +481,7 @@ EOF
     # Update copyright files
     for copyright_file in $(find "$DIR_PACKAGE" -type f -name "copyright"); do
         sed -i -E \
-            "s|(^    Wazuh, Inc <info@wazuh.com> on )[^$]+(\$)|\1${formatted_date}\2|" \
+            "s|(^    ShieldnetDefend, Inc <info@shieldnetdefend.com> on )[^$]+(\$)|\1${formatted_date}\2|" \
             "$copyright_file"
         log_action "Updated copyright date in: $copyright_file"
     done

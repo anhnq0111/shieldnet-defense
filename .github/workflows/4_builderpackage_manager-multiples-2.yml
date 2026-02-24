@@ -1,4 +1,4 @@
-name: Build DEB and RPM packages for Wazuh Manager
+name: Build DEB and RPM packages for ShieldnetDefend Manager
 
 on:
   workflow_dispatch:

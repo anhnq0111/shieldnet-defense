@@ -1,15 +1,15 @@
 '''
-copyright: Copyright (C) 2015-2024, Wazuh Inc.
+copyright: Copyright (C) 2015-2024, ShieldnetDefend Inc.
 
-           Created by Wazuh, Inc. <info@wazuh.com>.
+           Created by ShieldnetDefend, Inc. <info@shieldnetdefend.com>.
 
            This program is free software; you can redistribute it and/or modify it under the terms of GPLv2
 
 type: integration
 
-brief: The 'wazuh-analysisd' daemon receives the log messages and compares them to the rules.
+brief: The 'shieldnet-defend-analysisd' daemon receives the log messages and compares them to the rules.
        It then creates an alert when a log message matches an applicable rule.
-       Specifically, these tests will verify if the 'wazuh-analysisd' daemon correctly handles
+       Specifically, these tests will verify if the 'shieldnet-defend-analysisd' daemon correctly handles
        'syscheck' events considered rare.
 
 components:
@@ -21,8 +21,8 @@ targets:
     - manager
 
 daemons:
-    - wazuh-analysisd
-    - wazuh-db
+    - shieldnet-defend-analysisd
+    - shieldnet-defend-db
 
 os_platform:
     - linux
@@ -39,7 +39,7 @@ os_version:
     - Ubuntu Bionic
 
 references:
-    - https://documentation.wazuh.com/current/user-manual/reference/daemons/wazuh-analysisd.html
+    - https://documentation.shieldnetdefend.com/current/user-manual/reference/daemons/shieldnet-defend-analysisd.html
 
 tags:
     - events
@@ -49,13 +49,13 @@ import json
 
 from pathlib import Path
 
-from wazuh_testing import session_parameters
-from wazuh_testing.constants.daemons import WAZUH_DB_DAEMON, ANALYSISD_DAEMON
-from wazuh_testing.constants.paths.sockets import WAZUH_DB_SOCKET_PATH, ANALYSISD_QUEUE_SOCKET_PATH
-from wazuh_testing.modules.analysisd import patterns, configuration as analysisd_config
-from wazuh_testing.modules.monitord import configuration as monitord_config
-from wazuh_testing.tools import mitm
-from wazuh_testing.utils import configuration, callbacks
+from shieldnet_defend_testing import session_parameters
+from shieldnet_defend_testing.constants.daemons import SHIELDNET_DEFEND_DB_DAEMON, ANALYSISD_DAEMON
+from shieldnet_defend_testing.constants.paths.sockets import SHIELDNET_DEFEND_DB_SOCKET_PATH, ANALYSISD_QUEUE_SOCKET_PATH
+from shieldnet_defend_testing.modules.analysisd import patterns, configuration as analysisd_config
+from shieldnet_defend_testing.modules.monitord import configuration as monitord_config
+from shieldnet_defend_testing.tools import mitm
+from shieldnet_defend_testing.utils import configuration, callbacks
 
 from . import TEST_CASES_PATH
 
@@ -74,8 +74,8 @@ local_internal_options = {analysisd_config.ANALYSISD_DEBUG: '2', monitord_config
 # Test variables.
 receiver_sockets_params = [(ANALYSISD_QUEUE_SOCKET_PATH, 'AF_UNIX', 'UDP')]
 
-mitm_wdb = mitm.ManInTheMiddle(address=WAZUH_DB_SOCKET_PATH, family='AF_UNIX', connection_protocol='TCP')
-monitored_sockets_params = [(WAZUH_DB_DAEMON, mitm_wdb, True), (ANALYSISD_DAEMON, None, None)]
+mitm_wdb = mitm.ManInTheMiddle(address=SHIELDNET_DEFEND_DB_SOCKET_PATH, family='AF_UNIX', connection_protocol='TCP')
+monitored_sockets_params = [(SHIELDNET_DEFEND_DB_DAEMON, mitm_wdb, True), (ANALYSISD_DAEMON, None, None)]
 
 receiver_sockets, monitored_sockets = None, None  # Set in the fixtures
 
@@ -86,11 +86,11 @@ def test_validate_rare_socket_responses(
     test_metadata, configure_local_internal_options, configure_sockets_environment_module,
         connect_to_sockets_module, wait_for_analysisd_startup):
     '''
-    description: Validate each response from the 'wazuh-analysisd' daemon socket
-                 to the 'wazuh-db' daemon socket using rare 'syscheck' events
+    description: Validate each response from the 'shieldnet-defend-analysisd' daemon socket
+                 to the 'shieldnet-defend-db' daemon socket using rare 'syscheck' events
                  that include weird characters.
 
-    wazuh_min_version: 4.2.0
+    shieldnet_defend_min_version: 4.2.0
 
     tier: 2
 
@@ -100,7 +100,7 @@ def test_validate_rare_socket_responses(
             brief: Test case metadata.
         - configure_local_internal_options:
             type: fixture
-            brief: Configure the Wazuh local internal options.
+            brief: Configure the ShieldnetDefend local internal options.
         - configure_sockets_environment_module:
             type: fixture
             brief: Configure environment for sockets and MITM.
@@ -109,7 +109,7 @@ def test_validate_rare_socket_responses(
             brief: Module scope version of 'connect_to_sockets_module' fixture.
         - wait_for_analysisd_startup:
             type: fixture
-            brief: Wait until the 'wazuh-analysisd' has begun and the 'alerts.json' file is created.
+            brief: Wait until the 'shieldnet-defend-analysisd' has begun and the 'alerts.json' file is created.
         - test_case:
             type: list
             brief: List of tests to be performed.

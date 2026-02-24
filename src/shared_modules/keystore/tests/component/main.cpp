@@ -1,6 +1,6 @@
 /*
- * Wazuh shared modules utils
- * Copyright (C) 2015, Wazuh Inc.
+ * ShieldnetDefend shared modules utils
+ * Copyright (C) 2015, ShieldnetDefend Inc.
  * July 11, 2024.
  *
  * This program is free software; you can redistribute it

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015, Wazuh Inc.
+ * Copyright (C) 2015, ShieldnetDefend Inc.
  * November, 2020.
  *
  * This program is free software; you can redistribute it
@@ -17,9 +17,9 @@
 #include <stdio.h>
 
 #include "../wrappers/common.h"
-#include "../wrappers/wazuh/shared/debug_op_wrappers.h"
-#include "../wrappers/wazuh/shared/mq_op_wrappers.h"
-#include "../wrappers/wazuh/shared/validate_op_wrappers.h"
+#include "../wrappers/shieldnetdefend/shared/debug_op_wrappers.h"
+#include "../wrappers/shieldnetdefend/shared/mq_op_wrappers.h"
+#include "../wrappers/shieldnetdefend/shared/validate_op_wrappers.h"
 
 #include "../external/cJSON/cJSON.h"
 #include "../headers/store_op.h"

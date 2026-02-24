@@ -7,16 +7,16 @@ assignees: ''
 
 ---
 
-|Wazuh version|Component|
+|ShieldnetDefend version|Component|
 |---|---|
-| X.Y.Z-rev | Wazuh component |
+| X.Y.Z-rev | ShieldnetDefend component |
 
 ## Description
 <!--
 Whenever possible, issues should be created for bug reporting and feature requests.
 For questions related to the user experience, please refer:
-- Wazuh mailing list: https://groups.google.com/forum/#!forum/wazuh
-- Join Wazuh on Slack: https://wazuh.com/community/join-us-on-slack
+- ShieldnetDefend mailing list: https://groups.google.com/forum/#!forum/shieldnetdefend
+- Join ShieldnetDefend on Slack: https://shieldnetdefend.com/community/join-us-on-slack
 -->
 
 ## Checks

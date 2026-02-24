@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015, Wazuh Inc.
+ * Copyright (C) 2015, ShieldnetDefend Inc.
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General Public
@@ -16,12 +16,12 @@
 
 #include "../../headers/shared.h"
 #include "../../remoted/remoted.h"
-#include "../wrappers/wazuh/shared/debug_op_wrappers.h"
+#include "../wrappers/shieldnetdefend/shared/debug_op_wrappers.h"
 #include "../wrappers/libc/stdio_wrappers.h"
-#include "../wrappers/wazuh/shared/queue_linked_op_wrappers.h"
+#include "../wrappers/shieldnetdefend/shared/queue_linked_op_wrappers.h"
 
-#include "../wrappers/wazuh/remoted/queue_wrappers.h"
-#include "../wrappers/wazuh/remoted/manager_wrappers.h"
+#include "../wrappers/shieldnetdefend/remoted/queue_wrappers.h"
+#include "../wrappers/shieldnetdefend/remoted/manager_wrappers.h"
 #include "../../remoted/secure.c"
 
 void * save_control_thread(void * control_msg_queue);

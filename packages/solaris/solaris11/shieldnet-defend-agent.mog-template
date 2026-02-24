@@ -1,0 +1,12 @@
+set name=pkg.fmri value=shieldnet-defend-agent@<VERSION>,5.11-0
+set name=pkg.summary value="ShieldnetDefend agent"
+set name=pkg.description value="ShieldnetDefend agent monitoring utility"
+set name=info.maintainer value="ShieldnetDefend <info@shieldnetdefend.com>"
+set name=info.source-url value=https://github.com/shieldnetdefend/shieldnetdefend/archive/<TAG>.tar.gz
+<transform dir path=var$ -> drop>
+<transform dir path=lib$ -> drop>
+<transform dir path=lib/svc$ -> drop>
+<transform dir path=lib/svc/manifest$ -> drop>
+<transform dir path=lib/svc/manifest/site$ -> drop>
+<transform file path=lib/svc/manifest/.*\.xml$ -> \
+    default restart_fmri svc:/system/manifest-import:default>

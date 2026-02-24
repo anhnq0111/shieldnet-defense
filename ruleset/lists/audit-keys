@@ -1,5 +1,5 @@
-audit-wazuh-w:write
-audit-wazuh-r:read
-audit-wazuh-a:attribute
-audit-wazuh-x:execute
-audit-wazuh-c:command
+audit-shieldnet-defend-w:write
+audit-shieldnet-defend-r:read
+audit-shieldnet-defend-a:attribute
+audit-shieldnet-defend-x:execute
+audit-shieldnet-defend-c:command

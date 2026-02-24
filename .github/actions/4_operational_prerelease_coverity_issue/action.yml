@@ -34,7 +34,7 @@ runs:
         MAIN_ISSUE="${{ inputs.main_issue }}"
         PREV_ISSUE="${{ inputs.prev_issue }}"
 
-        REPO="wazuh/wazuh"
+        REPO="shieldnetdefend/shieldnetdefend"
         LABEL="level/task,type/test,type/test/coverity"
         TITLE="Release $RELEASE - $STAGE - Coverity scan"
         TAG="v$RELEASE-$(echo ${STAGE// /} | tr '[:upper:]' '[:lower:]')"
@@ -42,14 +42,14 @@ runs:
         BODY=$(cat <<EOF
         |Main RC issue|Version|Stage|Tag|Previous issue|
         |---|---|---|---|---|
-        |#$MAIN_ISSUE|$RELEASE|$STAGE|[$TAG](https://github.com/wazuh/wazuh/tree/$TAG)|#$PREV_ISSUE|
+        |#$MAIN_ISSUE|$RELEASE|$STAGE|[$TAG](https://github.com/shieldnetdefend/shieldnetdefend/tree/$TAG)|#$PREV_ISSUE|
 
         This issue will show the results of the Coverity scan for the current RC.
-        - [Coverity dashboard](https://scan.coverity.com/projects/wazuh-wazuh)
+        - [Coverity dashboard](https://scan.coverity.com/projects/shieldnet-defend-shieldnet-defend)
 
         ## Auditors' validation
-        - [ ] @wazuh/devel-xdrsiem-agent
-        - [ ] @wazuh/devel-xdrsiem-qa-release
+        - [ ] @shieldnetdefend/devel-xdrsiem-agent
+        - [ ] @shieldnetdefend/devel-xdrsiem-qa-release
         EOF
         )
 

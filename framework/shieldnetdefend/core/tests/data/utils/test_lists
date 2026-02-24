@@ -1,0 +1,5 @@
+test-shieldnet-defend-w:write
+test-shieldnet-defend-r:read
+test-shieldnet-defend-a:attribute
+test-shieldnet-defend-x:execute
+test-shieldnet-defend-c:command

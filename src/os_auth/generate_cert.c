@@ -1,7 +1,7 @@
 /*
- * Wazuh Certificate creation.
+ * ShieldnetDefend Certificate creation.
  *
- * Copyright (C) 2015, Wazuh Inc.
+ * Copyright (C) 2015, ShieldnetDefend Inc.
  * May 16, 2021.
  *
  * This program is free software; you can redistribute it

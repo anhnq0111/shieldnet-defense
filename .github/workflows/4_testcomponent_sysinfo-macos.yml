@@ -7,7 +7,7 @@ on:
         - ".github/workflows/4_testcomponent_sysinfo-macos.yml"
         - "src/data_provider/**"
         - "src/shared_modules/**"
-        - "src/wazuh_modules/syscollector/**"
+        - "src/shieldnet_defend_modules/syscollector/**"
         - "src/Makefile"
 
 jobs:
@@ -16,8 +16,8 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
-      # Build wazuh agent for macOS.
-      - name: Build wazuh agent for macOS
+      # Build shieldnetdefend agent for macOS.
+      - name: Build shieldnetdefend agent for macOS
         run: |
           make deps -C src TARGET=agent -j4
           make -C src build_syscollector TARGET=agent -j4

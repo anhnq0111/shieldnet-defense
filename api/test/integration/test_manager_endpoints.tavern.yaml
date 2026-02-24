@@ -17,23 +17,23 @@ stages:
         error: 0
         data:
           affected_items:
-            - wazuh-agentlessd: !anystr
-              wazuh-analysisd: !anystr
-              wazuh-authd: !anystr
-              wazuh-csyslogd: !anystr
-              wazuh-dbd: !anystr
-              wazuh-execd: !anystr
-              wazuh-integratord: !anystr
-              wazuh-logcollector: !anystr
-              wazuh-maild: !anystr
-              wazuh-monitord: !anystr
-              wazuh-remoted: !anystr
-              wazuh-reportd: !anystr
-              wazuh-syscheckd: !anystr
-              wazuh-apid: !anystr
-              wazuh-clusterd: !anystr
-              wazuh-db: !anystr
-              wazuh-modulesd: !anystr
+            - shieldnet-defend-agentlessd: !anystr
+              shieldnet-defend-analysisd: !anystr
+              shieldnet-defend-authd: !anystr
+              shieldnet-defend-csyslogd: !anystr
+              shieldnet-defend-dbd: !anystr
+              shieldnet-defend-execd: !anystr
+              shieldnet-defend-integratord: !anystr
+              shieldnet-defend-logcollector: !anystr
+              shieldnet-defend-maild: !anystr
+              shieldnet-defend-monitord: !anystr
+              shieldnet-defend-remoted: !anystr
+              shieldnet-defend-reportd: !anystr
+              shieldnet-defend-syscheckd: !anystr
+              shieldnet-defend-apid: !anystr
+              shieldnet-defend-clusterd: !anystr
+              shieldnet-defend-db: !anystr
+              shieldnet-defend-modulesd: !anystr
           failed_items: []
           total_affected_items: 1
           total_failed_items: 0
@@ -303,14 +303,14 @@ stages:
         error: 0
         data:
           affected_items:
-            - name: wazuh-remoted
-            - name: wazuh-analysisd
-            - name: wazuh-db
+            - name: shieldnet-defend-remoted
+            - name: shieldnet-defend-analysisd
+            - name: shieldnet-defend-db
           total_affected_items: 3
           failed_items: []
           total_failed_items: 0
 
-  # GET /manager/daemons/stats?daemons_list=wazuh-remoted
+  # GET /manager/daemons/stats?daemons_list=shieldnet-defend-remoted
   - name: Get statistics from a single daemon
     request:
       verify: False
@@ -319,19 +319,19 @@ stages:
       headers:
         Authorization: "Bearer {test_login_token}"
       params:
-        daemons_list: wazuh-remoted
+        daemons_list: shieldnet-defend-remoted
     response:
       status_code: 200
       json:
         error: 0
         data:
           affected_items:
-            - name: wazuh-remoted
+            - name: shieldnet-defend-remoted
           total_affected_items: 1
           failed_items: []
           total_failed_items: 0
 
-  # GET /manager/daemons/stats?daemons_list=wazuh-remoted,wazuh-db,wazuh-analysisd
+  # GET /manager/daemons/stats?daemons_list=shieldnet-defend-remoted,shieldnet-defend-db,shieldnet-defend-analysisd
   - name: Get statistics from a list of daemons
     request:
       verify: False
@@ -340,16 +340,16 @@ stages:
       headers:
         Authorization: "Bearer {test_login_token}"
       params:
-        daemons_list: wazuh-remoted,wazuh-db,wazuh-analysisd
+        daemons_list: shieldnet-defend-remoted,shieldnet-defend-db,shieldnet-defend-analysisd
     response:
       status_code: 200
       json:
         error: 0
         data:
           affected_items:
-            - name: wazuh-remoted
-            - name: wazuh-db
-            - name: wazuh-analysisd
+            - name: shieldnet-defend-remoted
+            - name: shieldnet-defend-db
+            - name: shieldnet-defend-analysisd
           total_affected_items: 3
           failed_items: []
           total_failed_items: 0
@@ -703,7 +703,7 @@ stages:
             total_failed_items: 0
 
   # GET /manager/logs
-  - name: Filters -> tag=wazuh-analysisd, limit=1
+  - name: Filters -> tag=shieldnet-defend-analysisd, limit=1
     request:
       verify: False
       url: "{protocol:s}://{host:s}:{port:d}/manager/logs"
@@ -711,7 +711,7 @@ stages:
       headers:
         Authorization: "Bearer {test_login_token}"
       params:
-        tag: wazuh-analysisd
+        tag: shieldnet-defend-analysisd
         limit: 1
     response:
         status_code: 200
@@ -725,7 +725,7 @@ stages:
             total_failed_items: 0
 
   # GET /manager/logs
-  - name: Filters -> tag=wazuh-syscheckd, limit=1
+  - name: Filters -> tag=shieldnet-defend-syscheckd, limit=1
     request:
       verify: False
       url: "{protocol:s}://{host:s}:{port:d}/manager/logs"
@@ -733,7 +733,7 @@ stages:
       headers:
         Authorization: "Bearer {test_login_token}"
       params:
-        tag: wazuh-syscheckd
+        tag: shieldnet-defend-syscheckd
         limit: 1
     response:
         status_code: 200
@@ -746,7 +746,7 @@ stages:
             total_affected_items: !anyint
             total_failed_items: 0
 
-  - name: Filters by query (tag=wazuh-syscheckd, level=info)
+  - name: Filters by query (tag=shieldnet-defend-syscheckd, level=info)
     request:
       verify: False
       url: "{protocol:s}://{host:s}:{port:d}/manager/logs"
@@ -754,14 +754,14 @@ stages:
       headers:
         Authorization: "Bearer {test_login_token}"
       params:
-        q: tag=wazuh-syscheckd;level=info
+        q: tag=shieldnet-defend-syscheckd;level=info
     response:
       status_code: 200
       verify_response_with:
         - function: tavern_utils:test_expected_value
           extra_kwargs:
             key: "tag"
-            expected_values: "wazuh-syscheckd"
+            expected_values: "shieldnet-defend-syscheckd"
         - function: tavern_utils:test_expected_value
           extra_kwargs:
             key: "level"
@@ -794,7 +794,7 @@ stages:
       headers:
         Authorization: "Bearer {test_login_token}"
       params:
-        tag: wazuh-unknown-daemon
+        tag: shieldnet-defend-unknown-daemon
     response:
       status_code: 200
       json:
@@ -1289,10 +1289,10 @@ stages:
           total_affected_items: 1
           total_failed_items: 0
 
-  - name: Show the config of wazuh-db/internal in the manager
+  - name: Show the config of shieldnet-defend-db/internal in the manager
     request:
       verify: False
-      url: "{protocol:s}://{host:s}:{port:d}/manager/configuration/wazuh-db/internal"
+      url: "{protocol:s}://{host:s}:{port:d}/manager/configuration/shieldnet-defend-db/internal"
       method: GET
       headers:
         Authorization: "Bearer {test_login_token}"
@@ -1302,7 +1302,7 @@ stages:
         error: !anyint
         data:
           affected_items:
-            - wazuh_db:
+            - shieldnet_defend_db:
                 commit_time_max: !anyint
                 commit_time_min: !anyint
                 open_db_limit: !anyint
@@ -1311,10 +1311,10 @@ stages:
           total_affected_items: 1
           total_failed_items: 0
 
-  - name: Show the config of wazuh-db/wdb in the manager
+  - name: Show the config of shieldnet-defend-db/wdb in the manager
     request:
       verify: False
-      url: "{protocol:s}://{host:s}:{port:d}/manager/configuration/wazuh-db/wdb"
+      url: "{protocol:s}://{host:s}:{port:d}/manager/configuration/shieldnet-defend-db/wdb"
       method: GET
       headers:
         Authorization: "Bearer {test_login_token}"
@@ -1552,7 +1552,7 @@ test_name: GET /manager/version/check with update_check disabled
 
 stages:
 
-  - name: Get wazuh version
+  - name: Get shieldnetdefend version
     request:
       verify: False
       url: "{protocol:s}://{host:s}:{port:d}/"
@@ -1563,7 +1563,7 @@ stages:
       status_code: 200
       save:
         json:
-          wazuh_version: data.api_version
+          shieldnet_defend_version: data.api_version
 
   - name: Get available updates
     request:
@@ -1577,7 +1577,7 @@ stages:
       verify_response_with:
         function: tavern_utils:validate_update_check_response
         extra_kwargs:
-          current_version: "v{wazuh_version:s}"
+          current_version: "v{shieldnet_defend_version:s}"
           update_check: false
 
   - name: Get available updates with force option
@@ -1594,14 +1594,14 @@ stages:
       verify_response_with:
         function: tavern_utils:validate_update_check_response
         extra_kwargs:
-          current_version: "v{wazuh_version:s}"
+          current_version: "v{shieldnet_defend_version:s}"
           update_check: false
 
 ---
 test_name: GET /manager/version/check with update_check enabled
 
 stages:
-  - name: Get wazuh version
+  - name: Get shieldnetdefend version
     request:
       verify: False
       url: "{protocol:s}://{host:s}:{port:d}/"
@@ -1612,7 +1612,7 @@ stages:
       status_code: 200
       save:
         json:
-          wazuh_version: data.api_version
+          shieldnet_defend_version: data.api_version
   
   - name: Enable update check
     request:
@@ -1667,7 +1667,7 @@ stages:
       verify_response_with:
         function: tavern_utils:validate_update_check_response
         extra_kwargs:
-          current_version: "v{wazuh_version:s}"
+          current_version: "v{shieldnet_defend_version:s}"
           update_check: true
 
   - name: Get available updates with force option
@@ -1686,7 +1686,7 @@ stages:
       verify_response_with:
         function: tavern_utils:validate_update_check_response
         extra_kwargs:
-          current_version: "v{wazuh_version:s}"
+          current_version: "v{shieldnet_defend_version:s}"
           update_check: true
 
 ---

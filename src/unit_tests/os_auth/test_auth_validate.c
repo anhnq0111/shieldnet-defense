@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015, Wazuh Inc.
+ * Copyright (C) 2015, ShieldnetDefend Inc.
  *
  * This program is free software; you can redistribute it
  * and/or modify it under the terms of the GNU General Public
@@ -21,8 +21,8 @@
 #include "../../addagent/manage_agents.h"
 
 #include "../wrappers/posix/dirent_wrappers.h"
-#include "../wrappers/wazuh/shared/debug_op_wrappers.h"
-#include "../wrappers/wazuh/os_auth/os_auth_wrappers.h"
+#include "../wrappers/shieldnetdefend/shared/debug_op_wrappers.h"
+#include "../wrappers/shieldnetdefend/os_auth/os_auth_wrappers.h"
 
 #define EXISTENT_AGENT1 "ExistentAgent1"
 #define EXISTENT_AGENT2 "ExistentAgent2"

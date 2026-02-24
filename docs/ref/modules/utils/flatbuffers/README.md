@@ -8,7 +8,7 @@ Another key use of FlatBuffers in the Vulnerability Detector module is for proce
 
 Due to the nature of FlatBuffers, the deserialization cost is significantly lower compared to JSON, regardless of the JSON library used. This makes FlatBuffers particularly well-suited for scanning operations, where deserialization performance is a critical factor.
 
-For the inventory harvester the data is converted into FlatBuffers and send it to wazuh-modulesd through the router module(IPC).
+For the inventory harvester the data is converted into FlatBuffers and send it to shieldnet-defend-modulesd through the router module(IPC).
 
 ## Flatbuffer schemas
 

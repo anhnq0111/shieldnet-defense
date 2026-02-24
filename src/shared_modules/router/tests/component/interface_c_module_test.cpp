@@ -1,6 +1,6 @@
 /*
- * Wazuh router - Interface tests
- * Copyright (C) 2015, Wazuh Inc.
+ * ShieldnetDefend router - Interface tests
+ * Copyright (C) 2015, ShieldnetDefend Inc.
  * Apr 29, 2022.
  *
  * This program is free software; you can redistribute it

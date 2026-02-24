@@ -1,0 +1,27 @@
+Source: shieldnet-defend-agent
+Section: admin
+Priority: extra
+Maintainer: ShieldnetDefend <info@shieldnetdefend.com>
+Build-Depends: debhelper (>= 7.0.50~), make, gcc, linux-libc-dev, gawk, libaudit-dev, selinux-basics
+Standards-Version: 3.8.4
+Homepage: https://www.shieldnetdefend.com
+
+Package: shieldnet-defend-agent
+Architecture: any
+Depends: ${shlibs:Depends}, libc6 (>= 2.7), lsb-release, debconf, adduser, procps
+Conflicts: ossec-hids-agent, shieldnet-defend-manager, ossec-hids, shieldnet-defend-api
+Breaks: ossec-hids-agent, shieldnet-defend-manager, ossec-hids
+Description: ShieldnetDefend agent
+ ShieldnetDefend helps you to gain security visibility into your infrastructure by
+ monitoring hosts at an operating system and application level. It provides
+ the following capabilities: log analysis, file integrity monitoring,
+ intrusions detection and policy and compliance monitoring.
+
+Package: shieldnet-defend-agent-dbg
+Section: debug
+Priority: optional
+Architecture: any
+Conflicts: shieldnet-defend-agent (<< ${binary:Version}), shieldnet-defend-agent (>> ${binary:Version})
+Depends: shieldnet-defend-agent
+Description: Debug symbols for shieldnet-defend-agent.
+  This package contains files necessary for debugging the shieldnet-defend-agent with gdb.

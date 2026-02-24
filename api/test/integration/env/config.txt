@@ -7,16 +7,16 @@
 
 | Agent | Name          | Groups                       | Status          |
 |-------|---------------|------------------------------|-----------------|
-| 000   | wazuh-master  |                              | active          |
-| 001   | wazuh-agent1  | default,group1               | active          |
-| 002   | wazuh-agent2  | default,group2               | active          |
-| 003   | wazuh-agent3  | default,group3               | active          |
-| 004   | wazuh-agent4  | default                      | active          |
-| 005   | wazuh-agent5  | default,group1,group2        | active          |
-| 006   | wazuh-agent6  | default,group2,group3        | active          |
-| 007   | wazuh-agent7  | default,group1,group3        | active          |
-| 008   | wazuh-agent8  | default,group1,group2,group3 | active          |
-| 009   | wazuh-agent9  | default,group1               | disconnected    |
-| 010   | wazuh-agent10 | default,group2               | disconnected    |
-| 011   | wazuh-agent11 |                              | never_connected |
-| 012   | wazuh-agent12 |                              | never_connected |
+| 000   | shieldnet-defend-master  |                              | active          |
+| 001   | shieldnet-defend-agent1  | default,group1               | active          |
+| 002   | shieldnet-defend-agent2  | default,group2               | active          |
+| 003   | shieldnet-defend-agent3  | default,group3               | active          |
+| 004   | shieldnet-defend-agent4  | default                      | active          |
+| 005   | shieldnet-defend-agent5  | default,group1,group2        | active          |
+| 006   | shieldnet-defend-agent6  | default,group2,group3        | active          |
+| 007   | shieldnet-defend-agent7  | default,group1,group3        | active          |
+| 008   | shieldnet-defend-agent8  | default,group1,group2,group3 | active          |
+| 009   | shieldnet-defend-agent9  | default,group1               | disconnected    |
+| 010   | shieldnet-defend-agent10 | default,group2               | disconnected    |
+| 011   | shieldnet-defend-agent11 |                              | never_connected |
+| 012   | shieldnet-defend-agent12 |                              | never_connected |

@@ -1,4 +1,4 @@
-/* Copyright (C) 2015, Wazuh Inc.
+/* Copyright (C) 2015, ShieldnetDefend Inc.
  * All right reserved.
  *
  * This program is free software; you can redistribute it
@@ -9,8 +9,8 @@
 
 #ifndef WIN32
 
-#include "wazuh_modules/wmodules.h"
-#include "wazuh_modules/wm_gcp.h"
+#include "shieldnet_defend_modules/wmodules.h"
+#include "shieldnet_defend_modules/wm_gcp.h"
 
 static const char *XML_ENABLED = "enabled";
 static const char *XML_PROJECT_ID = "project_id";

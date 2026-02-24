@@ -1,4 +1,4 @@
-/* Copyright (C) 2015, Wazuh Inc.
+/* Copyright (C) 2015, ShieldnetDefend Inc.
  * Copyright (C) 2009 Trend Micro Inc.
  * All rights reserved.
  *
@@ -12,7 +12,7 @@
 #include "config/config.h"
 #include "os_net/os_net.h"
 
-#ifdef WAZUH_UNIT_TESTING
+#ifdef SHIELDNET_DEFEND_UNIT_TESTING
 #define STATIC
 #else
 #define STATIC static

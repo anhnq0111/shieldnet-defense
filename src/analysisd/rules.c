@@ -1,4 +1,4 @@
-/* Copyright (C) 2015, Wazuh Inc.
+/* Copyright (C) 2015, ShieldnetDefend Inc.
  * Copyright (C) 2009 Trend Micro Inc.
  * All rights reserved.
  *
@@ -14,7 +14,7 @@
 #include "compiled_rules/compiled_rules.h"
 #include "analysisd.h"
 
-#ifdef WAZUH_UNIT_TESTING
+#ifdef SHIELDNET_DEFEND_UNIT_TESTING
 // Remove STATIC qualifier from tests
 #define STATIC
 #define INLINE

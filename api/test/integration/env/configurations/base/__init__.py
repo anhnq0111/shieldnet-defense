@@ -1,1 +1,1 @@
-wazuh_master = __import__('wazuh-master')
+shieldnet_defend_master = __import__('shieldnet-defend-master')

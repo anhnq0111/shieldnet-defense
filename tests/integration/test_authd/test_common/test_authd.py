@@ -1,15 +1,15 @@
 '''
-copyright: Copyright (C) 2015-2024, Wazuh Inc.
+copyright: Copyright (C) 2015-2024, ShieldnetDefend Inc.
 
-           Created by Wazuh, Inc. <info@wazuh.com>.
+           Created by ShieldnetDefend, Inc. <info@shieldnetdefend.com>.
 
            This program is free software; you can redistribute it and/or modify it under the terms of GPLv2
 
 type: integration
 
-brief: These tests will check if the 'wazuh-authd' daemon correctly handles the enrollment requests,
+brief: These tests will check if the 'shieldnet-defend-authd' daemon correctly handles the enrollment requests,
        generating consistent responses to the requests received on its IP v4 network socket.
-       The 'wazuh-authd' daemon can automatically add a Wazuh agent to a Wazuh manager and provide
+       The 'shieldnet-defend-authd' daemon can automatically add a ShieldnetDefend agent to a ShieldnetDefend manager and provide
        the key to the agent. It is used along with the 'agent-auth' application.
 
 components:
@@ -19,9 +19,9 @@ targets:
     - manager
 
 daemons:
-    - wazuh-authd
-    - wazuh-db
-    - wazuh-modulesd
+    - shieldnet-defend-authd
+    - shieldnet-defend-db
+    - shieldnet-defend-modulesd
 
 os_platform:
     - linux
@@ -38,8 +38,8 @@ os_version:
     - Ubuntu Bionic
 
 references:
-    - https://documentation.wazuh.com/current/user-manual/reference/daemons/wazuh-authd.html
-    - https://documentation.wazuh.com/current/user-manual/reference/tools/agent_groups.html
+    - https://documentation.shieldnetdefend.com/current/user-manual/reference/daemons/shieldnet-defend-authd.html
+    - https://documentation.shieldnetdefend.com/current/user-manual/reference/tools/agent_groups.html
 
 tags:
     - enrollment
@@ -50,9 +50,9 @@ import pytest
 from pathlib import Path
 
 from . import CONFIGURATIONS_FOLDER_PATH, TEST_CASES_FOLDER_PATH
-from wazuh_testing.constants.ports import DEFAULT_SSL_REMOTE_ENROLLMENT_PORT
-from wazuh_testing.constants.daemons import AUTHD_DAEMON, WAZUH_DB_DAEMON, MODULES_DAEMON
-from wazuh_testing.utils.configuration import get_test_cases_data, load_configuration_template
+from shieldnet_defend_testing.constants.ports import DEFAULT_SSL_REMOTE_ENROLLMENT_PORT
+from shieldnet_defend_testing.constants.daemons import AUTHD_DAEMON, SHIELDNET_DEFEND_DB_DAEMON, MODULES_DAEMON
+from shieldnet_defend_testing.utils.configuration import get_test_cases_data, load_configuration_template
 
 # Marks
 
@@ -69,7 +69,7 @@ test_configuration = load_configuration_template(test_configuration_path, test_c
 # Variables
 receiver_sockets_params = [(("localhost", DEFAULT_SSL_REMOTE_ENROLLMENT_PORT), 'AF_INET', 'SSL_TLSv1_2')]
 
-monitored_sockets_params = [(MODULES_DAEMON, None, True), (WAZUH_DB_DAEMON, None, True), (AUTHD_DAEMON, None, True)]
+monitored_sockets_params = [(MODULES_DAEMON, None, True), (SHIELDNET_DEFEND_DB_DAEMON, None, True), (AUTHD_DAEMON, None, True)]
 
 receiver_sockets, monitored_sockets = None, None  # Set in the fixtures
 
@@ -79,16 +79,16 @@ daemons_handler_configuration = {'all_daemons': True}
 
 # Tests
 @pytest.mark.parametrize('test_configuration,test_metadata', zip(test_configuration, test_metadata), ids=test_cases_ids)
-def test_ossec_auth_messages(test_configuration, test_metadata, set_wazuh_configuration,
+def test_ossec_auth_messages(test_configuration, test_metadata, set_shieldnet_defend_configuration,
                              truncate_monitored_files, configure_sockets_environment, daemons_handler,
                              wait_for_authd_startup, connect_to_sockets, set_up_groups):
     '''
     description:
-        Checks if when the `wazuh-authd` daemon receives different types of enrollment requests,
+        Checks if when the `shieldnet-defend-authd` daemon receives different types of enrollment requests,
         it responds appropriately to them. In this case, the enrollment requests are sent to
         an IP v4 network socket.
 
-    wazuh_min_version:
+    shieldnet_defend_min_version:
         4.2.0
 
     tier: 0
@@ -100,9 +100,9 @@ def test_ossec_auth_messages(test_configuration, test_metadata, set_wazuh_config
         - test_metadata:
             type: dict
             brief: Test case metadata.
-        - set_wazuh_configuration:
+        - set_shieldnet_defend_configuration:
             type: fixture
-            brief: Load basic wazuh configuration.
+            brief: Load basic shieldnetdefend configuration.
         - truncate_monitored_files:
             type: fixture
             brief: Truncate all the log files and json alerts files before and after the test execution.
@@ -114,7 +114,7 @@ def test_ossec_auth_messages(test_configuration, test_metadata, set_wazuh_config
             brief: Configure environment for sockets and MITM.
         - daemons_handler:
             type: fixture
-            brief: Restarts wazuh or a specific daemon passed.
+            brief: Restarts shieldnetdefend or a specific daemon passed.
         - wait_for_authd_startup:
             type: fixture
             brief: Waits until Authd is accepting connections.

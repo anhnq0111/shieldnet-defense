@@ -1,6 +1,6 @@
 /*
- * Wazuh Syscollector Module Configuration
- * Copyright (C) 2015, Wazuh Inc.
+ * ShieldnetDefend Syscollector Module Configuration
+ * Copyright (C) 2015, ShieldnetDefend Inc.
  * March 9, 2017.
  *
  * This program is free software; you can redistribute it
@@ -10,7 +10,7 @@
  */
 
 #ifdef ENABLE_SYSC
-#include "wazuh_modules/wmodules.h"
+#include "shieldnet_defend_modules/wmodules.h"
 
 static const char *XML_INTERVAL = "interval";
 static const char *XML_SCAN_ON_START = "scan_on_start";

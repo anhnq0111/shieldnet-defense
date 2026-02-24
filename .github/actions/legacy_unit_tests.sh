@@ -9,17 +9,17 @@ clean() {
     make clean -C src
 }
 
-build_wazuh_test_flags() {
+build_shieldnet_defend_test_flags() {
     local target=$1
-    echo "Building Wazuh for target: $target"
+    echo "Building ShieldnetDefend for target: $target"
     cd "$GITHUB_WORKSPACE"
     make deps -C src TARGET=${target} -j$(nproc)
     make -C src TARGET=${target} DEBUG=1 TEST=1 -j$(nproc)
 }
 
-build_wazuh_unit_tests() {
+build_shieldnet_defend_unit_tests() {
     local target=$1
-    echo "Building Wazuh Unit Tests for target: $target"
+    echo "Building ShieldnetDefend Unit Tests for target: $target"
     mkdir -p "$GITHUB_WORKSPACE/src/unit_tests/build"
     cd "$GITHUB_WORKSPACE/src/unit_tests/build"
     if [[ $target == "agent" ]]; then
@@ -32,9 +32,9 @@ build_wazuh_unit_tests() {
     make -j$(nproc)
 }
 
-run_wazuh_unit_tests() {
+run_shieldnet_defend_unit_tests() {
     local target=$1
-    echo "Running Wazuh Unit Tests for target: $target"
+    echo "Running ShieldnetDefend Unit Tests for target: $target"
     cd "$GITHUB_WORKSPACE/src/unit_tests/build"
     if [[ $target == "agent" ]]; then
         ctest --output-on-failure  > "test_results.txt" || true
@@ -91,9 +91,9 @@ main() {
     echo "Starting process for target: $target"
 
     clean
-    build_wazuh_test_flags $target
-    build_wazuh_unit_tests $target
-    run_wazuh_unit_tests $target
+    build_shieldnet_defend_test_flags $target
+    build_shieldnet_defend_unit_tests $target
+    run_shieldnet_defend_unit_tests $target
     format_display_test_results
     format_display_test_coverage $target
 }

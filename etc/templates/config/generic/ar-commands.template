@@ -5,8 +5,8 @@
   </command>
 
   <command>
-    <name>restart-wazuh</name>
-    <executable>restart-wazuh</executable>
+    <name>restart-shieldnet-defend</name>
+    <executable>restart-shieldnet-defend</executable>
   </command>
 
   <command>

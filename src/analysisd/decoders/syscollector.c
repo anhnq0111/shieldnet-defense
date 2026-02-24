@@ -1,5 +1,5 @@
 /*
-* Copyright (C) 2015, Wazuh Inc.
+* Copyright (C) 2015, ShieldnetDefend Inc.
 * August 30, 2017.
 *
 * This program is free software; you can redistribute it
@@ -20,10 +20,10 @@
 #include "string_op.h"
 #include "buffer_op.h"
 #include <time.h>
-#include "wazuhdb_op.h"
-#include "wazuh_db/wdb.h"
+#include "shieldnetdefenddb_op.h"
+#include "shieldnet_defend_db/wdb.h"
 
-#ifdef WAZUH_UNIT_TESTING
+#ifdef SHIELDNET_DEFEND_UNIT_TESTING
 #define STATIC
 #else
 #define STATIC static
@@ -297,49 +297,49 @@ int DecodeSyscollector(Eventinfo *lf,int *socket)
     fillData(lf,"type",msg_type);
     if (strcmp(msg_type, "port") == 0 || strcmp(msg_type, "port_end") == 0) {
         if (decode_port(lf, logJSON,socket) < 0) {
-            mdebug1("Unable to send ports information to Wazuh DB.");
+            mdebug1("Unable to send ports information to ShieldnetDefend DB.");
             cJSON_Delete (logJSON);
             return (0);
         }
     }
     else if (strcmp(msg_type, "program") == 0 || strcmp(msg_type, "program_end") == 0) {
         if (decode_package(lf, logJSON,socket) < 0) {
-            mdebug1("Unable to send packages information to Wazuh DB.");
+            mdebug1("Unable to send packages information to ShieldnetDefend DB.");
             cJSON_Delete (logJSON);
             return (0);
         }
     }
     else if (strcmp(msg_type, "hotfix") == 0 || strcmp(msg_type, "hotfix_end") == 0) {
         if (decode_hotfix(lf, logJSON, socket) < 0) {
-            mdebug1("Unable to send hotfixes information to Wazuh DB.");
+            mdebug1("Unable to send hotfixes information to ShieldnetDefend DB.");
             cJSON_Delete (logJSON);
             return (0);
         }
     }
     else if (strcmp(msg_type, "hardware") == 0) {
         if (decode_hardware(lf, logJSON,socket) < 0) {
-            mdebug1("Unable to send hardware information to Wazuh DB.");
+            mdebug1("Unable to send hardware information to ShieldnetDefend DB.");
             cJSON_Delete (logJSON);
             return (0);
         }
     }
     else if (strcmp(msg_type, "OS") == 0) {
         if (decode_osinfo(lf, logJSON,socket) < 0) {
-            mdebug1("Unable to send osinfo message to Wazuh DB.");
+            mdebug1("Unable to send osinfo message to ShieldnetDefend DB.");
             cJSON_Delete (logJSON);
             return (0);
         }
     }
     else if (strcmp(msg_type, "network") == 0 || strcmp(msg_type, "network_end") == 0) {
         if (decode_netinfo(lf, logJSON, socket) < 0) {
-            merror("Unable to send netinfo message to Wazuh DB.");
+            merror("Unable to send netinfo message to ShieldnetDefend DB.");
             cJSON_Delete (logJSON);
             return (0);
         }
     }
     else if (strcmp(msg_type, "process") == 0 || strcmp(msg_type, "process_end") == 0) {
         if (decode_process(lf, logJSON,socket) < 0) {
-            mdebug1("Unable to send processes information to Wazuh DB.");
+            mdebug1("Unable to send processes information to ShieldnetDefend DB.");
             cJSON_Delete (logJSON);
             return (0);
         }
@@ -2156,9 +2156,9 @@ static int decode_dbsync(Eventinfo * lf,   /* Event information */
                                                                                        data string. */
                         char *response = NULL;                                      /* Response is the string that will
                                                                                        contain the response from
-                                                                                       wazuh-db. */
+                                                                                       shieldnet-defend-db. */
                         char * msg = NULL;                                          /* Message is the string that will
-                                                                                       be sent to wazuh-db. */
+                                                                                       be sent to shieldnet-defend-db. */
 
                         os_calloc(OS_SIZE_1024, sizeof(char), response);
                         os_calloc(data_len + OS_SIZE_256, sizeof(char), msg);
@@ -2177,14 +2177,14 @@ static int decode_dbsync(Eventinfo * lf,   /* Event information */
 
                         if (ret_val == 0) {
                             if (strncmp(response, "err", 3) == 0) {
-                                /* If some error come to this point, it means that the error comes from wazuh-db. */
+                                /* If some error come to this point, it means that the error comes from shieldnet-defend-db. */
                                 mdebug1(A_QUERY_ERROR);
                             } else if (strncmp(response, "ok ", 3) != 0) {
                                 /* If the response is not ok, it means that the response is invalid. */
                                 merror(INVALID_RESPONSE);
                             }
                         } else {
-                            /* If the return value is not 0, it means that the query to wazuh-db failed. */
+                            /* If the return value is not 0, it means that the query to shieldnet-defend-db failed. */
                             mdebug2(WDBC_QUERY_EX_ERROR);
                         }
 

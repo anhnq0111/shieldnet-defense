@@ -1,6 +1,6 @@
 /*
- * Wazuh - Content Migration tests
- * Copyright (C) 2015, Wazuh Inc.
+ * ShieldnetDefend - Content Migration tests
+ * Copyright (C) 2015, ShieldnetDefend Inc.
  * March 03, 2023.
  *
  */

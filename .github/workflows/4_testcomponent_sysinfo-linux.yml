@@ -7,7 +7,7 @@ on:
         - ".github/workflows/4_testcomponent_sysinfo-linux.yml"
         - "src/data_provider/**"
         - "src/shared_modules/**"
-        - "src/wazuh_modules/syscollector/**"
+        - "src/shieldnet_defend_modules/syscollector/**"
         - "src/Makefile"
 
 jobs:
@@ -20,8 +20,8 @@ jobs:
           submodules: recursive
       - name: "Install a compatible CMake"
         uses: ./.github/actions/reinstall_cmake
-      # Build wazuh agent for linux.
-      - name: Build wazuh agent for linux
+      # Build shieldnetdefend agent for linux.
+      - name: Build shieldnetdefend agent for linux
         run: |
           make deps -C src TARGET=agent -j2
           make -C src build_syscollector TARGET=agent -j2

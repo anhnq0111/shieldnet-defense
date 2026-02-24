@@ -1,5 +1,5 @@
-# Copyright (C) 2015, Wazuh Inc.
-# Created by Wazuh, Inc. <info@wazuh.com>.
+# Copyright (C) 2015, ShieldnetDefend Inc.
+# Created by ShieldnetDefend, Inc. <info@shieldnetdefend.com>.
 # This program is a free software; you can redistribute it and/or modify it under the terms of GPLv2
 import asyncio
 import contextlib
@@ -9,10 +9,10 @@ from functools import wraps
 from typing import Callable
 
 from connexion import ConnexionMiddleware
-from wazuh.core.common import get_installation_uid
-from wazuh.core.cluster.utils import running_in_master_node
-from wazuh.core.configuration import update_check_is_enabled
-from wazuh.core.manager import query_update_check_service
+from shieldnetdefend.core.common import get_installation_uid
+from shieldnetdefend.core.cluster.utils import running_in_master_node
+from shieldnetdefend.core.configuration import update_check_is_enabled
+from shieldnetdefend.core.manager import query_update_check_service
 
 from api import configuration
 from api.constants import (
@@ -23,7 +23,7 @@ from api.constants import (
 
 ONE_DAY_SLEEP = 60*60*24
 
-logger = logging.getLogger('wazuh-api')
+logger = logging.getLogger('shieldnet-defend-api')
 
 cti_context = {}
 
@@ -95,4 +95,4 @@ async def lifespan_handler(_: ConnexionMiddleware):
         task.cancel()
         await task
 
-    logger.info('Shutdown wazuh-apid server.')
+    logger.info('Shutdown shieldnet-defend-apid server.')
