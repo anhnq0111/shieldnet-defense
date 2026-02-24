@@ -1191,7 +1191,7 @@ InstallLocal()
     ${INSTALL} -d -m 0770 -o ${WAZUH_USER} -g ${WAZUH_GROUP} ${INSTALLDIR}/queue/tasks
 
     ### Install Python
-    ${MAKEBIN} wpython INSTALLDIR=${INSTALLDIR} TARGET=${INSTYPE}
+    ${MAKEBIN} wpython INSTALLDIR=${INSTALLDIR} TARGET=${INSTYPE} || { echo "ERROR: Python package installation failed." >&2; exit 1; }
 
     ${MAKEBIN} --quiet -C ../framework install INSTALLDIR=${INSTALLDIR}
 
