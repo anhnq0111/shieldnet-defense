@@ -1,4 +1,4 @@
-name: ShieldNet Linux Debian Package Builder
+name: ShieldNet Linux Debian Package Builder for ARM64
 
 on:
   pull_request:
@@ -6,11 +6,11 @@ on:
       - main
   push:
     tags:
-      - debian-pkg-manager-v*
+      - debian-pkg-manager-arm64-v*
 
 jobs:
   build-deb:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04-arm64
     steps:
       - uses: actions/checkout@v4
         with:
