@@ -1,0 +1,37 @@
+name: ShieldNet Linux Debian Package Builder
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    tags:
+      - debian-pkg-v*
+
+jobs:
+  build-deb:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: White-label
+        run: |
+          ./white-lable.sh
+
+      - name: Setup Docker
+        id: setup-docker
+        uses: docker/setup-docker-action@v4
+
+      - name: build-pkg
+        id: build-shieldnet
+        run: |
+          cd packages
+          sudo ./generate_package.sh -t agent -a amd64 -s ~/shieldnet-linux-pkg-amd64 --system deb
+
+      - name: Upload packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: ShieldNet Linux Packages
+          path: ~/shieldnet-linux*
