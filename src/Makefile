@@ -2516,6 +2516,13 @@ else
 	cp external/${WPYTHON_TAR} ${WPYTHON_DIR}/${WPYTHON_TAR} && ${TAR} ${WPYTHON_DIR}/${WPYTHON_TAR} -C ${WPYTHON_DIR} && rm -rf ${WPYTHON_DIR}/${WPYTHON_TAR}
 endif
 	find ${WPYTHON_DIR} -name "*${WLIBPYTHON}" -exec ln -f {} ${INSTALLDIR}/lib/${WLIBPYTHON} \;
+	@# Create compat symlinks for pre-built Python binary (linked against original lib name)
+	@if [ -f ${WPYTHON_DIR}/bin/python3 ] && [ -f ${INSTALLDIR}/lib/${WAZUHEXT_LIB} ]; then \
+		for dep in $$(ldd ${WPYTHON_DIR}/bin/python3 2>/dev/null | grep 'not found' | awk '{print $$1}'); do \
+			echo "Creating compat symlink: $$dep -> ${WAZUHEXT_LIB}"; \
+			ln -sf ${WAZUHEXT_LIB} ${INSTALLDIR}/lib/$$dep; \
+		done; \
+	fi
 
 python_dependencies := requirements.txt
 
